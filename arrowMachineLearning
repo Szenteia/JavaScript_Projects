@@ -1,0 +1,135 @@
+import bpy
+import math
+import random
+
+# Function to create the dartboard
+def create_dartboard():
+    # Parameters
+    num_segments = 20
+    num_rings = 4
+    r_outer = 1.0
+    r_inner = 0.5
+
+    # Colors for segments
+    colors = [(0, 0, 0, 1), (1, 1, 1, 1), (0, 0, 0, 1)]  # Black, white, black
+
+    # Create vertices and faces
+    vertices = []
+    edges = []
+    faces = []
+    vertex_index = 0
+    for ring in range(num_rings):
+        for segment in range(num_segments):
+            angle1 = 2 * math.pi * (segment / num_segments)
+            angle2 = 2 * math.pi * ((segment + 1) / num_segments)
+
+            x_outer1 = r_outer * math.cos(angle1)
+            y_outer1 = r_outer * math.sin(angle1)
+            x_outer2 = r_outer * math.cos(angle2)
+            y_outer2 = r_outer * math.sin(angle2)
+
+            x_inner1 = r_inner * math.cos(angle1)
+            y_inner1 = r_inner * math.sin(angle1)
+            x_inner2 = r_inner * math.cos(angle2)
+            y_inner2 = r_inner * math.sin(angle2)
+
+            vertices.extend([(x_outer1, y_outer1, 0), (x_outer2, y_outer2, 0),
+                              (x_inner1, y_inner1, 0), (x_inner2, y_inner2, 0)])
+
+            if segment % 2 == 0:  # Add faces
+                faces.append((vertex_index, vertex_index + 1, vertex_index + 3, vertex_index + 2))
+            else:
+                faces.append((vertex_index + 1, vertex_index, vertex_index + 2, vertex_index + 3))
+
+            vertex_index += 4
+
+    # Create mesh
+    mesh = bpy.data.meshes.new("DartboardMesh")
+    mesh.from_pydata(vertices, edges, faces)
+
+    # Create object
+    dartboard_obj = bpy.data.objects.new("Dartboard", mesh)
+    bpy.context.collection.objects.link(dartboard_obj)
+
+    # Set materials for each face
+    for i, face in enumerate(mesh.polygons):
+        material_index = i % 3  # Alternate black, white, black
+        mat = bpy.data.materials.new(name=f"Material_{material_index}")
+        mat.diffuse_color = colors[material_index]
+        mesh.materials.append(mat)
+        face.material_index = material_index
+
+# Clear existing objects
+bpy.ops.object.select_all(action='DESELECT')
+bpy.ops.object.select_by_type(type='MESH')
+bpy.ops.object.delete()
+
+# Create the dartboard
+create_dartboard()
+# Function to set up the camera
+def setup_camera(location, rotation):
+    # Add camera object
+    bpy.ops.object.camera_add(location=location, rotation=rotation)
+    camera = bpy.context.object
+    camera.name = "Camera"
+    bpy.context.scene.camera = camera
+
+# Function to create arrow object
+def create_arrow():
+    bpy.ops.mesh.primitive_cube_add(size=0.1, location=bpy.context.scene.camera.location)
+    arrow = bpy.context.object
+    arrow.name = "Arrow"
+    bpy.context.collection.objects.link(arrow)
+    return arrow
+
+# Function to shoot arrow
+def shoot_arrow(arrow, direction, frame):
+    force = random.uniform(1, 10)  # Adjust as needed
+    arrow.location = bpy.context.scene.camera.location  # Reset arrow position
+    arrow.rotation_euler = direction.to_track_quat('Z', 'Y').to_euler()
+    arrow.keyframe_insert(data_path="location", frame=frame)
+    arrow.location = direction * force
+    arrow.keyframe_insert(data_path="location", frame=frame + 1)
+
+# Create the dartboard
+create_dartboard()
+
+# Set up the camera
+setup_camera((0, -10, 2), (math.radians(90), 0, 0))
+
+# Create arrow
+arrow = create_arrow()
+
+# Bullseye position (Assuming you have a specific coordinate for bullseye)
+bullseye_pos = (0, 0, 0)  # Update this with actual bullseye position
+
+# Animate arrow shots
+frame = 1
+while True:
+    # Set direction from camera to dartboard
+    direction = bpy.data.objects["Dartboard"].location - bpy.context.scene.camera.location
+    # Normalize direction vector
+    direction.normalize()
+    
+    # Shoot arrow
+    shoot_arrow(arrow, direction, frame)
+    frame += 2  # Increment frame for the next arrow shot
+    
+    # Calculate distance from dartboard to bullseye
+    hit_pos = arrow.location  # Assuming this gives the position where arrow hits dartboard
+    distance_to_bullseye = ((hit_pos[0] - bullseye_pos[0])**2 + (hit_pos[1] - bullseye_pos[1])**2 + (hit_pos[2] - bullseye_pos[2])**2)**0.5
+    
+    # Adjust aim
+    if distance_to_bullseye > 0.1:  # Adjust threshold as needed
+        # Calculate new direction towards bullseye
+        direction = (
+            (bullseye_pos[0] - hit_pos[0]) / distance_to_bullseye,
+            (bullseye_pos[1] - hit_pos[1]) / distance_to_bullseye,
+            (bullseye_pos[2] - hit_pos[2]) / distance_to_bullseye
+        )
+    else:
+        print("Bullseye hit!")
+        break  # Exit loop if bullseye is hit
+
+# Set end frame of animation
+bpy.context.scene.frame_end = frame + 1
