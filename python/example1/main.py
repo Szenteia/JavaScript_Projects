@@ -20,6 +20,12 @@ drone_rect = drone_image.get_rect()
 drone_rect.centerx = screen_width // 2
 drone_rect.centery = screen_height // 2
 
+# Load grenade image
+grenade_image = pygame.image.load("grenade.png")  # Replace "grenade.png" with the filename of your grenade image
+# Resize the grenade image
+grenade_size = (100, 100)  # Adjust the size as needed
+grenade_image = pygame.transform.scale(grenade_image, grenade_size)
+
 # Set up colors
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
@@ -38,9 +44,14 @@ prev_drone_x = drone_rect.centerx
 def draw_trench_line(start_x, end_x, y, width):
     pygame.draw.line(screen, GRAY, (start_x, y), (end_x, y), width)
     pygame.draw.line(screen, GRAY, (start_x, y + 5), (end_x, y + 5), width)
-    # Generate trench lines positions
+
+# Function to drop grenades
+def drop_grenade(drone_rect):
+    screen.blit(grenade_image, (drone_rect.centerx - grenade_size[0] / 2, drone_rect.centery - grenade_size[1] / 2))  # Adjust position to center the grenade image
+
+# Generate trench lines positions
 trench_lines = []
-for _ in range(20):
+for _ in range(25):
     start_x = random.randint(0, screen_width)
     end_x = start_x + random.randint(50, 150)
     y = random.randint(screen_height * 2 // 3, screen_height - 10)
@@ -53,6 +64,10 @@ while is_running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             is_running = False
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE:  # Drop grenade when spacebar is pressed
+                drop_grenade(drone_rect)  # Pass the drone's position to drop_grenade function
+
 
     # Get the state of all keyboard keys
     keys = pygame.key.get_pressed()
