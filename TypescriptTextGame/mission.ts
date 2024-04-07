@@ -1,3 +1,4 @@
+import { Squad } from "./squad";
 // Class for Mission
 export class Mission {
     // Start mission function
