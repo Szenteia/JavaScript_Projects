@@ -36,9 +36,9 @@ def create_bullet(x, y):
 
 # Timer for enemy and bullet creation
 enemy_timer = 0
-enemy_creation_interval = 150   # Create a new enemy every 60 frames
+enemy_creation_interval = 2100   # Create a new enemy every 60 frames
 bullet_timer = 0
-bullet_creation_interval = 100  # Create a new bullet every 10 frames
+bullet_creation_interval = 1000  # Create a new bullet every 10 frames
 
 # Game loop
 running = True
