@@ -13,18 +13,17 @@ title.addEventListener('click', () => {
     title.style.display = 'none';
 }
 );
-
+const rulesHolder = document.getElementById('rules-holder');
 const rulesDiv = document.getElementById('rules');
 const rulesButton = document.createElement('button');
 rulesButton.innerText = 'Rules';
 rulesButton.addEventListener('click', () => {
-    if (rulesDiv.style.display === 'none') {
-        rulesDiv.style.display = 'block';
-    } else {
-        rulesDiv.style.display = 'none';
-    }
+    rulesDiv.style.display = 'flex';
+    rulesButton.style.display = 'block';
 });
-gameDiv.appendChild(rulesButton);
+
+rulesHolder.appendChild(rulesButton);
+
 possibleChoices.forEach(possibleChoice => possibleChoice.addEventListener('click', (e) => {
     userChoice = e.target.id;
     userChoiceDisplay.innerHTML = userChoice;

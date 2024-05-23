@@ -37,3 +37,17 @@ body {
     flex-direction: column;
 
 }
+#rules-holder {
+    position: fixed;
+    top: 0;
+    right: 0;
+    background-color: #774040;
+    border-radius: 10px;
+    padding: 20px;
+    border-style: dotted;
+    border-color: beige;
+    color: beige;
+    font-weight: bold;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin-bottom: 20px;
+}
