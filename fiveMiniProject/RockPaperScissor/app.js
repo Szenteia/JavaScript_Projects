@@ -5,6 +5,14 @@ const possibleChoices = document.querySelectorAll('button');
 let userChoice;
 let computerChoice;
 
+const title = document.getElementById('title');
+const otherDivs = document.querySelectorAll('game');
+
+title.addEventListener('click', () => {
+    otherDivs.forEach(div => {
+        div.style.display = 'block';
+    });
+});
 possibleChoices.forEach(possibleChoice => possibleChoice.addEventListener('click', (e) => {
     userChoice = e.target.id;
     userChoiceDisplay.innerHTML = userChoice;
