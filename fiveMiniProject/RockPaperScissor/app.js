@@ -6,13 +6,25 @@ let userChoice;
 let computerChoice;
 
 const title = document.getElementById('title');
-const otherDivs = document.querySelectorAll('game');
+const gameDiv = document.getElementById('game');
 
 title.addEventListener('click', () => {
-    otherDivs.forEach(div => {
-        div.style.display = 'block';
-    });
+    gameDiv.style.display = 'flex';
+    title.style.display = 'none';
+}
+);
+
+const rulesDiv = document.getElementById('rules');
+const rulesButton = document.createElement('button');
+rulesButton.innerText = 'Rules';
+rulesButton.addEventListener('click', () => {
+    if (rulesDiv.style.display === 'none') {
+        rulesDiv.style.display = 'block';
+    } else {
+        rulesDiv.style.display = 'none';
+    }
 });
+gameDiv.appendChild(rulesButton);
 possibleChoices.forEach(possibleChoice => possibleChoice.addEventListener('click', (e) => {
     userChoice = e.target.id;
     userChoiceDisplay.innerHTML = userChoice;

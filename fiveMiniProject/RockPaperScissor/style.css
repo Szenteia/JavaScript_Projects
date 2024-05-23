@@ -3,8 +3,16 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
+    flex-direction: column;
 }
-
+#title {
+    font-size: 1rem;
+    background-color:#774040;
+    margin-bottom: 20px;
+    color: beige;
+    font-weight: bold;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
 #rules {
     display: flex;
     flex-direction: column;
@@ -14,11 +22,18 @@ body {
     padding: 20px;
     border-style: dotted;
     border-color: beige;
+    color: beige;
+    font-weight: bold;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin-bottom: 20px;
 
 }
 
 #game {
-    background-color: beige; /* Default background color */
+    background-color: #774040; /* Default background color */
     border-radius: 10px;
     display: none;
+    padding: 20px;
+    flex-direction: column;
+
 }
