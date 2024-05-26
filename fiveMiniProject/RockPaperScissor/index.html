@@ -1,40 +1,36 @@
 <!DOCTYPE html>
-<html lang="eng" dir="ltr">
+<html lang="en" dir="ltr">
 <head>
     <title>My Rock Paper Scissors Game</title>
     <link rel="stylesheet" href="style.css">
 </head>
-</head>
-    <body>
-    <button id="title">Welcome to Rock Paper Scissors Lizard Game! </button>
-    <div id="rules">
-        <h2>Rules:</h2>
-        <p>Scissors cuts Paper</p>
-        <p>Paper covers Rock</p>
-        <p>Rock crushes Lizard</p>
-        <p>Lizard poisons Spock</p>
-        <p>Spock smashes Scissors</p>
-        <p>Scissors decapitates Lizard</p>
-        <p>Lizard eats Paper</p>
-        <p>Paper disproves Spock</p>
-        <p>Spock vaporizes Rock</p>
-        <p>Rock crushes Scissors</p>
+<body>
+    <button id="title">Welcome to Rock Paper Scissors Lizard Spock Game!</button>
+    <div id="rules-holder">
+        <div id="rules">
+            <h2>Rules:</h2>
+            <p>Scissors cuts Paper</p>
+            <p>Paper covers Rock</p>
+            <p>Rock crushes Lizard</p>
+            <p>Lizard poisons Spock</p>
+            <p>Spock smashes Scissors</p>
+            <p>Scissors decapitates Lizard</p>
+            <p>Lizard eats Paper</p>
+            <p>Paper disproves Spock</p>
+            <p>Spock vaporizes Rock</p>
+            <p>Rock crushes Scissors</p>
+        </div>
     </div>
     <div id="game">
-    <h2>Computer's Choice: <span id="computer-choice"></span></h2>
-    <h2>Your Choice: <span id="user-choice"></span></h2>
-    <h2>Result: <span id="result"></span></h2>
-
-    <button className="button" id="rock">Rock</button>
-    <button className="button" id="paper">Paper</button>
-    <button className="button" id="scissors">Scissors</button>
-    <button className="button" id="lizard">Lizard</button>
-    <button className="button" id="spock">Spock</button>
-    </div>
-    <div id="rule-container">
-        <span id="rules-holder"></span>
+        <h2>Computer's Choice: <span id="computer-choice"></span></h2>
+        <h2>Your Choice: <span id="user-choice"></span></h2>
+        <h2>Result: <span id="result"></span></h2>
+        <button class="game-button" id="rock">Rock</button>
+        <button class="game-button" id="paper">Paper</button>
+        <button class="game-button" id="scissors">Scissors</button>
+        <button class="game-button" id="lizard">Lizard</button>
+        <button class="game-button" id="spock">Spock</button>
     </div>
     <script src="app.js" charset="utf-8"></script>
-    </body>
-
+</body>
 </html>

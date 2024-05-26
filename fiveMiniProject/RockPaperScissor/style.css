@@ -2,7 +2,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    height: 90vh;
     flex-direction: column;
 }
 #title {
@@ -35,6 +35,9 @@ body {
     display: none;
     padding: 20px;
     flex-direction: column;
+    color: beige;
+    font-weight: bold;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 
 }
 #rules-holder {
@@ -50,4 +53,8 @@ body {
     font-weight: bold;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin-bottom: 20px;
+}
+
+button{
+    margin: 2px;
 }
