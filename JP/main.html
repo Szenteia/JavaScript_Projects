@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Űrrobot Programozás</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1c1c1c;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        #game-container {
+            width: 80%;
+            height: 80%;
+            background-color: #333;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        #game-view {
+            flex-grow: 1;
+            background-color: #111;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #code-editor {
+            background-color: #222;
+            padding: 10px;
+            border-radius: 10px;
+            color: #fff;
+            height: 150px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        #run-button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #28a745;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            color: #fff;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <div id="game-view">
+            <!-- Itt fog megjelenni az űrrobot és a játék területe -->
+            <canvas id="gameCanvas" width="600" height="400"></canvas>
+        </div>
+        <textarea id="code-editor" placeholder="Írd be a kódot ide..."></textarea>
+        <button id="run-button">Futtatás</button>
+    </div>
+
+    <script>
+        // Elsőként létrehozzuk a játék canvas-át és annak kontextusát
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Robot pozíciójának és sebességének beállítása
+        let robot = {
+            x: 50,
+            y: canvas.height / 2 - 25,
+            width: 50,
+            height: 50,
+            speed: 0
+        };
+
+        let target = {
+            x: canvas.width - 100,
+            y: canvas.height / 2-25,
+            width: 50,
+            height: 50
+        };
+        // Robot, Target rajzolása a canvasra
+        function drawRobot() {
+            ctx.fillStyle = 'cyan';
+            ctx.fillRect(robot.x, robot.y, robot.width, robot.height);
+        }
+        function drawTarget() {
+            ctx.fillStyle = "yellow";
+            ctx.fillRect(target.x, target.y, target.width, target.height);
+        }
+
+        // A canvas törlése és a robot újrarajzolása
+        function updateGame() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawRobot();
+            drawTarget();
+            checkCollision();
+        }
+        // Ütközés ellenőrzése
+function checkCollision() {
+    if (
+        robot.x < target.x + target.width &&
+        robot.x + robot.width > target.x &&
+        robot.y < target.y + target.height &&
+        robot.y + robot.height > target.y
+    ) {
+        alert("Gratulálok, elérted a célpontot!");
+        resetGame();
+    }
+}
+
+// Játék visszaállítása a kezdeti állapotba
+function resetGame() {
+    robot.x = 50;
+    robot.speed = 0;
+    updateGame();
+}
+
+        // Kód futtatása a szerkesztőből
+        document.getElementById('run-button').addEventListener('click', () => {
+            const userCode = document.getElementById('code-editor').value;
+            try {
+                eval(userCode);  // A játékos által beírt kód végrehajtása
+                robot.x += robot.speed; // A robot mozgatása a kódban meghatározott sebességgel
+                updateGame();
+            } catch (e) {
+                alert('Hiba történt a kód futtatása közben: ' + e.message);
+            }
+        });
+
+        // Játék indítása: az első kirajzolás
+        updateGame();
+    </script>
+</body>
+</html>
