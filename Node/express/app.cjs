@@ -1,3 +1,4 @@
+const Joi = require('joi');
 const express = require('express');
 //create an express application
 const app = express();
@@ -28,8 +29,19 @@ app.get("/api/courses/:id", (req,res) =>
   if (!course) res.status(404).send('The course with the given ID was not found');
   res.send(course);
 });
-
+//add a new course, using Joi for validation
 app.post("/api/courses", (req,res) => {
+    const schema = Joi.object({
+        name: Joi.string().min(3).required()
+    });
+
+    const result = schema.validate(req.body);
+
+    if (result.error)
+    {
+        res.status(400).send(result.error.details[0].message);
+        return; 
+    }
     const course = {
         id: courses.length + 1,
         name: req.body.name
