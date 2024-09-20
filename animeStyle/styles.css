@@ -16,20 +16,34 @@
   /* Header Styling */
   header {
     background-color: #121825;
-    padding: 10px 20px;
+;
     position: fixed; /* Keeps the navbar fixed at the top */
     top: 0;
     width: 100%;
     z-index: 10; /* Ensures the navbar stays on top */
     height: 60px; /* Set a fixed height for the navbar */
-  }
-  
+  }  
   .logo {
-    color: #fff;
+    color: yellow; /* Initial color */
     font-size: 24px;
     font-weight: bold;
+    animation: colorChange 4.5s infinite; /* Animation duration 4.5s (1.5s per color change) */
+  }  
+  @keyframes colorChange {
+    0% {
+      color: yellow;
+    }
+    33% {
+      color: pink;
+    }
+    66% {
+      color: green;
+    }
+    100% {
+      color: yellow;
+    }
   }
-  
+
   .nav-links {
     list-style: none;
     display: flex;
@@ -52,9 +66,10 @@
   .nav-links a:hover {
     color: #f9d423;
   }
-/* Hero Section with Full-Screen Background */
+/* Hero Section */
 .hero-section {
     position: relative;
+    padding-top: 100px;
     height: calc(100vh - 60px); /* Adjust for navbar */
     padding-top: 60px;
     background-image: linear-gradient(
@@ -92,7 +107,7 @@
     background-size: cover; /* Ensure the image fully covers the screen */
     background-position: center;
     z-index: 1;
-    background-attachment: fixed; /* Keep the image fixed for parallax effect */
+    background-attachment:fixed; /* Keep the image fixed for parallax effect */
   }
   .hero-content {
     position: relative; /* Ensure it's above any background layers */
