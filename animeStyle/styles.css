@@ -1,10 +1,9 @@
-/* Reset and Basic Styling */
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
   }
-  
   body {
     margin: 0;
     padding: 0;
@@ -12,8 +11,6 @@
     background-color: #f0f0f0;
     color: #333;
   }
-  
-  /* Header Styling */
   header {
     background-color: #121825;
 ;
@@ -21,7 +18,7 @@
     top: 0;
     width: 100%;
     z-index: 10; /* Ensures the navbar stays on top */
-    height: 60px; /* Set a fixed height for the navbar */
+    height: 50px; /* Set a fixed height for the navbar */
   }  
   .logo {
     color: yellow; /* Initial color */
@@ -50,7 +47,8 @@
     list-style: none;
     display: flex;
     justify-content: flex-end;
-    align-items: center;
+    align-items: top;
+    margin: -10px;
 
   }
   
