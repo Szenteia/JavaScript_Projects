@@ -1,0 +1,155 @@
+/* Reset and Basic Styling */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f0f0f0;
+    color: #333;
+  }
+  
+  /* Header Styling */
+  header {
+    background-color: #2e51a2;
+    padding: 10px 20px;
+  }
+  
+  .logo {
+    color: #fff;
+    font-size: 24px;
+    font-weight: bold;
+  }
+  
+  .nav-links {
+    list-style: none;
+    display: flex;
+    justify-content: flex-end;
+  }
+  
+  .nav-links li {
+    margin: 0 15px;
+  }
+  
+  .nav-links a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 18px;
+    transition: color 0.3s;
+  }
+  
+  .nav-links a:hover {
+    color: #f9d423;
+  }
+  
+  /* Hero Section Styling */
+  .hero-section {
+    height: 100vh;
+    background-image: linear-gradient(
+        rgba(0, 0, 0, 0.7), 
+        rgba(0, 0, 0, 0.7)
+      ), 
+      url('images/hero-background.jpg'); /* Replace with your image */
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    text-align: center;
+  }
+  
+  .hero-section h2 {
+    font-size: 48px;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
+  }
+  
+  .hero-section p {
+    font-size: 24px;
+    margin: 20px 0;
+  }
+  
+  .hero-btn {
+    padding: 10px 20px;
+    background-color: #f9d423;
+    color: #333;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 18px;
+    transition: background-color 0.3s;
+  }
+  
+  .hero-btn:hover {
+    background-color: #eabc14;
+  }
+  
+  /* About Section with Hidden Scrollbar and Horizontal Scroll */
+.about-section {
+    overflow: hidden;
+    padding: 20px;
+    background-color: #fff;
+    position: relative;
+  }
+  
+  .about-wrapper {
+    display: flex;
+    transform: translateX(0);
+    transition: transform 0.5s ease; /* Smooth transition */
+  }
+  
+  .about-item {
+    flex: 0 0 100vw; /* Each item takes the full viewport width */
+    padding: 20px;
+    margin-right: 20px;
+    background-color: #f5f5f5;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .about-item h2 {
+    font-size: 36px;
+    margin-bottom: 10px;
+  }
+  
+  .about-item p {
+    font-size: 18px;
+    color: #333;
+  }
+  /*Gallery Sections */
+  section {
+    padding: 60px 20px;
+    text-align: center;
+  }
+  
+  section#about {
+    background-color: #fff;
+  }
+  
+  section#gallery {
+    background-color: #eaeaea;
+  }
+  
+  .image-gallery {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+  }
+  
+  .image-gallery img {
+    width: 300px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 10px;
+  }
+  
+  /* Footer Styling */
+  footer {
+    background-color: #2e51a2;
+    color: #fff;
+    padding: 20px;
+    text-align: center;
+  }
+  
