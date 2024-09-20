@@ -48,3 +48,19 @@ aboutSection.addEventListener('wheel', (event) => {
   // Apply the translation based on the current scroll amount
   aboutWrapper.style.transform = `translateX(-${scrollAmount}px)`;
 });
+
+window.addEventListener('scroll', () => {
+  const heroSection = document.querySelector('.hero-section');
+  const scrollPosition = window.scrollY;
+  
+  // Change background image when scroll passes 300px
+  if (scrollPosition > 100) {
+    heroSection.classList.add('demon');
+  } else {
+    heroSection.classList.remove('demon');
+  }
+
+  // Parallax effect: Move background down slightly on scroll
+  const parallaxValue = scrollPosition * 0.5; // Adjust speed by changing multiplier
+  heroSection.style.backgroundPositionY = `${parallaxValue}px`;
+});

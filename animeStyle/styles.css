@@ -6,6 +6,8 @@
   }
   
   body {
+    margin: 0;
+    padding: 0;
     font-family: 'Arial', sans-serif;
     background-color: #f0f0f0;
     color: #333;
@@ -13,8 +15,13 @@
   
   /* Header Styling */
   header {
-    background-color: #2e51a2;
+    background-color: #121825;
     padding: 10px 20px;
+    position: fixed; /* Keeps the navbar fixed at the top */
+    top: 0;
+    width: 100%;
+    z-index: 10; /* Ensures the navbar stays on top */
+    height: 60px; /* Set a fixed height for the navbar */
   }
   
   .logo {
@@ -27,6 +34,8 @@
     list-style: none;
     display: flex;
     justify-content: flex-end;
+    align-items: center;
+
   }
   
   .nav-links li {
@@ -43,36 +52,65 @@
   .nav-links a:hover {
     color: #f9d423;
   }
-  
-  /* Hero Section Styling */
-  .hero-section {
-    height: 100vh;
+/* Hero Section with Full-Screen Background */
+.hero-section {
+    position: relative;
+    height: calc(100vh - 60px); /* Adjust for navbar */
+    padding-top: 60px;
     background-image: linear-gradient(
-        rgba(0, 0, 0, 0.7), 
+        rgba(0, 0, 0, 0.7),
         rgba(0, 0, 0, 0.7)
-      ), 
-      url('images/hero-background.jpg'); /* Replace with your image */
+      ),
+      url('images/hero-background.jpg');
     background-size: cover;
+    background-repeat: no-repeat;
     background-position: center;
     display: flex;
     align-items: center;
     justify-content: center;
     color: #fff;
     text-align: center;
+    transition: background-image 3s ease-in-out;
+  }  
+  /* This class will be applied when we scroll down */
+  .hero-section.demon {
+    background-image: linear-gradient(
+        rgba(0, 0, 0, 0.7),
+        rgba(0, 0, 0, 0.7)
+      ),
+      url('images/demon-background.jpg'); /* New background */
   }
   
+  .hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: inherit;
+    background-size: cover; /* Ensure the image fully covers the screen */
+    background-position: center;
+    z-index: 1;
+    background-attachment: fixed; /* Keep the image fixed for parallax effect */
+  }
+  .hero-content {
+    position: relative; /* Ensure it's above any background layers */
+    z-index: 2; /* Make sure it's above the ::before overlay */
+  }
   .hero-section h2 {
     font-size: 48px;
-    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
+    color: #fff;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7); /* Add text shadow for better readability */
   }
-  
   .hero-section p {
     font-size: 24px;
-    margin: 20px 0;
+    color: #fff;
+    margin-top: 20px;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7); /* Add text shadow for better readability */
   }
-  
   .hero-btn {
-    padding: 10px 20px;
+
     background-color: #f9d423;
     color: #333;
     border-radius: 5px;
