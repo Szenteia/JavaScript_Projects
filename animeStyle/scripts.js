@@ -1,28 +1,28 @@
 // Smooth scrolling effect for navigation
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-      e.preventDefault();
-      document.querySelector(this.getAttribute('href')).scrollIntoView({
-        behavior: 'smooth'
-      });
+  anchor.addEventListener('click', function (e) {
+    e.preventDefault();
+    document.querySelector(this.getAttribute('href')).scrollIntoView({
+      behavior: 'smooth'
     });
   });
-  
-  // Simple gallery hover effect
-  const galleryImages = document.querySelectorAll('.image-gallery img');
-  
-  galleryImages.forEach(image => {
-    image.addEventListener('mouseover', () => {
-      image.style.transform = 'scale(1.1)';
-      image.style.transition = 'transform 0.5s ease';
-    });
-  
-    image.addEventListener('mouseout', () => {
-      image.style.transform = 'scale(1)';
-    });
+});
+
+// Simple gallery hover effect
+const galleryImages = document.querySelectorAll('.image-gallery img');
+
+galleryImages.forEach(image => {
+  image.addEventListener('mouseover', () => {
+    image.style.transform = 'scale(1.1)';
+    image.style.transition = 'transform 0.5s ease';
   });
-  
-  // JavaScript to handle horizontal scroll on vertical scroll
+
+  image.addEventListener('mouseout', () => {
+    image.style.transform = 'scale(1)';
+  });
+});
+
+// JavaScript to handle horizontal scroll on vertical scroll
 let scrollAmount = 0;
 const aboutSection = document.querySelector('.about-section');
 const aboutWrapper = document.querySelector('.about-wrapper');
@@ -37,7 +37,7 @@ aboutSection.addEventListener('wheel', (event) => {
 
   // Adjust the scroll amount based on the wheel delta
   scrollAmount += event.deltaY;
-  
+
   // Limit the scroll amount to the maximum scrollable width
   if (scrollAmount < 0) {
     scrollAmount = 0;
@@ -52,7 +52,7 @@ aboutSection.addEventListener('wheel', (event) => {
 window.addEventListener('scroll', () => {
   const heroSection = document.querySelector('.hero-section');
   const scrollPosition = window.scrollY;
-  
+
   // Change background image when scroll passes 300px
   if (scrollPosition > 100) {
     heroSection.classList.add('demon');
@@ -64,3 +64,33 @@ window.addEventListener('scroll', () => {
   const parallaxValue = scrollPosition * 0.5; // Adjust speed by changing multiplier
   heroSection.style.backgroundPositionY = `${parallaxValue}px`;
 });
+
+// Function to fetch currently airing anime and display them
+async function fetchCurrentlyAiringAnime() {
+  try {
+    const response = await fetch('https://api.jikan.moe/v4/seasons/now');
+    const data = await response.json();
+
+    // Get the container element where the anime list will be displayed
+    const gallery = document.querySelector('.image-gallery');
+    gallery.innerHTML = ''; // Clear any existing content
+
+    // Loop through the anime data and create elements to display
+    data.data.forEach(anime => {
+      const animeElement = document.createElement('div');
+      animeElement.classList.add('anime-item');
+      animeElement.innerHTML = `
+              <img src="${anime.images.jpg.image_url}" alt="${anime.title}" />
+              <h3>${anime.title}</h3>
+              <p>Episodes: ${anime.episodes || 'N/A'}</p>
+              <p>Score: ${anime.score || 'N/A'}</p>
+          `;
+      gallery.appendChild(animeElement);
+    });
+  } catch (error) {
+    console.error('Error fetching currently airing anime:', error);
+  }
+}
+
+// Call the function to fetch anime when the page loads
+window.addEventListener('load', fetchCurrentlyAiringAnime);
