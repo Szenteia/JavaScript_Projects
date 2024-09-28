@@ -193,18 +193,141 @@
     gap: 20px;
   }
   
-  .image-gallery img {
-    width: 300px;
-    height: 200px;
-    object-fit: cover;
+  .image-gallery {
+    display: flex;
+    flex-wrap: wrap; /* Allow the items to wrap onto multiple rows */
+    justify-content: center;
+    gap: 20px;
+    background-color: #121825; /* Same color as the header */
+    padding: 20px;
     border-radius: 10px;
-  }
-  
+    margin-top: 20px;
+}
+.anime-item {
+  background-color: #ffffff;
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  width: 250px;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.anime-item img {
+  border-radius: 8px;
+  max-width: 100%;
+  height: auto;
+}
+
+.anime-item h3 {
+  font-size: 18px;
+  margin: 10px 0;
+}
+
+.anime-item p {
+  font-size: 14px;
+  color: #333;
+}
+
+/* Hover effect for anime items */
+.anime-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+/* "Want to see more?" button styling */
+.load-more-btn {
+  background-color: #f9d423;
+  color: #333;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  margin: 20px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+.load-more-btn:hover {
+  background-color: #eabc14;
+}
+
+/* Sorting dropdown */
+.sort-dropdown {
+  background-color: #f9d423;
+  color: #333;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  margin: 20px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+.sort-dropdown:hover {
+  background-color: #eabc14;
+}
   /* Footer Styling */
   footer {
-    background-color: #2e51a2;
+    background-color: #121825;
     color: #fff;
     padding: 20px;
     text-align: center;
   }
-  
+  .load-more-btn {
+    background-color: #f9d423;
+    color: #333;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    margin: 20px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+.load-more-btn:hover {
+    background-color: #eabc14;
+}
+.favourites-list {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  padding: 20px;
+}
+
+.favourite-item {
+  background-color: #fff;
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  width: 200px;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.favourite-item img.favourite-img {
+  width: 100%;
+  border-radius: 8px;
+  height: auto;
+}
+
+.favourite-item h3 {
+  font-size: 18px;
+  margin: 10px 0;
+}
+
+.favourite-item button.remove-btn {
+  background-color: #ff6b6b;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.favourite-item button.remove-btn:hover {
+  background-color: #e14a4a;
+}  

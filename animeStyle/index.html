@@ -14,8 +14,8 @@
       <ul class="nav-links">
         <li><a href="#home">Home</a></li>
         <li><a href="#about">About</a></li>
-        <li><a href="#gallery">Gallery</a></li>
-        <li><a href="#contact">Contact</a></li>
+        <li><a href="#gallery">Running Shows</a></li>
+        <li><a href="#favourites">My Favourites</a></li>
       </ul>
     </nav>
   </header>
@@ -44,16 +44,29 @@
       </div>
     </div>
   </section>
-
+  <div style="text-align: center; margin: 20px;">
+    <label for="sort-dropdown" style="color: #333; font-size: 18px;">Sort by:</label>
+    <select id="sort-dropdown" class="sort-dropdown">
+      <option value="alphabetical">Alphabetical Order</option>
+      <option value="score">Score (High to Low)</option>
+    </select>
+  </div>
+  
   <section id="gallery">
-    <h2>Currentry Running Animes</h2>
+    <h2>Currently Running Animes</h2>
     <div class="image-gallery">
-      <!-- Anime images will go here -->
+      <!-- Anime images will be dynamically inserted here -->
     </div>
+  </section>
+  <section id="favourites">
+    <h2>My Favourite Animes</h2>
+ <ul class="favourites-list">
+  <!-- Favourite Anime list images will be dynamically inserted here -->
+ </ul>
   </section>
 
   <footer>
-    <p>&copy; 2024 Anime World. All rights reserved.</p>
+    <p>&copy; 2024 Anime World. András Szentei's Project for showing my HTML, JS, CSS knowledge with Api calls and some manipulating options</p>
   </footer>
 
   <script src="scripts.js"></script>
