@@ -1,16 +1,3 @@
-// Unsplash API Information (Replace `YOUR_ACCESS_KEY` with your actual API key)
-const unsplashAPI = {
-    baseUrl: "https://api.unsplash.com/search/photos",
-    accessKey: "4heakZbMu3GWh6c0m_uWHycvPEAT2qEM6WGUtoivqkxE" // Use your provided key
-};
-
-// Keywords to search for images for each theme
-const themeKeywords = {
-    sixties: "60s design",
-    seventies: "70s design",
-    eighties: "80s design"
-};
-
 // Function to switch themes based on button click
 function switchTheme(themeClass) {
     // Remove existing theme classes
@@ -21,9 +8,6 @@ function switchTheme(themeClass) {
 
     // Update the information dynamically based on the theme
     updateInformation(themeClass);
-
-    // Fetch and update the image gallery dynamically
-    fetchImages(themeKeywords[themeClass]);
 }
 
 // Function to update the information content based on theme
@@ -55,40 +39,6 @@ function updateInformation(themeClass) {
 
     // Set the content based on the selected theme
     infoContent.innerHTML = themeInformation[themeClass] || "Select a theme to learn more about it!";
-}
-
-// Function to fetch images from Unsplash API based on the keyword
-function fetchImages(keyword) {
-    const url = `${unsplashAPI.baseUrl}?query=${keyword}&client_id=${unsplashAPI.accessKey}&per_page=10`;
-    
-    fetch(url)
-        .then(response => response.json())
-        .then(data => {
-            // Clear existing images
-            const imageGallery = document.getElementById('image-gallery');
-            imageGallery.innerHTML = "";
-
-            // Display 10 images
-            data.results.forEach(image => {
-                const imageItem = document.createElement('div');
-                imageItem.classList.add('image-item');
-                
-                // Set the image and info
-                imageItem.innerHTML = `
-                    <img src="${image.urls.regular}" alt="${image.alt_description || 'Retro Image'}">
-                    <div class="image-info">
-                        <p>Photographer: ${image.user.name}</p>
-                        <p>${image.alt_description || 'No description available'}</p>
-                    </div>
-                `;
-                
-                // Append the image item to the gallery
-                imageGallery.appendChild(imageItem);
-            });
-        })
-        .catch(error => {
-            console.error("Error fetching the images: ", error);
-        });
 }
 
 // Attach event listeners to each theme button

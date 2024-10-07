@@ -43,7 +43,6 @@ h1 {
     background: #fff;
     color: #111;
 }
-
 /* Information Container */
 #info-container {
     max-width: 800px;
@@ -61,54 +60,133 @@ h1 {
 }
 
 #info-container p {
-    font-size: 1.1em;
+    font-size: 1.7em;
     line-height: 1.5;
     text-align: justify;
 }
-
-/* Image Gallery */
-#image-gallery {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr); /* 2 columns */
-    gap: 20px;
-    padding: 20px;
-    max-width: 800px;
-    margin: 20px auto;
+/* 60's Theme */
+body.sixties {
+    background-color: #f9f871;
+    color: #111;
 }
 
-.image-item {
-    position: relative;
-    overflow: hidden;
-    border: 2px solid #fff;
-    border-radius: 10px;
-    box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+.sixties h1 {
+    color: #d22e2e;
 }
 
-.image-item img {
-    width: 100%;
-    height: auto;
-    border-radius: 10px;
-    transition: transform 0.3s ease-in-out;
+.sixties .theme-button {
+    border-color: #d22e2e;
+    color: #d22e2e;
 }
 
-.image-item:hover img {
-    transform: scale(1.1); /* Zoom in on hover */
-}
-
-.image-info {
+/* 60's Background Pattern */
+.sixties::before {
+    content: "";
     position: absolute;
-    bottom: 10px;
-    left: 10px;
-    right: 10px;
-    background: rgba(0, 0, 0, 0.7);
-    padding: 10px;
-    color: #fff;
-    border-radius: 5px;
-    text-align: center;
-    opacity: 0;
-    transition: opacity 0.3s ease-in-out;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, #f9f871 10%, transparent 10%) 0 0,
+                radial-gradient(circle, #ffcc00 10%, transparent 10%) 50px 50px;
+    background-size: 100px 100px;
+    z-index: -1;
+    animation: rotatePattern 20s linear infinite;
 }
 
-.image-item:hover .image-info {
-    opacity: 1; /* Show info on hover */
+@keyframes rotatePattern {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* 70's Theme */
+body.seventies {
+    background-color: #d98825;
+    color: #2e2e1f;
+}
+
+.seventies h1 {
+    color: #9e623d;
+}
+
+.seventies .theme-button {
+    border-color: #9e623d;
+    color: #9e623d;
+}
+
+/* 70's Background Pattern */
+.seventies::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        45deg,
+        #d98825 25%,
+        transparent 25%,
+        transparent 50%,
+        #d98825 50%,
+        #d98825 75%,
+        transparent 75%,
+        transparent 100%
+    );
+    background-size: 50px 50px;
+    z-index: -1;
+    animation: slidePattern 1s linear infinite;
+}
+
+@keyframes slidePattern {
+    from {
+        background-position: 0 0;
+    }
+    to {
+        background-position: 50px 50px;
+    }
+}
+
+/* 80's Theme */
+body.eighties {
+    background-color: #111;
+    color: #f5a623;
+}
+
+.eighties h1 {
+    color: #f5a623;
+}
+
+.eighties .theme-button {
+    border-color: #f5a623;
+    color: #f5a623;
+}
+
+/* 80's Background Pattern */
+.eighties::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, rgba(255,0,150,0.5), rgba(0,204,255,0.5));
+    background-size: 200% 200%;
+    z-index: -1;
+    animation: moveGradient 10s ease infinite;
+}
+
+@keyframes moveGradient {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
 }
