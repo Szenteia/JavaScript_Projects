@@ -1,0 +1,38 @@
+body {
+    background-color: #111; /* Dark background */
+    font-family: 'Roboto', sans-serif;
+    color: #fff;
+    margin: 0;
+    padding: 0;
+}
+
+h1 {
+    text-align: center;
+    font-size: 4em;
+    margin-top: 20vh;
+    text-transform: uppercase;
+    font-weight: bold;
+    color: #f5a623; /* Neon Orange */
+    text-shadow: 0 0 10px #f5a623, 0 0 20px #f5a623, 0 0 30px #f5a623;
+}
+
+.neon-button {
+    display: block;
+    margin: 20px auto;
+    padding: 15px 30px;
+    font-size: 1.5em;
+    background: #1b1b1b;
+    border: 2px solid #f5a623;
+    color: #f5a623;
+    text-transform: uppercase;
+    cursor: pointer;
+    text-align: center;
+    transition: 0.3s;
+    box-shadow: 0 0 10px #f5a623, 0 0 20px #f5a623;
+}
+
+.neon-button:hover {
+    background: #f5a623;
+    color: #111;
+    box-shadow: 0 0 20px #f5a623, 0 0 30px #f5a623;
+}
