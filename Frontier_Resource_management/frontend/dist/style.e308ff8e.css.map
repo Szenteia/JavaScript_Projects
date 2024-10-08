@@ -1,0 +1,1 @@
+{"version":3,"sources":["style.css"],"names":[],"mappings":"AAAA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA","file":"style.e308ff8e.css","sourceRoot":"..","sourcesContent":["body {\n    font-family: Arial, sans-serif;\n    background-color: #282c34;\n    color: #61dafb;\n    text-align: center;\n}\n\n#app {\n    margin-top: 50px;\n}"]}
