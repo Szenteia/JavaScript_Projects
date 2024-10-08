@@ -3592,6 +3592,130 @@ var UnitPurchase = /** @class */function () {
   return UnitPurchase;
 }();
 exports.UnitPurchase = UnitPurchase;
+},{}],"components/EnemyUnit.ts":[function(require,module,exports) {
+"use strict";
+
+// frontend/components/EnemyUnit.ts
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.EnemyUnit = void 0;
+var EnemyUnit = /** @class */function () {
+  function EnemyUnit(type, health, speed, attackPower, startX, startY) {
+    this.type = type;
+    this.health = health;
+    this.speed = speed;
+    this.attackPower = attackPower;
+    this.position = {
+      x: startX,
+      y: startY
+    };
+  }
+  EnemyUnit.prototype.move = function () {
+    // Fentről lefelé mozgás (y tengely mentén növekszik a pozíció)
+    this.position.y += this.speed;
+  };
+  EnemyUnit.prototype.getPosition = function () {
+    return this.position;
+  };
+  EnemyUnit.prototype.getHealth = function () {
+    return this.health;
+  };
+  EnemyUnit.prototype.takeDamage = function (amount) {
+    this.health -= amount;
+  };
+  EnemyUnit.prototype.isDestroyed = function () {
+    return this.health <= 0;
+  };
+  EnemyUnit.prototype.getType = function () {
+    return this.type;
+  };
+  return EnemyUnit;
+}();
+exports.EnemyUnit = EnemyUnit;
+},{}],"components/EnemyManager.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.EnemyManager = void 0;
+var EnemyUnit_1 = require("./EnemyUnit");
+var EnemyManager = /** @class */function () {
+  function EnemyManager() {
+    this.enemies = [];
+  }
+  EnemyManager.prototype.spawnEnemy = function (type, health, speed, attackPower, startX, startY) {
+    var newEnemy = new EnemyUnit_1.EnemyUnit(type, health, speed, attackPower, startX, startY);
+    this.enemies.push(newEnemy);
+  };
+  EnemyManager.prototype.moveEnemies = function () {
+    this.enemies.forEach(function (enemy) {
+      enemy.move();
+    });
+  };
+  EnemyManager.prototype.renderEnemies = function (ctx) {
+    this.enemies.forEach(function (enemy) {
+      ctx.fillStyle = 'red';
+      ctx.fillRect(enemy.getPosition().x, enemy.getPosition().y, 20, 20); //simple square for now 
+    });
+  };
+  EnemyManager.prototype.removeDestroyedEnemies = function () {
+    this.enemies = this.enemies.filter(function (enemy) {
+      return !enemy.isDestroyed() && enemy.getPosition().y < window.innerHeight;
+    });
+  };
+  EnemyManager.prototype.getEnemies = function () {
+    return this.enemies;
+  };
+  return EnemyManager;
+}();
+exports.EnemyManager = EnemyManager;
+},{"./EnemyUnit":"components/EnemyUnit.ts"}],"components/GameCanvas.ts":[function(require,module,exports) {
+"use strict";
+
+// frontend/components/GameCanvas.ts
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.GameCanvas = void 0;
+var GameCanvas = /** @class */function () {
+  function GameCanvas(enemyManager) {
+    this.canvas = document.createElement('canvas');
+    this.ctx = this.canvas.getContext('2d');
+    this.enemyManager = enemyManager;
+    // Canvas alapvető stílusok
+    this.canvas.style.border = '1px solid #61dafb';
+    this.setCanvasSize();
+    window.addEventListener('resize', this.setCanvasSize.bind(this)); // Méretváltozás figyelése
+  }
+  // Dinamikus canvas méretezés a teljes képernyő kitöltéséhez
+  GameCanvas.prototype.setCanvasSize = function () {
+    var _a, _b;
+    var headerHeight = ((_a = document.querySelector('header')) === null || _a === void 0 ? void 0 : _a.clientHeight) || 0;
+    var gameControlsHeight = ((_b = document.querySelector('div')) === null || _b === void 0 ? void 0 : _b.clientHeight) || 0;
+    this.canvas.width = window.innerWidth;
+    this.canvas.height = window.innerHeight - headerHeight - gameControlsHeight - 40; // A header és vezérlők közötti magasság kitöltése
+  };
+  GameCanvas.prototype.render = function (parentElement) {
+    parentElement.appendChild(this.canvas);
+  };
+  GameCanvas.prototype.update = function () {
+    if (this.ctx) {
+      // Játéktér törlése (frissítés)
+      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+      // Ellenséges egységek mozgatása
+      this.enemyManager.moveEnemies();
+      // Ellenséges egységek kirajzolása
+      this.enemyManager.renderEnemies(this.ctx);
+    }
+  };
+  GameCanvas.prototype.getCanvasWidth = function () {
+    return this.canvas.width;
+  };
+  return GameCanvas;
+}();
+exports.GameCanvas = GameCanvas;
 },{}],"main.ts":[function(require,module,exports) {
 "use strict";
 
@@ -3605,6 +3729,8 @@ var GameControls_1 = require("./components/GameControls");
 var BadgeDisplay_1 = require("./components/BadgeDisplay");
 var ResourceManager_1 = require("./components/ResourceManager");
 var UnitPurchase_1 = require("./components/UnitPurchase");
+var EnemyManager_1 = require("./components/EnemyManager");
+var GameCanvas_1 = require("./components/GameCanvas");
 var ws = new WebSocket("ws://localhost:8000/ws");
 ws.onopen = function () {
   console.log("Connected to WebSocket server");
@@ -3643,18 +3769,14 @@ playButton.addEventListener('click', function () {
 });
 var app = document.getElementById('app');
 if (app) {
-  // Fejléc renderelése
   var header = new Header_1.Header();
   header.render(app);
-  // Erőforrás kezelő létrehozása
-  var resourceManager = new ResourceManager_1.ResourceManager(500); // Kezdeti erőforrás: 500 pont
-  // Erőforrás kijelző renderelése
+  var resourceManager = new ResourceManager_1.ResourceManager(500);
   var resourceDisplay_1 = new ResourceDisplay_1.ResourceDisplay(resourceManager);
   resourceDisplay_1.render(app);
-  // Védekezési egységek vásárlása
   var unitPurchase = new UnitPurchase_1.UnitPurchase(resourceManager, function (unitType) {
     console.log("".concat(unitType, " purchased!"));
-    resourceDisplay_1.updateResources(); // Frissítjük az erőforrás kijelzést
+    resourceDisplay_1.updateResources();
   });
   unitPurchase.render(app);
   var gameControls = new GameControls_1.GameControls(function () {
@@ -3666,8 +3788,16 @@ if (app) {
   var badgeDisplay = new BadgeDisplay_1.BadgeDisplay();
   badgeDisplay.addBadge("First Game Started");
   badgeDisplay.render(app);
+  var enemyManager_1 = new EnemyManager_1.EnemyManager();
+  var gameCanvas_1 = new GameCanvas_1.GameCanvas(enemyManager_1);
+  gameCanvas_1.render(app);
+  setInterval(function () {
+    enemyManager_1.spawnEnemy('Simple Infantry', 100, 2, 10, Math.random() * gameCanvas_1.getCanvasWidth(), 0);
+    gameCanvas_1.update();
+    enemyManager_1.removeDestroyedEnemies();
+  }, 1000);
 }
-},{"howler":"node_modules/howler/dist/howler.js","./components/Header":"components/Header.ts","./components/ResourceDisplay":"components/ResourceDisplay.ts","./components/GameControls":"components/GameControls.ts","./components/BadgeDisplay":"components/BadgeDisplay.ts","./components/ResourceManager":"components/ResourceManager.ts","./components/UnitPurchase":"components/UnitPurchase.ts"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"howler":"node_modules/howler/dist/howler.js","./components/Header":"components/Header.ts","./components/ResourceDisplay":"components/ResourceDisplay.ts","./components/GameControls":"components/GameControls.ts","./components/BadgeDisplay":"components/BadgeDisplay.ts","./components/ResourceManager":"components/ResourceManager.ts","./components/UnitPurchase":"components/UnitPurchase.ts","./components/EnemyManager":"components/EnemyManager.ts","./components/GameCanvas":"components/GameCanvas.ts"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;

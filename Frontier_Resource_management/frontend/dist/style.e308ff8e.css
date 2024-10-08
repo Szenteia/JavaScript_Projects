@@ -1,4 +1,4 @@
-body {
+body, html {
     font-family: Arial, sans-serif;
     background-color: #282c34;
     color: #61fbe1;
@@ -27,6 +27,10 @@ button:hover {
     background-color: #2f7dc5;
 }
 
+canvas {
+    max-width: 100%;
+    box-sizing: border-box;
+}
 ul {
     list-style-type: none;
     padding: 0;
@@ -35,12 +39,15 @@ ul {
 ul li {
     margin: 5px 0;
     padding: 10px;
-    background-color: #61dafb;
-    color: #222;
+    background-color: #61fbe1;
+    color: #1f1d1d;
     border-radius: 5px;
 }
 
 #app {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     margin: 10px;
 }
 

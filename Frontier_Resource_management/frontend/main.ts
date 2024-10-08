@@ -5,6 +5,8 @@ import { GameControls } from './components/GameControls';
 import { BadgeDisplay } from './components/BadgeDisplay';
 import { ResourceManager } from './components/ResourceManager';
 import { UnitPurchase } from './components/UnitPurchase';
+import { EnemyManager } from './components/EnemyManager';
+import { GameCanvas } from './components/GameCanvas';
 
 const ws = new WebSocket("ws://localhost:8000/ws");
 
@@ -52,22 +54,20 @@ playButton.addEventListener('click', () => {
 });
 
 const app = document.getElementById('app');
+
 if (app) {
-    // Fejléc renderelése
+
     const header = new Header();
     header.render(app);
 
-    // Erőforrás kezelő létrehozása
-    const resourceManager = new ResourceManager(500);  // Kezdeti erőforrás: 500 pont
+    const resourceManager = new ResourceManager(500);  
 
-    // Erőforrás kijelző renderelése
     const resourceDisplay = new ResourceDisplay(resourceManager);
     resourceDisplay.render(app);
 
-    // Védekezési egységek vásárlása
     const unitPurchase = new UnitPurchase(resourceManager, (unitType: string) => {
         console.log(`${unitType} purchased!`);
-        resourceDisplay.updateResources();  // Frissítjük az erőforrás kijelzést
+        resourceDisplay.updateResources();  
     });
     unitPurchase.render(app);
 
@@ -77,8 +77,18 @@ if (app) {
     );
     gameControls.render(app);
 
-
     const badgeDisplay = new BadgeDisplay();
     badgeDisplay.addBadge("First Game Started");
     badgeDisplay.render(app);
+
+    const enemyManager = new EnemyManager();
+
+    const gameCanvas = new GameCanvas(enemyManager);
+    gameCanvas.render(app);
+
+    setInterval(() => {
+        enemyManager.spawnEnemy('Simple Infantry', 100, 2, 10, Math.random() * gameCanvas.getCanvasWidth(), 0); 
+        gameCanvas.update();
+        enemyManager.removeDestroyedEnemies();
+    }, 1000);
  }
