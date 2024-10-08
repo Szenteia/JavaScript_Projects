@@ -3,6 +3,8 @@ import { Header } from './components/Header';
 import { ResourceDisplay } from './components/ResourceDisplay';
 import { GameControls } from './components/GameControls';
 import { BadgeDisplay } from './components/BadgeDisplay';
+import { ResourceManager } from './components/ResourceManager';
+import { UnitPurchase } from './components/UnitPurchase';
 
 const ws = new WebSocket("ws://localhost:8000/ws");
 
@@ -50,11 +52,24 @@ playButton.addEventListener('click', () => {
 });
 
 const app = document.getElementById('app');
- if (app) {
-    const resourceDisplay = new ResourceDisplay();
-    resourceDisplay.render(app);
+if (app) {
+    // Fejléc renderelése
     const header = new Header();
     header.render(app);
+
+    // Erőforrás kezelő létrehozása
+    const resourceManager = new ResourceManager(500);  // Kezdeti erőforrás: 500 pont
+
+    // Erőforrás kijelző renderelése
+    const resourceDisplay = new ResourceDisplay(resourceManager);
+    resourceDisplay.render(app);
+
+    // Védekezési egységek vásárlása
+    const unitPurchase = new UnitPurchase(resourceManager, (unitType: string) => {
+        console.log(`${unitType} purchased!`);
+        resourceDisplay.updateResources();  // Frissítjük az erőforrás kijelzést
+    });
+    unitPurchase.render(app);
 
     const gameControls = new GameControls(
         () => { console.log("Game Started!"); },  

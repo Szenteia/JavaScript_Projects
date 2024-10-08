@@ -3399,8 +3399,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.ResourceDisplay = void 0;
 var ResourceDisplay = /** @class */function () {
-  function ResourceDisplay() {
-    this.resourceAmount = 100; // Kezdeti erőforrás mennyiség
+  function ResourceDisplay(resourceManager) {
+    this.resourceManager = resourceManager;
     this.element = document.createElement('div');
     this.element.style.padding = '10px';
     this.element.style.backgroundColor = '#333';
@@ -3409,12 +3409,11 @@ var ResourceDisplay = /** @class */function () {
     this.element.style.fontSize = '18px';
     this.updateDisplay();
   }
-  ResourceDisplay.prototype.updateResource = function (amount) {
-    this.resourceAmount += amount;
-    this.updateDisplay();
-  };
   ResourceDisplay.prototype.updateDisplay = function () {
-    this.element.innerHTML = "Available Resources: ".concat(this.resourceAmount);
+    this.element.innerHTML = "Available Resources: ".concat(this.resourceManager.getAvailableResources());
+  };
+  ResourceDisplay.prototype.updateResources = function () {
+    this.updateDisplay();
   };
   ResourceDisplay.prototype.render = function (parentElement) {
     parentElement.appendChild(this.element);
@@ -3497,6 +3496,102 @@ var BadgeDisplay = /** @class */function () {
   return BadgeDisplay;
 }();
 exports.BadgeDisplay = BadgeDisplay;
+},{}],"components/ResourceManager.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.ResourceManager = void 0;
+var ResourceManager = /** @class */function () {
+  function ResourceManager(initialResources) {
+    this.resourceAmount = initialResources;
+    this.unitCosts = {
+      'Anti-Tank Infantry': 50,
+      'Air Defense': 100,
+      'Radar': 75,
+      'Plane': 150,
+      'Tank': 200,
+      'APC': 100,
+      'Drone': 120,
+      'Rocket': 250,
+      'Artillery': 300,
+      'Elite Infantry': 80,
+      'Simple Infantry': 30
+    };
+  }
+  ResourceManager.prototype.getUnitCosts = function () {
+    return this.unitCosts;
+  };
+  ResourceManager.prototype.getAvailableResources = function () {
+    return this.resourceAmount;
+  };
+  ResourceManager.prototype.canPurchaseUnit = function (unitType) {
+    return this.unitCosts[unitType] <= this.resourceAmount;
+  };
+  ResourceManager.prototype.purchaseUnit = function (unitType) {
+    if (this.canPurchaseUnit(unitType)) {
+      this.resourceAmount -= this.unitCosts[unitType];
+      return true;
+    }
+    return false;
+  };
+  ResourceManager.prototype.addResources = function (amount) {
+    this.resourceAmount += amount;
+  };
+  return ResourceManager;
+}();
+exports.ResourceManager = ResourceManager;
+},{}],"components/UnitPurchase.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.UnitPurchase = void 0;
+var UnitPurchase = /** @class */function () {
+  function UnitPurchase(resourceManager, onUnitPurchasedCallback) {
+    this.resourceManager = resourceManager;
+    this.onUnitPurchasedCallback = onUnitPurchasedCallback;
+    this.element = document.createElement('div');
+    this.element.style.display = 'flex';
+    this.element.style.flexWrap = 'wrap';
+    this.element.style.justifyContent = 'center';
+    this.element.style.margin = '20px';
+    this.createUnitButtons();
+  }
+  UnitPurchase.prototype.createUnitButtons = function () {
+    var _this = this;
+    // A getter metódus használata a unitCosts eléréséhez
+    Object.keys(this.resourceManager.getUnitCosts()).forEach(function (unitType) {
+      var button = _this.createButton(unitType);
+      _this.element.appendChild(button);
+    });
+  };
+  UnitPurchase.prototype.createButton = function (unitType) {
+    var _this = this;
+    var button = document.createElement('button');
+    button.innerText = "".concat(unitType, " (").concat(this.resourceManager.getUnitCosts()[unitType], " pts)");
+    button.style.padding = '10px 15px';
+    button.style.margin = '5px';
+    button.style.fontSize = '14px';
+    button.style.cursor = 'pointer';
+    button.style.flexBasis = '30%';
+    button.addEventListener('click', function () {
+      if (_this.resourceManager.purchaseUnit(unitType)) {
+        _this.onUnitPurchasedCallback(unitType);
+      } else {
+        alert('Not enough resources!');
+      }
+    });
+    return button;
+  };
+  UnitPurchase.prototype.render = function (parentElement) {
+    parentElement.appendChild(this.element);
+  };
+  return UnitPurchase;
+}();
+exports.UnitPurchase = UnitPurchase;
 },{}],"main.ts":[function(require,module,exports) {
 "use strict";
 
@@ -3508,6 +3603,8 @@ var Header_1 = require("./components/Header");
 var ResourceDisplay_1 = require("./components/ResourceDisplay");
 var GameControls_1 = require("./components/GameControls");
 var BadgeDisplay_1 = require("./components/BadgeDisplay");
+var ResourceManager_1 = require("./components/ResourceManager");
+var UnitPurchase_1 = require("./components/UnitPurchase");
 var ws = new WebSocket("ws://localhost:8000/ws");
 ws.onopen = function () {
   console.log("Connected to WebSocket server");
@@ -3546,10 +3643,20 @@ playButton.addEventListener('click', function () {
 });
 var app = document.getElementById('app');
 if (app) {
-  var resourceDisplay = new ResourceDisplay_1.ResourceDisplay();
-  resourceDisplay.render(app);
+  // Fejléc renderelése
   var header = new Header_1.Header();
   header.render(app);
+  // Erőforrás kezelő létrehozása
+  var resourceManager = new ResourceManager_1.ResourceManager(500); // Kezdeti erőforrás: 500 pont
+  // Erőforrás kijelző renderelése
+  var resourceDisplay_1 = new ResourceDisplay_1.ResourceDisplay(resourceManager);
+  resourceDisplay_1.render(app);
+  // Védekezési egységek vásárlása
+  var unitPurchase = new UnitPurchase_1.UnitPurchase(resourceManager, function (unitType) {
+    console.log("".concat(unitType, " purchased!"));
+    resourceDisplay_1.updateResources(); // Frissítjük az erőforrás kijelzést
+  });
+  unitPurchase.render(app);
   var gameControls = new GameControls_1.GameControls(function () {
     console.log("Game Started!");
   }, function () {
@@ -3560,7 +3667,7 @@ if (app) {
   badgeDisplay.addBadge("First Game Started");
   badgeDisplay.render(app);
 }
-},{"howler":"node_modules/howler/dist/howler.js","./components/Header":"components/Header.ts","./components/ResourceDisplay":"components/ResourceDisplay.ts","./components/GameControls":"components/GameControls.ts","./components/BadgeDisplay":"components/BadgeDisplay.ts"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"howler":"node_modules/howler/dist/howler.js","./components/Header":"components/Header.ts","./components/ResourceDisplay":"components/ResourceDisplay.ts","./components/GameControls":"components/GameControls.ts","./components/BadgeDisplay":"components/BadgeDisplay.ts","./components/ResourceManager":"components/ResourceManager.ts","./components/UnitPurchase":"components/UnitPurchase.ts"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;

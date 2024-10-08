@@ -1,8 +1,12 @@
+import { ResourceManager } from "./ResourceManager";
+
 export class ResourceDisplay {
     private element: HTMLElement;
-    private resourceAmount: number = 100;  // Kezdeti erőforrás mennyiség
+    private resourceManager: ResourceManager;  // Kezdeti erőforrás mennyiség
 
-    constructor() {
+    constructor(resourceManager: ResourceManager) {
+        this.resourceManager = resourceManager;
+
         this.element = document.createElement('div');
         this.element.style.padding = '10px';
         this.element.style.backgroundColor = '#333';
@@ -12,13 +16,12 @@ export class ResourceDisplay {
         this.updateDisplay();
     }
 
-    public updateResource(amount: number): void {
-        this.resourceAmount += amount;
-        this.updateDisplay();
+    private updateDisplay(): void {
+        this.element.innerHTML = `Available Resources: ${this.resourceManager.getAvailableResources()}`;
     }
 
-    private updateDisplay(): void {
-        this.element.innerHTML = `Available Resources: ${this.resourceAmount}`;
+    public updateResources(): void {
+        this.updateDisplay();
     }
 
     public render(parentElement: HTMLElement): void {
