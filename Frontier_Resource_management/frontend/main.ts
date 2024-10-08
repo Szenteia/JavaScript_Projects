@@ -1,4 +1,8 @@
 import { Howl } from 'howler';
+import { Header } from './components/Header';
+import { ResourceDisplay } from './components/ResourceDisplay';
+import { GameControls } from './components/GameControls';
+import { BadgeDisplay } from './components/BadgeDisplay';
 
 const ws = new WebSocket("ws://localhost:8000/ws");
 
@@ -20,9 +24,10 @@ ws.onclose = () => {
 };
 
 const playButton = document.createElement('button');
-playButton.innerText = 'Play Game Sound';
+playButton.innerText = 'Game Sound';
 playButton.style.padding = '10px 20px';
-playButton.style.fontSize = '16px';
+playButton.style.color = 'darkgreen';
+playButton.style.fontSize = '14px';
 playButton.style.marginTop = '20px';
 document.body.appendChild(playButton);
 
@@ -43,3 +48,22 @@ playButton.addEventListener('click', () => {
         sound.play();
     }
 });
+
+const app = document.getElementById('app');
+ if (app) {
+    const resourceDisplay = new ResourceDisplay();
+    resourceDisplay.render(app);
+    const header = new Header();
+    header.render(app);
+
+    const gameControls = new GameControls(
+        () => { console.log("Game Started!"); },  
+        () => { console.log("Game Paused!"); }    
+    );
+    gameControls.render(app);
+
+
+    const badgeDisplay = new BadgeDisplay();
+    badgeDisplay.addBadge("First Game Started");
+    badgeDisplay.render(app);
+ }

@@ -3369,6 +3369,134 @@ var global = arguments[3];
   };
 })();
 
+},{}],"components/Header.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Header = void 0;
+var Header = /** @class */function () {
+  function Header() {
+    this.element = document.createElement('header');
+    this.element.style.padding = '20px';
+    this.element.style.backgroundColor = '#222';
+    this.element.style.textAlign = 'center';
+    this.element.style.fontSize = '24px';
+    this.element.innerHTML = '<h1>Frontier</h1>';
+  }
+  Header.prototype.render = function (parentElement) {
+    parentElement.appendChild(this.element);
+  };
+  return Header;
+}();
+exports.Header = Header;
+},{}],"components/ResourceDisplay.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.ResourceDisplay = void 0;
+var ResourceDisplay = /** @class */function () {
+  function ResourceDisplay() {
+    this.resourceAmount = 100; // Kezdeti erőforrás mennyiség
+    this.element = document.createElement('div');
+    this.element.style.padding = '10px';
+    this.element.style.backgroundColor = '#333';
+    this.element.style.color = '#fff';
+    this.element.style.textAlign = 'center';
+    this.element.style.fontSize = '18px';
+    this.updateDisplay();
+  }
+  ResourceDisplay.prototype.updateResource = function (amount) {
+    this.resourceAmount += amount;
+    this.updateDisplay();
+  };
+  ResourceDisplay.prototype.updateDisplay = function () {
+    this.element.innerHTML = "Available Resources: ".concat(this.resourceAmount);
+  };
+  ResourceDisplay.prototype.render = function (parentElement) {
+    parentElement.appendChild(this.element);
+  };
+  return ResourceDisplay;
+}();
+exports.ResourceDisplay = ResourceDisplay;
+},{}],"components/GameControls.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.GameControls = void 0;
+var GameControls = /** @class */function () {
+  function GameControls(onStartCallback, onPauseCallback) {
+    this.element = document.createElement('div');
+    this.element.style.display = 'flex';
+    this.element.style.justifyContent = 'center';
+    this.element.style.margin = '20px';
+    this.onStartCallback = onStartCallback;
+    this.onPauseCallback = onPauseCallback;
+    var startButton = this.createButton('Start Game', this.onStartCallback);
+    var pauseButton = this.createButton('Pause Game', this.onPauseCallback);
+    this.element.appendChild(startButton);
+    this.element.appendChild(pauseButton);
+  }
+  GameControls.prototype.createButton = function (label, onClick) {
+    var button = document.createElement('button');
+    button.innerText = label;
+    button.style.padding = '10px 20px';
+    button.style.margin = '0 10px';
+    button.style.fontSize = '16px';
+    button.style.cursor = 'pointer';
+    button.addEventListener('click', onClick);
+    return button;
+  };
+  GameControls.prototype.render = function (parentElement) {
+    parentElement.appendChild(this.element);
+  };
+  return GameControls;
+}();
+exports.GameControls = GameControls;
+},{}],"components/BadgeDisplay.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.BadgeDisplay = void 0;
+var BadgeDisplay = /** @class */function () {
+  function BadgeDisplay() {
+    this.badges = [];
+    this.element = document.createElement('div');
+    this.element.style.padding = '10px';
+    this.element.style.backgroundColor = '#444';
+    this.element.style.color = '#fff';
+    this.element.style.textAlign = 'center';
+    this.element.style.fontSize = '16px';
+    this.element.style.margin = '20px';
+    this.element.innerHTML = '<h2>Achievements and Badges</h2>';
+  }
+  BadgeDisplay.prototype.addBadge = function (badge) {
+    this.badges.push(badge);
+    this.updateDisplay();
+  };
+  BadgeDisplay.prototype.updateDisplay = function () {
+    this.element.innerHTML = '<h2>Achievements and Badges</h2>';
+    var badgeList = document.createElement('ul');
+    this.badges.forEach(function (badge) {
+      var badgeItem = document.createElement('li');
+      badgeItem.innerText = badge;
+      badgeList.appendChild(badgeItem);
+    });
+    this.element.appendChild(badgeList);
+  };
+  BadgeDisplay.prototype.render = function (parentElement) {
+    parentElement.appendChild(this.element);
+  };
+  return BadgeDisplay;
+}();
+exports.BadgeDisplay = BadgeDisplay;
 },{}],"main.ts":[function(require,module,exports) {
 "use strict";
 
@@ -3376,6 +3504,10 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 var howler_1 = require("howler");
+var Header_1 = require("./components/Header");
+var ResourceDisplay_1 = require("./components/ResourceDisplay");
+var GameControls_1 = require("./components/GameControls");
+var BadgeDisplay_1 = require("./components/BadgeDisplay");
 var ws = new WebSocket("ws://localhost:8000/ws");
 ws.onopen = function () {
   console.log("Connected to WebSocket server");
@@ -3391,9 +3523,10 @@ ws.onclose = function () {
   console.log("disconnected form WebSocket server");
 };
 var playButton = document.createElement('button');
-playButton.innerText = 'Play Game Sound';
+playButton.innerText = 'Game Sound';
 playButton.style.padding = '10px 20px';
-playButton.style.fontSize = '16px';
+playButton.style.color = 'darkgreen';
+playButton.style.fontSize = '14px';
 playButton.style.marginTop = '20px';
 document.body.appendChild(playButton);
 //sound initialization
@@ -3411,7 +3544,23 @@ playButton.addEventListener('click', function () {
     sound.play();
   }
 });
-},{"howler":"node_modules/howler/dist/howler.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+var app = document.getElementById('app');
+if (app) {
+  var resourceDisplay = new ResourceDisplay_1.ResourceDisplay();
+  resourceDisplay.render(app);
+  var header = new Header_1.Header();
+  header.render(app);
+  var gameControls = new GameControls_1.GameControls(function () {
+    console.log("Game Started!");
+  }, function () {
+    console.log("Game Paused!");
+  });
+  gameControls.render(app);
+  var badgeDisplay = new BadgeDisplay_1.BadgeDisplay();
+  badgeDisplay.addBadge("First Game Started");
+  badgeDisplay.render(app);
+}
+},{"howler":"node_modules/howler/dist/howler.js","./components/Header":"components/Header.ts","./components/ResourceDisplay":"components/ResourceDisplay.ts","./components/GameControls":"components/GameControls.ts","./components/BadgeDisplay":"components/BadgeDisplay.ts"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -3436,7 +3585,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50921" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "52496" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];
