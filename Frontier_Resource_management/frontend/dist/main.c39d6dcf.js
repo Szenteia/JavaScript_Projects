@@ -3621,6 +3621,9 @@ var EnemyUnit = /** @class */function () {
   EnemyUnit.prototype.getHealth = function () {
     return this.health;
   };
+  EnemyUnit.prototype.getAttackPower = function () {
+    return this.attackPower;
+  };
   EnemyUnit.prototype.takeDamage = function (amount) {
     this.health -= amount;
   };
@@ -3654,6 +3657,15 @@ var EnemyManager = /** @class */function () {
       enemy.move();
     });
   };
+  EnemyManager.prototype.manageAttacks = function (base) {
+    this.enemies.forEach(function (enemy) {
+      if (enemy.getPosition().y >= base.getHealth()) {
+        // Ha az ellenség elérte a frontvonalat, támadja
+        console.log("Enemy attacks base with ".concat(enemy.getAttackPower(), " power!"));
+        base.takeDamage(enemy.getAttackPower());
+      }
+    });
+  };
   EnemyManager.prototype.renderEnemies = function (ctx) {
     this.enemies.forEach(function (enemy) {
       ctx.fillStyle = 'red';
@@ -3680,43 +3692,175 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.GameCanvas = void 0;
 var GameCanvas = /** @class */function () {
-  function GameCanvas(enemyManager) {
+  function GameCanvas(enemyManager, defenseManager, base) {
     this.canvas = document.createElement('canvas');
     this.ctx = this.canvas.getContext('2d');
     this.enemyManager = enemyManager;
-    // Canvas alapvető stílusok
+    this.defenseManager = defenseManager;
+    this.base = base;
     this.canvas.style.border = '1px solid #61dafb';
     this.setCanvasSize();
-    window.addEventListener('resize', this.setCanvasSize.bind(this)); // Méretváltozás figyelése
+    window.addEventListener('resize', this.setCanvasSize.bind(this)); //keep track of window size change
   }
-  // Dinamikus canvas méretezés a teljes képernyő kitöltéséhez
+  // dinamic canvas sizing
   GameCanvas.prototype.setCanvasSize = function () {
     var _a, _b;
     var headerHeight = ((_a = document.querySelector('header')) === null || _a === void 0 ? void 0 : _a.clientHeight) || 0;
     var gameControlsHeight = ((_b = document.querySelector('div')) === null || _b === void 0 ? void 0 : _b.clientHeight) || 0;
     this.canvas.width = window.innerWidth;
-    this.canvas.height = window.innerHeight - headerHeight - gameControlsHeight - 40; // A header és vezérlők közötti magasság kitöltése
+    this.canvas.height = window.innerHeight - headerHeight - gameControlsHeight - 40;
   };
   GameCanvas.prototype.render = function (parentElement) {
     parentElement.appendChild(this.canvas);
   };
   GameCanvas.prototype.update = function () {
     if (this.ctx) {
-      // Játéktér törlése (frissítés)
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-      // Ellenséges egységek mozgatása
       this.enemyManager.moveEnemies();
-      // Ellenséges egységek kirajzolása
+      this.enemyManager.manageAttacks(this.base);
       this.enemyManager.renderEnemies(this.ctx);
+      this.defenseManager.manageAttacks(this.enemyManager.getEnemies());
+      this.defenseManager.renderDefenses(this.ctx);
     }
   };
   GameCanvas.prototype.getCanvasWidth = function () {
     return this.canvas.width;
   };
+  GameCanvas.prototype.getCanvas = function () {
+    return this.canvas;
+  };
+  GameCanvas.prototype.endRound = function () {
+    this.defenseManager.resetAttacks();
+  };
   return GameCanvas;
 }();
 exports.GameCanvas = GameCanvas;
-},{}],"main.ts":[function(require,module,exports) {
+},{}],"components/Base.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Base = void 0;
+var Base = /** @class */function () {
+  function Base(initialHealth, repairCostPerPoint) {
+    this.health = initialHealth;
+    this.maxHealth = initialHealth;
+    this.repairCostPerPoint = repairCostPerPoint;
+  }
+  Base.prototype.getHealth = function () {
+    return this.health;
+  };
+  Base.prototype.repair = function (points, availabeResources) {
+    var totalRepairCost = points * this.repairCostPerPoint;
+    if (availabeResources >= totalRepairCost) {
+      this.health = Math.min(this.maxHealth, this.health + points);
+      return totalRepairCost;
+    }
+    return 0; //no available founds
+  };
+  Base.prototype.takeDamage = function (amount) {
+    this.health = Math.max(0, this.health - amount);
+  };
+  Base.prototype.isDestroyed = function () {
+    return this.health <= 0;
+  };
+  return Base;
+}();
+exports.Base = Base;
+},{}],"components/DefenseUnit.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.DefenseUnit = void 0;
+var DefenseUnit = /** @class */function () {
+  function DefenseUnit(type, attackPower, attackSpeed, range, startX, startY) {
+    this.type = type;
+    this.attackPower = attackPower;
+    this.attackSpeed = attackSpeed; // Time (in ms) between attacks
+    this.range = range; // Range within which the unit can attack
+    this.position = {
+      x: startX,
+      y: startY
+    }; // Position of the defense unit on the canvas
+    this.lastAttackTime = 0; // Keeps track of the last attack time for cooldown purposes
+  }
+  DefenseUnit.prototype.getPosition = function () {
+    return this.position;
+  };
+  DefenseUnit.prototype.isEnemyInRange = function (enemyPosition) {
+    var dx = enemyPosition.x - this.position.x;
+    var dy = enemyPosition.y - this.position.y;
+    var distance = Math.sqrt(dx * dx + dy * dy);
+    return distance <= this.range;
+  };
+  DefenseUnit.prototype.canAttack = function (currentTime) {
+    return currentTime - this.lastAttackTime >= this.attackSpeed;
+  };
+  // Perform an attack, updating the last attack time and returning the attack power
+  DefenseUnit.prototype.attack = function () {
+    this.lastAttackTime = Date.now();
+    return this.attackPower;
+  };
+  // Get the type of defense unit
+  DefenseUnit.prototype.getType = function () {
+    return this.type;
+  };
+  // Resets the unit's attack status at the end of each round
+  DefenseUnit.prototype.resetAttackStatus = function () {
+    this.lastAttackTime = 0;
+  };
+  return DefenseUnit;
+}();
+exports.DefenseUnit = DefenseUnit;
+},{}],"components/DefenseManager.ts":[function(require,module,exports) {
+"use strict";
+
+// frontend/components/DefenseManager.ts
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.DefenseManager = void 0;
+var DefenseUnit_1 = require("./DefenseUnit");
+var DefenseManager = /** @class */function () {
+  function DefenseManager() {
+    this.defenses = [];
+    this.hasAttackedThisRound = false;
+  }
+  DefenseManager.prototype.placeDefenseUnit = function (type, attackPower, attackSpeed, range, startX, startY) {
+    var newDefense = new DefenseUnit_1.DefenseUnit(type, attackPower, attackSpeed, range, startX, startY);
+    this.defenses.push(newDefense);
+  };
+  DefenseManager.prototype.manageAttacks = function (enemies) {
+    if (!this.hasAttackedThisRound) {
+      this.defenses.forEach(function (defense) {
+        enemies.forEach(function (enemy) {
+          if (defense.isEnemyInRange(enemy.getPosition())) {
+            enemy.takeDamage(defense.attack());
+          }
+        });
+      });
+      this.hasAttackedThisRound = true;
+    }
+  };
+  DefenseManager.prototype.resetAttacks = function () {
+    this.hasAttackedThisRound = false;
+  };
+  DefenseManager.prototype.renderDefenses = function (ctx) {
+    this.defenses.forEach(function (defense) {
+      ctx.fillStyle = 'blue';
+      ctx.fillRect(defense.getPosition().x, defense.getPosition().y, 20, 20);
+    });
+  };
+  DefenseManager.prototype.getDefenses = function () {
+    return this.defenses;
+  };
+  return DefenseManager;
+}();
+exports.DefenseManager = DefenseManager;
+},{"./DefenseUnit":"components/DefenseUnit.ts"}],"main.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3731,6 +3875,8 @@ var ResourceManager_1 = require("./components/ResourceManager");
 var UnitPurchase_1 = require("./components/UnitPurchase");
 var EnemyManager_1 = require("./components/EnemyManager");
 var GameCanvas_1 = require("./components/GameCanvas");
+var Base_1 = require("./components/Base");
+var DefenseManager_1 = require("./components/DefenseManager");
 var ws = new WebSocket("ws://localhost:8000/ws");
 ws.onopen = function () {
   console.log("Connected to WebSocket server");
@@ -3788,16 +3934,58 @@ if (app) {
   var badgeDisplay = new BadgeDisplay_1.BadgeDisplay();
   badgeDisplay.addBadge("First Game Started");
   badgeDisplay.render(app);
+  var base_1 = new Base_1.Base(1000, 5);
   var enemyManager_1 = new EnemyManager_1.EnemyManager();
-  var gameCanvas_1 = new GameCanvas_1.GameCanvas(enemyManager_1);
-  gameCanvas_1.render(app);
+  var defenseManager_1 = new DefenseManager_1.DefenseManager();
+  var gameCanvas_1 = new GameCanvas_1.GameCanvas(enemyManager_1, defenseManager_1, base_1);
+  // Game state variables
+  var currentRound_1 = 0;
+  var waveCounter_1 = 0;
+  var maxWavesPerRound_1 = 3;
+  var roundInterval_1;
+  function startNewRound() {
+    currentRound_1++;
+    waveCounter_1 = 0;
+    console.log("Round ".concat(currentRound_1, " started!"));
+    spawnNextWave();
+    roundInterval_1 = setInterval(function () {
+      if (waveCounter_1 < maxWavesPerRound_1) {
+        spawnNextWave();
+      } else {
+        endRound();
+      }
+    }, 5000); // Time between waves within a round
+  }
+  // Function to spawn the next wave
+  function spawnNextWave() {
+    waveCounter_1++;
+    console.log("Wave ".concat(waveCounter_1, " in Round ").concat(currentRound_1, " started!"));
+    // Example of spawning 5 enemy units randomly positioned along the x-axis
+    for (var i = 0; i < 5; i++) {
+      enemyManager_1.spawnEnemy('Simple Infantry', 100, 2, 10,
+      // type, health, speed, attackPower
+      Math.random() * gameCanvas_1.getCanvas().width, 0 // random x-position, starting at y=0
+      );
+    }
+    gameCanvas_1.update();
+  }
+  function endRound() {
+    console.log("Round ".concat(currentRound_1, " ended!"));
+    clearInterval(roundInterval_1); // Stop spawning new waves
+    defenseManager_1.resetAttacks();
+  }
   setInterval(function () {
-    enemyManager_1.spawnEnemy('Simple Infantry', 100, 2, 10, Math.random() * gameCanvas_1.getCanvasWidth(), 0);
     gameCanvas_1.update();
     enemyManager_1.removeDestroyedEnemies();
-  }, 1000);
+    if (base_1.isDestroyed()) {
+      console.log("Base has been destroyed! Game Over.");
+      clearInterval(roundInterval_1);
+      return;
+    }
+  }, 100);
+  startNewRound();
 }
-},{"howler":"node_modules/howler/dist/howler.js","./components/Header":"components/Header.ts","./components/ResourceDisplay":"components/ResourceDisplay.ts","./components/GameControls":"components/GameControls.ts","./components/BadgeDisplay":"components/BadgeDisplay.ts","./components/ResourceManager":"components/ResourceManager.ts","./components/UnitPurchase":"components/UnitPurchase.ts","./components/EnemyManager":"components/EnemyManager.ts","./components/GameCanvas":"components/GameCanvas.ts"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"howler":"node_modules/howler/dist/howler.js","./components/Header":"components/Header.ts","./components/ResourceDisplay":"components/ResourceDisplay.ts","./components/GameControls":"components/GameControls.ts","./components/BadgeDisplay":"components/BadgeDisplay.ts","./components/ResourceManager":"components/ResourceManager.ts","./components/UnitPurchase":"components/UnitPurchase.ts","./components/EnemyManager":"components/EnemyManager.ts","./components/GameCanvas":"components/GameCanvas.ts","./components/Base":"components/Base.ts","./components/DefenseManager":"components/DefenseManager.ts"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -3822,7 +4010,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "52496" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54585" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];

@@ -100,20 +100,19 @@ if (app) {
         waveCounter = 0;
         console.log(`Round ${currentRound} started!`);
         
-        // Call next wave
         spawnNextWave();
 
-        // Set interval to handle waves within the round
+
         roundInterval = setInterval(() => {
             if (waveCounter < maxWavesPerRound) {
                 spawnNextWave();
             } else {
                 endRound();
             }
-        }, 5000);  // Time between waves within a round (5 seconds as an example)
+        }, 5000);  // Time between waves within a round
     }
 
-    // Function to spawn the next wave of enemies
+    // Function to spawn the next wave
     function spawnNextWave() {
         waveCounter++;
         console.log(`Wave ${waveCounter} in Round ${currentRound} started!`);
@@ -122,38 +121,32 @@ if (app) {
         for (let i = 0; i < 5; i++) {
             enemyManager.spawnEnemy(
                 'Simple Infantry', 100, 2, 10,  // type, health, speed, attackPower
-                Math.random() * gameCanvas.canvas.width, 0  // random x-position, starting at y=0
+                Math.random() * gameCanvas.getCanvas().width, 0  // random x-position, starting at y=0
             );
         }
 
         gameCanvas.update();
     }
 
-    // Function to end the current round
+
     function endRound() {
         console.log(`Round ${currentRound} ended!`);
         clearInterval(roundInterval);  // Stop spawning new waves
 
-        // Perform end-of-round logic, e.g., reset defense unit attacks
         defenseManager.resetAttacks();
-
-        // Display a message or button to start the next round
     }
 
-    // Game update loop
     setInterval(() => {
         gameCanvas.update();
-        enemyManager.removeDestroyedEnemies();  // Remove enemies that are destroyed or off-screen
+        enemyManager.removeDestroyedEnemies();
 
-        // Check if the base has been destroyed
         if (base.isDestroyed()) {
             console.log("Base has been destroyed! Game Over.");
             clearInterval(roundInterval);
             return;
         }
 
-    }, 100);  // Update the game canvas every 100ms
+    }, 100);
 
-    // Initial call to start the first round
     startNewRound();
 }
