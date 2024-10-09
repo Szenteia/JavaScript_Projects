@@ -25,10 +25,10 @@ export class DefenseManager {
         const newDefense = new DefenseUnit(type, attackPower, attackSpeed, range, this.nextPlacementPosition.x, this.nextPlacementPosition.y);
         console.log(`New defense unit created at position: ${newDefense.getPosition().x}, ${newDefense.getPosition().y}`);
         this.defenses.push(newDefense);
-        this.updatePlacementPosition();  // Frissítjük a következő pozíciót
+        this.updatePlacementPosition();
     }
     private updatePlacementPosition(): void {
-        this.nextPlacementPosition.x += this.unitWidth + 10;
+        this.nextPlacementPosition.x += this.unitWidth + 20;
 
         if (this.nextPlacementPosition.x + this.unitWidth > this.canvasWidth) {
             this.nextPlacementPosition.x = 50;
@@ -42,6 +42,7 @@ export class DefenseManager {
                 enemies.forEach(enemy => {
                     if (defense.isEnemyInRange(enemy.getPosition()) && defense.canAttack(currentTime)) {
                         enemy.takeDamage(defense.attack(currentTime));
+                        console.log(`Enemy at position: ${enemy.getPosition().x}, ${enemy.getPosition().y} took damage!`);
                     }
                 });
             });

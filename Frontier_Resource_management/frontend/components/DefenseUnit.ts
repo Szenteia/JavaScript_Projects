@@ -11,7 +11,7 @@ export class DefenseUnit {
         this.type = type;
         this.attackPower = attackPower;
         this.attackSpeed = attackSpeed;  // Time (in ms) between attacks
-        this.range = range;  // Range within which the unit can attack
+        this.range = range; 
         this.position = { x: startX, y: startY };  // Position of the defense unit on the canvas
         this.lastAttackTime = 0;  // Keeps track of the last attack time for cooldown purposes
     }
@@ -34,6 +34,7 @@ export class DefenseUnit {
     // Perform an attack, updating the last attack time and returning the attack power
     public attack(currentTime: number): number {
         this.lastAttackTime =  currentTime;
+        console.log(`${this.type} attacked! Power: ${this.attackPower}`);
         return this.attackPower;
     }
 

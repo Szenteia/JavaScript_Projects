@@ -16,7 +16,7 @@ export class EnemyUnit {
     }
 
     public move(): void {
-        // Fentről lefelé mozgás (y tengely mentén növekszik a pozíció)
+        // moving from up to down
         this.position.y += this.speed;
     }
 
@@ -32,8 +32,9 @@ export class EnemyUnit {
         return this.attackPower;
     }
 
-    public takeDamage(amount: number): void {
-        this.health -= amount;
+    public takeDamage(damage: number): void {
+        this.health -= damage;
+        console.log(`Enemy took ${damage} damage. Remaining health: ${this.health}`);
     }
 
     public isDestroyed(): boolean {

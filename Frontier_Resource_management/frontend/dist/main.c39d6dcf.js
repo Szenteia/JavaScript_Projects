@@ -3612,7 +3612,7 @@ var EnemyUnit = /** @class */function () {
     };
   }
   EnemyUnit.prototype.move = function () {
-    // Fentről lefelé mozgás (y tengely mentén növekszik a pozíció)
+    // moving from up to down
     this.position.y += this.speed;
   };
   EnemyUnit.prototype.getPosition = function () {
@@ -3624,8 +3624,9 @@ var EnemyUnit = /** @class */function () {
   EnemyUnit.prototype.getAttackPower = function () {
     return this.attackPower;
   };
-  EnemyUnit.prototype.takeDamage = function (amount) {
-    this.health -= amount;
+  EnemyUnit.prototype.takeDamage = function (damage) {
+    this.health -= damage;
+    console.log("Enemy took ".concat(damage, " damage. Remaining health: ").concat(this.health));
   };
   EnemyUnit.prototype.isDestroyed = function () {
     return this.health <= 0;
@@ -3806,7 +3807,7 @@ var DefenseUnit = /** @class */function () {
     this.type = type;
     this.attackPower = attackPower;
     this.attackSpeed = attackSpeed; // Time (in ms) between attacks
-    this.range = range; // Range within which the unit can attack
+    this.range = range;
     this.position = {
       x: startX,
       y: startY
@@ -3828,6 +3829,7 @@ var DefenseUnit = /** @class */function () {
   // Perform an attack, updating the last attack time and returning the attack power
   DefenseUnit.prototype.attack = function (currentTime) {
     this.lastAttackTime = currentTime;
+    console.log("".concat(this.type, " attacked! Power: ").concat(this.attackPower));
     return this.attackPower;
   };
   // Get the type of defense unit
@@ -3871,10 +3873,10 @@ var DefenseManager = /** @class */function () {
     var newDefense = new DefenseUnit_1.DefenseUnit(type, attackPower, attackSpeed, range, this.nextPlacementPosition.x, this.nextPlacementPosition.y);
     console.log("New defense unit created at position: ".concat(newDefense.getPosition().x, ", ").concat(newDefense.getPosition().y));
     this.defenses.push(newDefense);
-    this.updatePlacementPosition(); // Frissítjük a következő pozíciót
+    this.updatePlacementPosition();
   };
   DefenseManager.prototype.updatePlacementPosition = function () {
-    this.nextPlacementPosition.x += this.unitWidth + 10;
+    this.nextPlacementPosition.x += this.unitWidth + 20;
     if (this.nextPlacementPosition.x + this.unitWidth > this.canvasWidth) {
       this.nextPlacementPosition.x = 50;
       this.nextPlacementPosition.y += this.unitHeight + 10;
@@ -3886,6 +3888,7 @@ var DefenseManager = /** @class */function () {
         enemies.forEach(function (enemy) {
           if (defense.isEnemyInRange(enemy.getPosition()) && defense.canAttack(currentTime)) {
             enemy.takeDamage(defense.attack(currentTime));
+            console.log("Enemy at position: ".concat(enemy.getPosition().x, ", ").concat(enemy.getPosition().y, " took damage!"));
           }
         });
       });
