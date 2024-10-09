@@ -3657,15 +3657,22 @@ var EnemyManager = /** @class */function () {
       enemy.move();
     });
   };
-  EnemyManager.prototype.manageAttacks = function (base) {
+  EnemyManager.prototype.attackBase = function (base) {
     this.enemies.forEach(function (enemy) {
       if (enemy.getPosition().y >= base.getHealth()) {
-        // Ha az ellenség elérte a frontvonalat, támadja
-        console.log("Enemy attacks base with ".concat(enemy.getAttackPower(), " power!"));
         base.takeDamage(enemy.getAttackPower());
       }
     });
   };
+  /*     public manageAttacks(base: Base): void {
+          this.enemies.forEach(enemy => {
+              if (enemy.getPosition().y >= base.getHealth()) {  // Ha az ellenség elérte a frontvonalat, támadja
+                  console.log(`Enemy attacks base with ${enemy.getAttackPower()} power!`);
+                  base.takeDamage(enemy.getAttackPower());
+              }
+          });
+      }
+       */
   EnemyManager.prototype.renderEnemies = function (ctx) {
     this.enemies.forEach(function (enemy) {
       ctx.fillStyle = 'red';
@@ -3717,7 +3724,7 @@ var GameCanvas = /** @class */function () {
     if (this.ctx) {
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
       this.enemyManager.moveEnemies();
-      this.enemyManager.manageAttacks(this.base);
+      this.enemyManager.attackBase(this.base);
       this.enemyManager.renderEnemies(this.ctx);
       this.defenseManager.manageAttacks(this.enemyManager.getEnemies());
       this.defenseManager.renderDefenses(this.ctx);
@@ -3759,11 +3766,22 @@ var Base = /** @class */function () {
     }
     return 0; //no available founds
   };
-  Base.prototype.takeDamage = function (amount) {
-    this.health = Math.max(0, this.health - amount);
+  Base.prototype.takeDamage = function (damage) {
+    this.health -= damage;
+    if (this.health < 0) {
+      this.health = 0;
+      console.log("damage taken: ".concat(damage));
+    }
   };
   Base.prototype.isDestroyed = function () {
     return this.health <= 0;
+  };
+  Base.prototype.render = function (ctx) {
+    ctx.fillStyle = 'green';
+    ctx.fillRect(10, ctx.canvas.height - 30, this.health / 1000 * (ctx.canvas.width - 20), 20); // Egyszerű életerő csík
+    ctx.fillStyle = 'black';
+    ctx.font = '16px Arial';
+    ctx.fillText("Base Health: ".concat(this.health), 10, ctx.canvas.height - 35);
   };
   return Base;
 }();

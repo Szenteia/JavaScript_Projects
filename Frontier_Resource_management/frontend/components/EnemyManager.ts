@@ -18,8 +18,16 @@ export class EnemyManager {
             enemy.move();  
         });
     }
+    public attackBase(base: Base): void {
+        this.enemies.forEach(enemy => {
+            if (enemy.getPosition().y >= base.getHealth()) { 
+                base.takeDamage(enemy.getAttackPower());  
+            }
+        });
+    }
 
-    public manageAttacks(base: Base): void {
+
+/*     public manageAttacks(base: Base): void {
         this.enemies.forEach(enemy => {
             if (enemy.getPosition().y >= base.getHealth()) {  // Ha az ellenség elérte a frontvonalat, támadja
                 console.log(`Enemy attacks base with ${enemy.getAttackPower()} power!`);
@@ -27,6 +35,7 @@ export class EnemyManager {
             }
         });
     }
+     */
 
     public renderEnemies(ctx: CanvasRenderingContext2D): void {
         this.enemies.forEach(enemy => {

@@ -41,7 +41,7 @@ export class GameCanvas {
             this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
             this.enemyManager.moveEnemies();
-            this.enemyManager.manageAttacks(this.base);
+            this.enemyManager.attackBase(this.base);
             this.enemyManager.renderEnemies(this.ctx);
 
             this.defenseManager.manageAttacks(this.enemyManager.getEnemies());
