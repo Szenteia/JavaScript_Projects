@@ -3778,7 +3778,7 @@ var Base = /** @class */function () {
   };
   Base.prototype.render = function (ctx) {
     ctx.fillStyle = 'green';
-    ctx.fillRect(10, ctx.canvas.height - 30, this.health / 1000 * (ctx.canvas.width - 20), 20); // Egyszerű életerő csík
+    ctx.fillRect(10, ctx.canvas.height - 30, this.health / 1000 * (ctx.canvas.width - 20), 20);
     ctx.fillStyle = 'black';
     ctx.font = '16px Arial';
     ctx.fillText("Base Health: ".concat(this.health), 10, ctx.canvas.height - 35);
@@ -4043,7 +4043,10 @@ if (app) {
   }
   setInterval(function () {
     gameCanvas_1.update();
+    enemyManager_1.moveEnemies();
+    enemyManager_1.attackBase(base_1);
     enemyManager_1.removeDestroyedEnemies();
+    base_1.render(gameCanvas_1.getCanvas().getContext('2d'));
     if (base_1.isDestroyed()) {
       console.log("Base has been destroyed! Game Over.");
       clearInterval(roundInterval_1);

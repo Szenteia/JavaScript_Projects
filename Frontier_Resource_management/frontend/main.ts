@@ -142,10 +142,13 @@ if (app) {
 
         defenseManager.resetAttacks();
     }
-
     setInterval(() => {
         gameCanvas.update();
+        enemyManager.moveEnemies(); 
+        enemyManager.attackBase(base); 
         enemyManager.removeDestroyedEnemies();
+
+        base.render(gameCanvas.getCanvas().getContext('2d')!);  
 
         if (base.isDestroyed()) {
             console.log("Base has been destroyed! Game Over.");

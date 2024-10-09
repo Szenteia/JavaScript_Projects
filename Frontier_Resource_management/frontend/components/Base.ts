@@ -36,7 +36,7 @@ export class Base {
     }
     public render(ctx: CanvasRenderingContext2D): void {
         ctx.fillStyle = 'green';
-        ctx.fillRect(10, ctx.canvas.height - 30, (this.health / 1000) * (ctx.canvas.width - 20), 20);  // Egyszerű életerő csík
+        ctx.fillRect(10, ctx.canvas.height - 30, (this.health / 1000) * (ctx.canvas.width - 20), 20);
         ctx.fillStyle = 'black';
         ctx.font = '16px Arial';
         ctx.fillText(`Base Health: ${this.health}`, 10, ctx.canvas.height - 35);
