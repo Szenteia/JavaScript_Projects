@@ -83,8 +83,10 @@ if (app) {
     gameCanvas.render(app);
 
     const unitPurchase = new UnitPurchase(resourceManager, (unitType: string) => {
+        defenseManager.placeDefenseUnit(unitType, 50, 1000, 150);
         console.log(`${unitType} purchased!`);
         resourceDisplay.updateResources();  
+        gameCanvas.update();
     });
     unitPurchase.render(app);
 
@@ -103,6 +105,7 @@ if (app) {
         currentRound++;
         waveCounter = 0;
         console.log(`Round ${currentRound} started!`);
+        defenseManager.deployReserveUnits();
         
         spawnNextWave();
 

@@ -3977,8 +3977,10 @@ if (app) {
   var gameCanvas_1 = new GameCanvas_1.GameCanvas(enemyManager_1, defenseManager_1, base_1);
   gameCanvas_1.render(app);
   var unitPurchase = new UnitPurchase_1.UnitPurchase(resourceManager, function (unitType) {
+    defenseManager_1.placeDefenseUnit(unitType, 50, 1000, 150);
     console.log("".concat(unitType, " purchased!"));
     resourceDisplay_1.updateResources();
+    gameCanvas_1.update();
   });
   unitPurchase.render(app);
   var badgeDisplay = new BadgeDisplay_1.BadgeDisplay();
@@ -3993,6 +3995,7 @@ if (app) {
     currentRound_1++;
     waveCounter_1 = 0;
     console.log("Round ".concat(currentRound_1, " started!"));
+    defenseManager_1.deployReserveUnits();
     spawnNextWave();
     roundInterval_1 = setInterval(function () {
       if (waveCounter_1 < maxWavesPerRound_1) {
@@ -4056,7 +4059,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54585" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56854" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];
