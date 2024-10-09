@@ -3818,21 +3818,40 @@ exports.DefenseUnit = DefenseUnit;
 },{}],"components/DefenseManager.ts":[function(require,module,exports) {
 "use strict";
 
-// frontend/components/DefenseManager.ts
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.DefenseManager = void 0;
 var DefenseUnit_1 = require("./DefenseUnit");
 var DefenseManager = /** @class */function () {
-  function DefenseManager() {
-    this.defenses = [];
+  function DefenseManager(canvasWidth) {
+    this.defenses = []; // Aktuális védelmi egységek
+    this.reserveUnits = []; // Tartalék egységek, amelyek túléltek egy hullámot
     this.hasAttackedThisRound = false;
+    this.nextPlacementPosition = {
+      x: 50,
+      y: 450
+    }; // Kezdő pozíció a base alatti elhelyezéshez
+    this.unitWidth = 40; // Egység szélessége a pozícionáláshoz
+    this.unitHeight = 40; // Egység magassága a pozícionáláshoz
+    this.canvasWidth = canvasWidth;
   }
-  DefenseManager.prototype.placeDefenseUnit = function (type, attackPower, attackSpeed, range, startX, startY) {
-    var newDefense = new DefenseUnit_1.DefenseUnit(type, attackPower, attackSpeed, range, startX, startY);
+  // Új védelmi egység elhelyezése a base alá automatikusan
+  DefenseManager.prototype.placeDefenseUnit = function (type, attackPower, attackSpeed, range) {
+    var newDefense = new DefenseUnit_1.DefenseUnit(type, attackPower, attackSpeed, range, this.nextPlacementPosition.x, this.nextPlacementPosition.y);
     this.defenses.push(newDefense);
+    this.updatePlacementPosition(); // Frissítjük a következő pozíciót
   };
+  // Frissíti a következő egység elhelyezésének pozícióját
+  DefenseManager.prototype.updatePlacementPosition = function () {
+    this.nextPlacementPosition.x += this.unitWidth + 10; // Következő pozíció balra mozgatása
+    // Ha a következő pozíció túllépi a canvas szélességét, új sorba lép
+    if (this.nextPlacementPosition.x + this.unitWidth > this.canvasWidth) {
+      this.nextPlacementPosition.x = 50; // Vissza az első oszlophoz
+      this.nextPlacementPosition.y += this.unitHeight + 10; // Lejjebb lép egy sorral
+    }
+  };
+  // Védelmi egységek támadása az ellenségekre, egyszeri támadás egy körön belül
   DefenseManager.prototype.manageAttacks = function (enemies) {
     if (!this.hasAttackedThisRound) {
       this.defenses.forEach(function (defense) {
@@ -3842,16 +3861,42 @@ var DefenseManager = /** @class */function () {
           }
         });
       });
-      this.hasAttackedThisRound = true;
+      this.hasAttackedThisRound = true; // Támadást végrehajtották ebben a körben
     }
   };
-  DefenseManager.prototype.resetAttacks = function () {
-    this.hasAttackedThisRound = false;
+  // Kör végén az életben maradt egységek áthelyezése a tartalékba
+  DefenseManager.prototype.moveToReserve = function () {
+    this.reserveUnits = this.defenses.filter(function (defense) {
+      return defense.attack() > 0;
+    }); // Csak az életben maradt egységeket helyezzük át
+    this.defenses = []; // Az aktuális védelmi egységek listájának kiürítése
   };
+  // Tartalékban lévő egységek újra elhelyezése a base alá
+  DefenseManager.prototype.deployReserveUnits = function () {
+    var _this = this;
+    this.reserveUnits.forEach(function (unit) {
+      unit['position'] = {
+        x: _this.nextPlacementPosition.x,
+        y: _this.nextPlacementPosition.y
+      };
+      _this.defenses.push(unit);
+      _this.updatePlacementPosition();
+    });
+    this.reserveUnits = []; // Kiürítjük a tartalékot
+  };
+  // Védelmi egységek kirajzolása a játéktérre
   DefenseManager.prototype.renderDefenses = function (ctx) {
+    var _this = this;
     this.defenses.forEach(function (defense) {
       ctx.fillStyle = 'blue';
-      ctx.fillRect(defense.getPosition().x, defense.getPosition().y, 20, 20);
+      ctx.fillRect(defense.getPosition().x, defense.getPosition().y, _this.unitWidth, _this.unitHeight);
+    });
+  };
+  // Kör végén a támadási státusz visszaállítása
+  DefenseManager.prototype.resetAttacks = function () {
+    this.hasAttackedThisRound = false;
+    this.defenses.forEach(function (defense) {
+      return defense.resetAttackStatus();
     });
   };
   DefenseManager.prototype.getDefenses = function () {
@@ -3920,24 +3965,25 @@ if (app) {
   var resourceManager = new ResourceManager_1.ResourceManager(500);
   var resourceDisplay_1 = new ResourceDisplay_1.ResourceDisplay(resourceManager);
   resourceDisplay_1.render(app);
-  var unitPurchase = new UnitPurchase_1.UnitPurchase(resourceManager, function (unitType) {
-    console.log("".concat(unitType, " purchased!"));
-    resourceDisplay_1.updateResources();
-  });
-  unitPurchase.render(app);
   var gameControls = new GameControls_1.GameControls(function () {
     console.log("Game Started!");
   }, function () {
     console.log("Game Paused!");
   });
   gameControls.render(app);
+  var base_1 = new Base_1.Base(1000, 5);
+  var enemyManager_1 = new EnemyManager_1.EnemyManager();
+  var defenseManager_1 = new DefenseManager_1.DefenseManager(window.innerWidth);
+  var gameCanvas_1 = new GameCanvas_1.GameCanvas(enemyManager_1, defenseManager_1, base_1);
+  gameCanvas_1.render(app);
+  var unitPurchase = new UnitPurchase_1.UnitPurchase(resourceManager, function (unitType) {
+    console.log("".concat(unitType, " purchased!"));
+    resourceDisplay_1.updateResources();
+  });
+  unitPurchase.render(app);
   var badgeDisplay = new BadgeDisplay_1.BadgeDisplay();
   badgeDisplay.addBadge("First Game Started");
   badgeDisplay.render(app);
-  var base_1 = new Base_1.Base(1000, 5);
-  var enemyManager_1 = new EnemyManager_1.EnemyManager();
-  var defenseManager_1 = new DefenseManager_1.DefenseManager();
-  var gameCanvas_1 = new GameCanvas_1.GameCanvas(enemyManager_1, defenseManager_1, base_1);
   // Game state variables
   var currentRound_1 = 0;
   var waveCounter_1 = 0;

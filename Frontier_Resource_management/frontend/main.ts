@@ -67,11 +67,6 @@ if (app) {
     const resourceDisplay = new ResourceDisplay(resourceManager);
     resourceDisplay.render(app);
 
-    const unitPurchase = new UnitPurchase(resourceManager, (unitType: string) => {
-        console.log(`${unitType} purchased!`);
-        resourceDisplay.updateResources();  
-    });
-    unitPurchase.render(app);
 
     const gameControls = new GameControls(
         () => { console.log("Game Started!"); },  
@@ -79,15 +74,24 @@ if (app) {
     );
     gameControls.render(app);
 
+
+    const base = new Base(1000, 5);
+    const enemyManager = new EnemyManager();
+    const defenseManager = new DefenseManager(window.innerWidth);
+
+    const gameCanvas = new GameCanvas(enemyManager, defenseManager, base);
+    gameCanvas.render(app);
+
+    const unitPurchase = new UnitPurchase(resourceManager, (unitType: string) => {
+        console.log(`${unitType} purchased!`);
+        resourceDisplay.updateResources();  
+    });
+    unitPurchase.render(app);
+
     const badgeDisplay = new BadgeDisplay();
     badgeDisplay.addBadge("First Game Started");
     badgeDisplay.render(app);
 
-    const base = new Base(1000, 5);
-    const enemyManager = new EnemyManager();
-    const defenseManager = new DefenseManager();
-
-    const gameCanvas = new GameCanvas(enemyManager, defenseManager, base);
 
     // Game state variables
     let currentRound = 0;
