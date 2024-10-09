@@ -23,13 +23,12 @@ export class GameCanvas {
         window.addEventListener('resize', this.setCanvasSize.bind(this));  //keep track of window size change
     }
 
-    // dinamic canvas sizing
     private setCanvasSize(): void {
         const headerHeight = document.querySelector('header')?.clientHeight || 0;
         const gameControlsHeight = document.querySelector('div')?.clientHeight || 0;
 
         this.canvas.width = window.innerWidth;
-        this.canvas.height = window.innerHeight - headerHeight - gameControlsHeight - 40; 
+        this.canvas.height = window.innerHeight - headerHeight - gameControlsHeight - 40;
     }
 
     public render(parentElement: HTMLElement): void {
@@ -44,11 +43,15 @@ export class GameCanvas {
             this.enemyManager.attackBase(this.base);
             this.enemyManager.renderEnemies(this.ctx);
 
-            this.defenseManager.manageAttacks(this.enemyManager.getEnemies());
+            const currentTime = Date.now();
+            this.defenseManager.manageAttacks(this.enemyManager.getEnemies(), currentTime);  
             this.defenseManager.renderDefenses(this.ctx);
+
+            this.base.render(this.ctx);
         }
     }
-    getCanvasWidth(): number {
+
+    public getCanvasWidth(): number {
         return this.canvas.width;
     }
 

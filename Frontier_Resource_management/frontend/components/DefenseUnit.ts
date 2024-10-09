@@ -32,8 +32,8 @@ export class DefenseUnit {
     }
 
     // Perform an attack, updating the last attack time and returning the attack power
-    public attack(): number {
-        this.lastAttackTime = Date.now();
+    public attack(currentTime: number): number {
+        this.lastAttackTime =  currentTime;
         return this.attackPower;
     }
 
