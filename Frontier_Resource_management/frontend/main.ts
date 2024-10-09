@@ -7,6 +7,8 @@ import { ResourceManager } from './components/ResourceManager';
 import { UnitPurchase } from './components/UnitPurchase';
 import { EnemyManager } from './components/EnemyManager';
 import { GameCanvas } from './components/GameCanvas';
+import { Base } from './components/Base';
+import { DefenseManager } from './components/DefenseManager';
 
 const ws = new WebSocket("ws://localhost:8000/ws");
 
@@ -81,14 +83,77 @@ if (app) {
     badgeDisplay.addBadge("First Game Started");
     badgeDisplay.render(app);
 
+    const base = new Base(1000, 5);
     const enemyManager = new EnemyManager();
+    const defenseManager = new DefenseManager();
 
-    const gameCanvas = new GameCanvas(enemyManager);
-    gameCanvas.render(app);
+    const gameCanvas = new GameCanvas(enemyManager, defenseManager, base);
 
-    setInterval(() => {
-        enemyManager.spawnEnemy('Simple Infantry', 100, 2, 10, Math.random() * gameCanvas.getCanvasWidth(), 0); 
+    // Game state variables
+    let currentRound = 0;
+    let waveCounter = 0;
+    const maxWavesPerRound = 3;
+    let roundInterval: number;
+
+    function startNewRound() {
+        currentRound++;
+        waveCounter = 0;
+        console.log(`Round ${currentRound} started!`);
+        
+        // Call next wave
+        spawnNextWave();
+
+        // Set interval to handle waves within the round
+        roundInterval = setInterval(() => {
+            if (waveCounter < maxWavesPerRound) {
+                spawnNextWave();
+            } else {
+                endRound();
+            }
+        }, 5000);  // Time between waves within a round (5 seconds as an example)
+    }
+
+    // Function to spawn the next wave of enemies
+    function spawnNextWave() {
+        waveCounter++;
+        console.log(`Wave ${waveCounter} in Round ${currentRound} started!`);
+
+        // Example of spawning 5 enemy units randomly positioned along the x-axis
+        for (let i = 0; i < 5; i++) {
+            enemyManager.spawnEnemy(
+                'Simple Infantry', 100, 2, 10,  // type, health, speed, attackPower
+                Math.random() * gameCanvas.canvas.width, 0  // random x-position, starting at y=0
+            );
+        }
+
         gameCanvas.update();
-        enemyManager.removeDestroyedEnemies();
-    }, 1000);
- }
+    }
+
+    // Function to end the current round
+    function endRound() {
+        console.log(`Round ${currentRound} ended!`);
+        clearInterval(roundInterval);  // Stop spawning new waves
+
+        // Perform end-of-round logic, e.g., reset defense unit attacks
+        defenseManager.resetAttacks();
+
+        // Display a message or button to start the next round
+    }
+
+    // Game update loop
+    setInterval(() => {
+        gameCanvas.update();
+        enemyManager.removeDestroyedEnemies();  // Remove enemies that are destroyed or off-screen
+
+        // Check if the base has been destroyed
+        if (base.isDestroyed()) {
+            console.log("Base has been destroyed! Game Over.");
+            clearInterval(roundInterval);
+            return;
+        }
+
+    }, 100);  // Update the game canvas every 100ms
+
+    // Initial call to start the first round
+    startNewRound();
+}

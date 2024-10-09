@@ -28,6 +28,10 @@ export class EnemyUnit {
         return this.health;
     }
 
+    public getAttackPower(): number {
+        return this.attackPower;
+    }
+
     public takeDamage(amount: number): void {
         this.health -= amount;
     }

@@ -21,8 +21,9 @@ export class EnemyManager {
 
     public manageAttacks(base: Base): void {
         this.enemies.forEach(enemy => {
-            if (enemy.getPosition().y >= base.getHealth()) {  
-                base.takeDamage(enemy.attackPower);
+            if (enemy.getPosition().y >= base.getHealth()) {  // Ha az ellenség elérte a frontvonalat, támadja
+                console.log(`Enemy attacks base with ${enemy.getAttackPower()} power!`);
+                base.takeDamage(enemy.getAttackPower());
             }
         });
     }

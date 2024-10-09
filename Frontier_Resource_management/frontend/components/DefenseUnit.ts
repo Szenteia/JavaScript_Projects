@@ -1,0 +1,49 @@
+
+export class DefenseUnit {
+    private type: string;
+    private attackPower: number;
+    private attackSpeed: number;
+    private range: number;
+    private position: { x: number, y: number };
+    private lastAttackTime: number;
+
+    constructor(type: string, attackPower: number, attackSpeed: number, range: number, startX: number, startY: number) {
+        this.type = type;
+        this.attackPower = attackPower;
+        this.attackSpeed = attackSpeed;  // Time (in ms) between attacks
+        this.range = range;  // Range within which the unit can attack
+        this.position = { x: startX, y: startY };  // Position of the defense unit on the canvas
+        this.lastAttackTime = 0;  // Keeps track of the last attack time for cooldown purposes
+    }
+
+    public getPosition(): { x: number, y: number } {
+        return this.position;
+    }
+
+    public isEnemyInRange(enemyPosition: { x: number, y: number }): boolean {
+        const dx = enemyPosition.x - this.position.x;
+        const dy = enemyPosition.y - this.position.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        return distance <= this.range;
+    }
+
+    public canAttack(currentTime: number): boolean {
+        return currentTime - this.lastAttackTime >= this.attackSpeed;
+    }
+
+    // Perform an attack, updating the last attack time and returning the attack power
+    public attack(): number {
+        this.lastAttackTime = Date.now();
+        return this.attackPower;
+    }
+
+    // Get the type of defense unit
+    public getType(): string {
+        return this.type;
+    }
+
+    // Resets the unit's attack status at the end of each round
+    public resetAttackStatus(): void {
+        this.lastAttackTime = 0;
+    }
+}
