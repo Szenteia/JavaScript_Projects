@@ -77,14 +77,16 @@ if (app) {
 
     const base = new Base(1000, 5);
     const enemyManager = new EnemyManager();
-    const defenseManager = new DefenseManager(window.innerWidth);
+    const defenseManager = new DefenseManager(window.innerWidth, base);
 
     const gameCanvas = new GameCanvas(enemyManager, defenseManager, base);
     gameCanvas.render(app);
 
     const unitPurchase = new UnitPurchase(resourceManager, (unitType: string) => {
+        console.log(`Purchasing unit: ${unitType}`);
         defenseManager.placeDefenseUnit(unitType, 50, 1000, 150);
-        console.log(`${unitType} purchased!`);
+     //   console.log(`Unit placed at position: ${JSON.stringify(defenseManager.getDefenses().map(unit => unit.getPosition()))}`);
+     //   console.log(`${unitType} purchased!`);
         resourceDisplay.updateResources();  
         gameCanvas.update();
     });

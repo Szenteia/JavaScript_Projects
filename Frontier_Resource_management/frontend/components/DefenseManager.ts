@@ -1,25 +1,32 @@
 import { DefenseUnit } from './DefenseUnit';
 import { EnemyUnit } from './EnemyUnit';
+import { Base } from './Base';
 
 export class DefenseManager {
     private defenses: DefenseUnit[] = [];  
     private reserveUnits: DefenseUnit[] = []; 
     private hasAttackedThisRound: boolean = false;
-    private nextPlacementPosition = { x: 50, y: 350 };  
+    private nextPlacementPosition = { x: 50, y: 200 };  
     private readonly unitWidth = 40;  
     private readonly unitHeight = 40;  
-    private readonly canvasWidth: number;  
+    private readonly canvasWidth: number;
+    private base: Base;
 
-    constructor(canvasWidth: number) {
+    constructor(canvasWidth: number, base: Base) {
         this.canvasWidth = canvasWidth;
+        this.base = base;
+        this.nextPlacementPosition = {
+            x: 50,
+            y: 200
+        };
     }
 
     public placeDefenseUnit(type: string, attackPower: number, attackSpeed: number, range: number): void {
         const newDefense = new DefenseUnit(type, attackPower, attackSpeed, range, this.nextPlacementPosition.x, this.nextPlacementPosition.y);
+        console.log(`New defense unit created at position: ${newDefense.getPosition().x}, ${newDefense.getPosition().y}`);
         this.defenses.push(newDefense);
-        this.updatePlacementPosition();  
+        this.updatePlacementPosition();  // Frissítjük a következő pozíciót
     }
-
     private updatePlacementPosition(): void {
         this.nextPlacementPosition.x += this.unitWidth + 10;
 

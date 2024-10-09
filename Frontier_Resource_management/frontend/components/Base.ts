@@ -31,6 +31,10 @@ export class Base {
 
     }
 
+    public getHealthBarYPosition(): number {
+        return 400;
+    }
+
     public isDestroyed(): boolean {
         return this.health <= 0;
     }

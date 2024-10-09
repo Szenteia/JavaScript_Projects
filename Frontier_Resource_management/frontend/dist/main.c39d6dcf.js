@@ -3714,13 +3714,17 @@ var GameCanvas = /** @class */function () {
     var headerHeight = ((_a = document.querySelector('header')) === null || _a === void 0 ? void 0 : _a.clientHeight) || 0;
     var gameControlsHeight = ((_b = document.querySelector('div')) === null || _b === void 0 ? void 0 : _b.clientHeight) || 0;
     this.canvas.width = window.innerWidth;
-    this.canvas.height = window.innerHeight - headerHeight - gameControlsHeight - 40;
+    this.canvas.height = window.innerHeight - headerHeight - gameControlsHeight - 20;
   };
   GameCanvas.prototype.render = function (parentElement) {
     parentElement.appendChild(this.canvas);
   };
   GameCanvas.prototype.update = function () {
     if (this.ctx) {
+      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+      // error searching
+      this.ctx.fillStyle = 'purple';
+      this.ctx.fillRect(this.canvas.width / 2 - 25, this.canvas.height / 2 - 25, 50, 50);
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
       this.enemyManager.moveEnemies();
       this.enemyManager.attackBase(this.base);
@@ -3773,6 +3777,9 @@ var Base = /** @class */function () {
       this.health = 0;
       console.log("damage taken: ".concat(damage));
     }
+  };
+  Base.prototype.getHealthBarYPosition = function () {
+    return 400;
   };
   Base.prototype.isDestroyed = function () {
     return this.health <= 0;
@@ -3843,22 +3850,28 @@ Object.defineProperty(exports, "__esModule", {
 exports.DefenseManager = void 0;
 var DefenseUnit_1 = require("./DefenseUnit");
 var DefenseManager = /** @class */function () {
-  function DefenseManager(canvasWidth) {
+  function DefenseManager(canvasWidth, base) {
     this.defenses = [];
     this.reserveUnits = [];
     this.hasAttackedThisRound = false;
     this.nextPlacementPosition = {
       x: 50,
-      y: 350
+      y: 200
     };
     this.unitWidth = 40;
     this.unitHeight = 40;
     this.canvasWidth = canvasWidth;
+    this.base = base;
+    this.nextPlacementPosition = {
+      x: 50,
+      y: 200
+    };
   }
   DefenseManager.prototype.placeDefenseUnit = function (type, attackPower, attackSpeed, range) {
     var newDefense = new DefenseUnit_1.DefenseUnit(type, attackPower, attackSpeed, range, this.nextPlacementPosition.x, this.nextPlacementPosition.y);
+    console.log("New defense unit created at position: ".concat(newDefense.getPosition().x, ", ").concat(newDefense.getPosition().y));
     this.defenses.push(newDefense);
-    this.updatePlacementPosition();
+    this.updatePlacementPosition(); // Frissítjük a következő pozíciót
   };
   DefenseManager.prototype.updatePlacementPosition = function () {
     this.nextPlacementPosition.x += this.unitWidth + 10;
@@ -3984,12 +3997,14 @@ if (app) {
   gameControls.render(app);
   var base_1 = new Base_1.Base(1000, 5);
   var enemyManager_1 = new EnemyManager_1.EnemyManager();
-  var defenseManager_1 = new DefenseManager_1.DefenseManager(window.innerWidth);
+  var defenseManager_1 = new DefenseManager_1.DefenseManager(window.innerWidth, base_1);
   var gameCanvas_1 = new GameCanvas_1.GameCanvas(enemyManager_1, defenseManager_1, base_1);
   gameCanvas_1.render(app);
   var unitPurchase = new UnitPurchase_1.UnitPurchase(resourceManager, function (unitType) {
+    console.log("Purchasing unit: ".concat(unitType));
     defenseManager_1.placeDefenseUnit(unitType, 50, 1000, 150);
-    console.log("".concat(unitType, " purchased!"));
+    //   console.log(`Unit placed at position: ${JSON.stringify(defenseManager.getDefenses().map(unit => unit.getPosition()))}`);
+    //   console.log(`${unitType} purchased!`);
     resourceDisplay_1.updateResources();
     gameCanvas_1.update();
   });
