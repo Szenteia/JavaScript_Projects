@@ -1,5 +1,5 @@
 
-
+import { Base } from './Base';
 import { EnemyUnit } from './EnemyUnit';
 
 export class EnemyManager {
@@ -16,6 +16,14 @@ export class EnemyManager {
     public moveEnemies(): void {
         this.enemies.forEach(enemy => {
             enemy.move();  
+        });
+    }
+
+    public manageAttacks(base: Base): void {
+        this.enemies.forEach(enemy => {
+            if (enemy.getPosition().y >= base.getHealth()) {  
+                base.takeDamage(enemy.attackPower);
+            }
         });
     }
 
