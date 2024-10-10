@@ -7,6 +7,7 @@ body {
     padding: 0;
     transition: background-color 0.5s ease, color 0.5s ease;
     overflow: hidden; /* Prevent scroll for moving patterns */
+    overflow-y: auto;
 }
 
 h1 {
@@ -198,6 +199,8 @@ body.eighties {
     padding: 20px;
     margin: 0 auto;
     max-width: 1200px;
+    max-height: 80vh;
+
 }
 .image-item {
     position: relative;
