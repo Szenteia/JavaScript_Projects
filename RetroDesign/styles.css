@@ -41,7 +41,7 @@ h1 {
 
 .theme-button:hover {
     background: #fff;
-    color: #111;
+    color: #555;
 }
 /* Information Container */
 #info-container {
@@ -189,4 +189,27 @@ body.eighties {
     100% {
         background-position: 0% 50%;
     }
+}
+
+#image-gallery {
+    display: grid;
+    gap: 10px;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* Dinamic layout for bento */
+    padding: 20px;
+    margin: 0 auto;
+    max-width: 1200px;
+}
+.image-item {
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+.image-item img {
+    width: 100%;
+    height: auto;
+    transition: transform 0.3s ease-in-out;
+}
+.image-item:hover img {
+    transform: scale(1.05);
 }

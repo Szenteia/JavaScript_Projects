@@ -1,3 +1,49 @@
+const pixabayAPI = {
+    baseUrl: "https://pixabay.com/api/",
+    key: "40183-9b47af445c3952742a6617b36"
+};
+
+// Kulcsszavak a különböző témákhoz
+const themeKeywords = {
+    sixties: "1960s",
+    seventies: "1970s",
+    eighties: "1980s"
+};
+
+function fetchImages(keyword) {
+    const url = `${pixabayAPI.baseUrl}?key=${pixabayAPI.key}&q=${keyword}&image_type=photo&per_page=15`;
+
+    fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Galéria törlése
+            const imageGallery = document.getElementById('image-gallery');
+            imageGallery.innerHTML = "";
+
+            // Képek dinamikus betöltése és megjelenítése
+            data.hits.forEach(photo => {
+                const imageItem = document.createElement('div');
+                imageItem.classList.add('image-item');
+
+                // Kép és információ megjelenítése
+                imageItem.innerHTML = `
+                    <img src="${photo.webformatURL}" alt="${photo.tags}">
+                `;
+
+                // Hozzáadás a galériához
+                imageGallery.appendChild(imageItem);
+            });
+        })
+        .catch(error => {
+            console.error("Hiba történt a képek betöltése közben: ", error);
+        });
+}
+
 // Function to switch themes based on button click
 function switchTheme(themeClass) {
     // Remove existing theme classes
