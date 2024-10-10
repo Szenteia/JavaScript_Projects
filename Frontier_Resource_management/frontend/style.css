@@ -29,7 +29,7 @@ button:hover {
 
 canvas {
     max-width: 100%;
-    box-sizing: border-box;
+    box-sizing:content-box ;
 }
 ul {
     list-style-type: none;
