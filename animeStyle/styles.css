@@ -156,10 +156,11 @@
   
   .about-item {
     flex: 0 0 100vw; /* Each item takes the full viewport width */
-    height: min-content;
+    height: 80vh;
+    min-height: 100%;
     padding: 20px;
     margin-right: 20px;
-    background-color: #f5f5f5;
+    background-color: #121825;
     border-radius: 10px;
     text-align: center;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
@@ -167,12 +168,13 @@
   
   .about-item h2 {
     font-size: 36px;
+    color: #f5f5f5;
     margin-bottom: 10px;
   }
   
   .about-item p {
     font-size: 18px;
-    color: #333;
+    color: #f5f5f5;
   }
   /*Gallery Sections */
   section {
