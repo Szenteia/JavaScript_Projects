@@ -8,8 +8,8 @@ export class EnemyManager {
     constructor() {}
 
 
-    public spawnEnemy(type: string, health: number, speed: number, attackPower: number, startX: number, startY: number): void {
-        const newEnemy = new EnemyUnit(type, health, speed, attackPower, startX, startY);
+    public spawnEnemy(type: string, health: number, range: number, speed: number, attackPower: number, startX: number, startY: number): void {
+        const newEnemy = new EnemyUnit(type, health, range, speed, attackPower, startX, startY);
         this.enemies.push(newEnemy);
     }
 
@@ -27,7 +27,7 @@ export class EnemyManager {
     }
 
 
-/*     public manageAttacks(base: Base): void {
+     public manageAttacks(base: Base): void {
         this.enemies.forEach(enemy => {
             if (enemy.getPosition().y >= base.getHealth()) {  // Ha az ellenség elérte a frontvonalat, támadja
                 console.log(`Enemy attacks base with ${enemy.getAttackPower()} power!`);
@@ -35,7 +35,7 @@ export class EnemyManager {
             }
         });
     }
-     */
+     
 
     public renderEnemies(ctx: CanvasRenderingContext2D): void {
         this.enemies.forEach(enemy => {

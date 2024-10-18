@@ -3653,8 +3653,8 @@ var EnemyManager = /** @class */function () {
   function EnemyManager() {
     this.enemies = [];
   }
-  EnemyManager.prototype.spawnEnemy = function (type, health, speed, attackPower, startX, startY) {
-    var newEnemy = new EnemyUnit_1.EnemyUnit(type, health, speed, attackPower, startX, startY);
+  EnemyManager.prototype.spawnEnemy = function (type, health, range, speed, attackPower, startX, startY) {
+    var newEnemy = new EnemyUnit_1.EnemyUnit(type, health, range, speed, attackPower, startX, startY);
     this.enemies.push(newEnemy);
   };
   EnemyManager.prototype.moveEnemies = function () {
@@ -3669,15 +3669,15 @@ var EnemyManager = /** @class */function () {
       }
     });
   };
-  /*     public manageAttacks(base: Base): void {
-          this.enemies.forEach(enemy => {
-              if (enemy.getPosition().y >= base.getHealth()) {  // Ha az ellenség elérte a frontvonalat, támadja
-                  console.log(`Enemy attacks base with ${enemy.getAttackPower()} power!`);
-                  base.takeDamage(enemy.getAttackPower());
-              }
-          });
+  EnemyManager.prototype.manageAttacks = function (base) {
+    this.enemies.forEach(function (enemy) {
+      if (enemy.getPosition().y >= base.getHealth()) {
+        // Ha az ellenség elérte a frontvonalat, támadja
+        console.log("Enemy attacks base with ".concat(enemy.getAttackPower(), " power!"));
+        base.takeDamage(enemy.getAttackPower());
       }
-       */
+    });
+  };
   EnemyManager.prototype.renderEnemies = function (ctx) {
     this.enemies.forEach(function (enemy) {
       ctx.fillStyle = 'red';
@@ -3734,7 +3734,8 @@ var GameCanvas = /** @class */function () {
       this.enemyManager.attackBase(this.base);
       this.enemyManager.renderEnemies(this.ctx);
       var currentTime = Date.now();
-      this.defenseManager.manageAttacks(this.enemyManager.getEnemies(), currentTime);
+      // Helyesen használjuk az enemyManager-t, nem a defenseManager-t a getEnemies metódussal
+      this.defenseManager.manageAttacks(this.enemyManager.getEnemies());
       this.defenseManager.renderDefenses(this.ctx);
       this.base.render(this.ctx);
     }
@@ -3867,7 +3868,7 @@ var DefenseManager = /** @class */function () {
     this.reserveUnits = [];
     this.nextPlacementPosition = {
       x: 50,
-      y: 200
+      y: 400
     };
     this.unitWidth = 40;
     this.unitHeight = 40;
@@ -3875,7 +3876,7 @@ var DefenseManager = /** @class */function () {
     this.base = base;
     this.nextPlacementPosition = {
       x: 50,
-      y: 200
+      y: 400
     };
   }
   // Egyszerűsített védelmi egység elhelyezés
@@ -3892,32 +3893,37 @@ var DefenseManager = /** @class */function () {
       this.nextPlacementPosition.y += this.unitHeight + 10;
     }
   };
-  // Támadások kezelése egyszerűsített logikával
   DefenseManager.prototype.manageAttacks = function (enemies) {
     var _this = this;
-    // Rendezés hatótávolság szerint
     this.defenses.sort(function (a, b) {
       return b.getRange() - a.getRange();
     });
     enemies.sort(function (a, b) {
       return b.getRange() - a.getRange();
     });
-    // Védekezési támadások
-    while (this.defenses.length > 0 && enemies.length > 0) {
-      var defense = this.defenses[0]; // A legnagyobb hatótávolságú védelmi egység
-      var enemy = enemies[0]; // Az első ellenség a sorban
-      if (defense.isEnemyInRange(enemy.getPosition())) {
-        enemy.takeDamage(defense.attack(Date.now())); // Védelmi egység támad
-        if (enemy.getHealth() <= 0) {
-          enemies.shift(); // Ellenség eltávolítása
+    for (var i = 0; i < this.defenses.length; i++) {
+      var defense = this.defenses[i];
+      for (var j = 0; j < enemies.length; j++) {
+        var enemy = enemies[j];
+        if (defense.isEnemyInRange(enemy.getPosition())) {
+          enemy.takeDamage(defense.attack(Date.now()));
+          console.log("Enemy attacked: Remaining health ".concat(enemy.getHealth()));
+          if (enemy.getHealth() <= 0) {
+            console.log("Enemy destroyed!");
+            enemies.splice(j, 1); // Távolítsd el az ellenséget a listából
+            j--; // Mivel egy elem eltűnik, vissza kell lépnünk egy indexet
+          }
+          // Ha a védelmi egység elpusztult, azt is eltávolítjuk
+          if (defense.getHealth() <= 0) {
+            console.log("Defense unit destroyed!");
+            this.defenses.splice(i, 1); // Távolítsd el a védelmi egységet
+            i--; // Hasonlóan, vissza kell lépnünk egy indexet
+            break; // Kilépünk az aktuális védelmi egység támadásából
+          }
         }
       }
-      // Ellenőrizd, ha a védelmi egység elpusztult
-      if (defense.getHealth() <= 0) {
-        this.defenses.shift(); // Védelmi egység eltávolítása
-      }
     }
-    // Ha nincsenek védelmi egységek, a bázist támadják az ellenségek
+    // Ha nincsenek többé védelmi egységek, a bázist támadják
     if (this.defenses.length === 0) {
       enemies.forEach(function (enemy) {
         _this.base.takeDamage(enemy.getAttackPower());
@@ -4018,7 +4024,7 @@ if (app) {
   gameCanvas_1.render(app);
   var unitPurchase = new UnitPurchase_1.UnitPurchase(resourceManager, function (unitType) {
     console.log("Purchasing unit: ".concat(unitType));
-    defenseManager_1.placeDefenseUnit(unitType, 50, 1000, 150);
+    defenseManager_1.placeDefenseUnit(unitType, 50, 100, 1000, 150);
     //   console.log(`Unit placed at position: ${JSON.stringify(defenseManager.getDefenses().map(unit => unit.getPosition()))}`);
     //   console.log(`${unitType} purchased!`);
     resourceDisplay_1.updateResources();
@@ -4037,7 +4043,7 @@ if (app) {
     currentRound_1++;
     waveCounter_1 = 0;
     console.log("Round ".concat(currentRound_1, " started!"));
-    defenseManager_1.deployReserveUnits();
+    //  defenseManager.deployReserveUnits();
     spawnNextWave();
     roundInterval_1 = setInterval(function () {
       if (waveCounter_1 < maxWavesPerRound_1) {
@@ -4053,8 +4059,8 @@ if (app) {
     console.log("Wave ".concat(waveCounter_1, " in Round ").concat(currentRound_1, " started!"));
     // Example of spawning 5 enemy units randomly positioned along the x-axis
     for (var i = 0; i < 5; i++) {
-      enemyManager_1.spawnEnemy('Simple Infantry', 100, 2, 10,
-      // type, health, speed, attackPower
+      enemyManager_1.spawnEnemy('Simple Infantry', 100, 10, 2, 10,
+      // type, health,range, speed, attackPower
       Math.random() * gameCanvas_1.getCanvas().width, 0 // random x-position, starting at y=0
       );
     }
@@ -4076,7 +4082,7 @@ if (app) {
       clearInterval(roundInterval_1);
       return;
     }
-  }, 100);
+  }, 1000);
   startNewRound();
 }
 },{"howler":"node_modules/howler/dist/howler.js","./components/Header":"components/Header.ts","./components/ResourceDisplay":"components/ResourceDisplay.ts","./components/GameControls":"components/GameControls.ts","./components/BadgeDisplay":"components/BadgeDisplay.ts","./components/ResourceManager":"components/ResourceManager.ts","./components/UnitPurchase":"components/UnitPurchase.ts","./components/EnemyManager":"components/EnemyManager.ts","./components/GameCanvas":"components/GameCanvas.ts","./components/Base":"components/Base.ts","./components/DefenseManager":"components/DefenseManager.ts"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
@@ -4104,7 +4110,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59605" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "60528" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];

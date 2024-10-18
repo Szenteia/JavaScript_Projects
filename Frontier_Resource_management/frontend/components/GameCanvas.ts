@@ -43,15 +43,16 @@ export class GameCanvas {
             this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
             this.ctx.fillStyle = 'purple';
             this.ctx.fillRect(this.canvas.width / 2 - 25, this.canvas.height / 2 - 25, 50, 50);
-
+    
             this.enemyManager.moveEnemies();
             this.enemyManager.attackBase(this.base);
             this.enemyManager.renderEnemies(this.ctx);
-
+    
             const currentTime = Date.now();
-            this.defenseManager.manageAttacks(this.enemyManager.getEnemies(), currentTime);  
+            // Helyesen használjuk az enemyManager-t, nem a defenseManager-t a getEnemies metódussal
+            this.defenseManager.manageAttacks(this.enemyManager.getEnemies());  
             this.defenseManager.renderDefenses(this.ctx);
-
+    
             this.base.render(this.ctx);
         }
     }

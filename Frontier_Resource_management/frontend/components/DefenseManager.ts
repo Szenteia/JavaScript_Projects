@@ -5,7 +5,7 @@ import { Base } from './Base';
 export class DefenseManager {
     private defenses: DefenseUnit[] = [];  
     private reserveUnits: DefenseUnit[] = []; 
-    private nextPlacementPosition = { x: 50, y: 200 };  
+    private nextPlacementPosition = { x: 50, y: 400 };  
     private readonly unitWidth = 40;  
     private readonly unitHeight = 40;  
     private readonly canvasWidth: number;
@@ -14,7 +14,7 @@ export class DefenseManager {
     constructor(canvasWidth: number, base: Base) {
         this.canvasWidth = canvasWidth;
         this.base = base;
-        this.nextPlacementPosition = { x: 50, y: 200 };
+        this.nextPlacementPosition = { x: 50, y:400 };
     }
 
     // Egyszerűsített védelmi egység elhelyezés
@@ -33,40 +33,47 @@ export class DefenseManager {
             this.nextPlacementPosition.y += this.unitHeight + 10;
         }
     }
-
-    // Támadások kezelése egyszerűsített logikával
     public manageAttacks(enemies: EnemyUnit[]): void {
-        // Rendezés hatótávolság szerint
         this.defenses.sort((a, b) => b.getRange() - a.getRange());
         enemies.sort((a, b) => b.getRange() - a.getRange());
+    
+    for (let i = 0; i < this.defenses.length; i++) {
+        const defense = this.defenses[i];
 
-        // Védekezési támadások
-        while (this.defenses.length > 0 && enemies.length > 0) {
-            const defense = this.defenses[0];  // A legnagyobb hatótávolságú védelmi egység
-            const enemy = enemies[0];  // Az első ellenség a sorban
+        for (let j = 0; j < enemies.length; j++) {
+            const enemy = enemies[j];
+
 
             if (defense.isEnemyInRange(enemy.getPosition())) {
-                enemy.takeDamage(defense.attack(Date.now()));  // Védelmi egység támad
+                enemy.takeDamage(defense.attack(Date.now()));
+                console.log(`Enemy attacked: Remaining health ${enemy.getHealth()}`);
+
+
                 if (enemy.getHealth() <= 0) {
-                    enemies.shift();  // Ellenség eltávolítása
+                    console.log(`Enemy destroyed!`);
+                    enemies.splice(j, 1);  // Távolítsd el az ellenséget a listából
+                    j--;  // Mivel egy elem eltűnik, vissza kell lépnünk egy indexet
+                }
+
+                // Ha a védelmi egység elpusztult, azt is eltávolítjuk
+                if (defense.getHealth() <= 0) {
+                    console.log(`Defense unit destroyed!`);
+                    this.defenses.splice(i, 1);  // Távolítsd el a védelmi egységet
+                    i--;  // Hasonlóan, vissza kell lépnünk egy indexet
+                    break;  // Kilépünk az aktuális védelmi egység támadásából
                 }
             }
-
-            // Ellenőrizd, ha a védelmi egység elpusztult
-            if (defense.getHealth() <= 0) {
-                this.defenses.shift();  // Védelmi egység eltávolítása
-            }
-        }
-
-        // Ha nincsenek védelmi egységek, a bázist támadják az ellenségek
-        if (this.defenses.length === 0) {
-            enemies.forEach(enemy => {
-                this.base.takeDamage(enemy.getAttackPower());
-                console.log(`Base attacked! Base health: ${this.base.getHealth()}`);
-            });
         }
     }
 
+    // Ha nincsenek többé védelmi egységek, a bázist támadják
+    if (this.defenses.length === 0) {
+        enemies.forEach(enemy => {
+            this.base.takeDamage(enemy.getAttackPower());
+            console.log(`Base attacked! Base health: ${this.base.getHealth()}`);
+        });
+    }
+}
     // Védekezési egységek kirajzolása
     public renderDefenses(ctx: CanvasRenderingContext2D): void {
         this.defenses.forEach(defense => {

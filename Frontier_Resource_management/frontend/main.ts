@@ -84,7 +84,7 @@ if (app) {
 
     const unitPurchase = new UnitPurchase(resourceManager, (unitType: string) => {
         console.log(`Purchasing unit: ${unitType}`);
-        defenseManager.placeDefenseUnit(unitType, 50, 1000, 150);
+        defenseManager.placeDefenseUnit(unitType, 50,100, 1000, 150);
      //   console.log(`Unit placed at position: ${JSON.stringify(defenseManager.getDefenses().map(unit => unit.getPosition()))}`);
      //   console.log(`${unitType} purchased!`);
         resourceDisplay.updateResources();  
@@ -107,7 +107,7 @@ if (app) {
         currentRound++;
         waveCounter = 0;
         console.log(`Round ${currentRound} started!`);
-        defenseManager.deployReserveUnits();
+      //  defenseManager.deployReserveUnits();
         
         spawnNextWave();
 
@@ -129,7 +129,7 @@ if (app) {
         // Example of spawning 5 enemy units randomly positioned along the x-axis
         for (let i = 0; i < 5; i++) {
             enemyManager.spawnEnemy(
-                'Simple Infantry', 100, 2, 10,  // type, health, speed, attackPower
+                'Simple Infantry', 100,10, 2, 10,  // type, health,range, speed, attackPower
                 Math.random() * gameCanvas.getCanvas().width, 0  // random x-position, starting at y=0
             );
         }
@@ -158,7 +158,7 @@ if (app) {
             return;
         }
 
-    }, 100);
+    }, 1000);
 
     startNewRound();
 }
