@@ -3601,9 +3601,10 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.EnemyUnit = void 0;
 var EnemyUnit = /** @class */function () {
-  function EnemyUnit(type, health, speed, attackPower, startX, startY) {
+  function EnemyUnit(type, health, range, speed, attackPower, startX, startY) {
     this.type = type;
     this.health = health;
+    this.range = range;
     this.speed = speed;
     this.attackPower = attackPower;
     this.position = {
@@ -3620,6 +3621,9 @@ var EnemyUnit = /** @class */function () {
   };
   EnemyUnit.prototype.getHealth = function () {
     return this.health;
+  };
+  EnemyUnit.prototype.getRange = function () {
+    return this.range;
   };
   EnemyUnit.prototype.getAttackPower = function () {
     return this.attackPower;
@@ -3707,15 +3711,16 @@ var GameCanvas = /** @class */function () {
     this.defenseManager = defenseManager;
     this.base = base;
     this.canvas.style.border = '1px solid #61dafb';
-    this.setCanvasSize();
+    this.setCanvasSize(); // Canvas méret beállítása az induláskor
     window.addEventListener('resize', this.setCanvasSize.bind(this)); //keep track of window size change
   }
+  // Dinamikus canvas méret beállítása, minimum 50%-os lefedettséggel
   GameCanvas.prototype.setCanvasSize = function () {
-    var _a, _b;
-    var headerHeight = ((_a = document.querySelector('header')) === null || _a === void 0 ? void 0 : _a.clientHeight) || 0;
-    var gameControlsHeight = ((_b = document.querySelector('div')) === null || _b === void 0 ? void 0 : _b.clientHeight) || 0;
-    this.canvas.width = window.innerWidth;
-    this.canvas.height = window.innerHeight - headerHeight - gameControlsHeight - 20;
+    var minWidth = window.innerWidth * 0.5; // Képernyő szélességének 50%-a
+    var minHeight = window.innerHeight * 0.5; // Képernyő magasságának 50%-a
+    this.canvas.width = Math.max(minWidth, 800); // Legalább 800px széles legyen
+    this.canvas.height = Math.max(minHeight, 600); // Legalább 600px magas legyen
+    console.log("Canvas size set to: ".concat(this.canvas.width, "px width, ").concat(this.canvas.height, "px height"));
   };
   GameCanvas.prototype.render = function (parentElement) {
     parentElement.appendChild(this.canvas);
@@ -3723,10 +3728,8 @@ var GameCanvas = /** @class */function () {
   GameCanvas.prototype.update = function () {
     if (this.ctx) {
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-      // error searching
       this.ctx.fillStyle = 'purple';
       this.ctx.fillRect(this.canvas.width / 2 - 25, this.canvas.height / 2 - 25, 50, 50);
-      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
       this.enemyManager.moveEnemies();
       this.enemyManager.attackBase(this.base);
       this.enemyManager.renderEnemies(this.ctx);
@@ -3803,8 +3806,9 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.DefenseUnit = void 0;
 var DefenseUnit = /** @class */function () {
-  function DefenseUnit(type, attackPower, attackSpeed, range, startX, startY) {
+  function DefenseUnit(type, health, attackPower, attackSpeed, range, startX, startY) {
     this.type = type;
+    this.health = health;
     this.attackPower = attackPower;
     this.attackSpeed = attackSpeed; // Time (in ms) between attacks
     this.range = range;
@@ -3832,6 +3836,12 @@ var DefenseUnit = /** @class */function () {
     console.log("".concat(this.type, " attacked! Power: ").concat(this.attackPower));
     return this.attackPower;
   };
+  DefenseUnit.prototype.getRange = function () {
+    return this.range;
+  };
+  DefenseUnit.prototype.getHealth = function () {
+    return this.health;
+  };
   // Get the type of defense unit
   DefenseUnit.prototype.getType = function () {
     return this.type;
@@ -3855,7 +3865,6 @@ var DefenseManager = /** @class */function () {
   function DefenseManager(canvasWidth, base) {
     this.defenses = [];
     this.reserveUnits = [];
-    this.hasAttackedThisRound = false;
     this.nextPlacementPosition = {
       x: 50,
       y: 200
@@ -3869,12 +3878,13 @@ var DefenseManager = /** @class */function () {
       y: 200
     };
   }
-  DefenseManager.prototype.placeDefenseUnit = function (type, attackPower, attackSpeed, range) {
-    var newDefense = new DefenseUnit_1.DefenseUnit(type, attackPower, attackSpeed, range, this.nextPlacementPosition.x, this.nextPlacementPosition.y);
-    console.log("New defense unit created at position: ".concat(newDefense.getPosition().x, ", ").concat(newDefense.getPosition().y));
+  // Egyszerűsített védelmi egység elhelyezés
+  DefenseManager.prototype.placeDefenseUnit = function (type, health, attackPower, attackSpeed, range) {
+    var newDefense = new DefenseUnit_1.DefenseUnit(type, health, attackPower, attackSpeed, range, this.nextPlacementPosition.x, this.nextPlacementPosition.y);
     this.defenses.push(newDefense);
     this.updatePlacementPosition();
   };
+  // Pozíció frissítése az új egységek számára
   DefenseManager.prototype.updatePlacementPosition = function () {
     this.nextPlacementPosition.x += this.unitWidth + 20;
     if (this.nextPlacementPosition.x + this.unitWidth > this.canvasWidth) {
@@ -3882,37 +3892,40 @@ var DefenseManager = /** @class */function () {
       this.nextPlacementPosition.y += this.unitHeight + 10;
     }
   };
-  DefenseManager.prototype.manageAttacks = function (enemies, currentTime) {
-    if (!this.hasAttackedThisRound) {
-      this.defenses.forEach(function (defense) {
-        enemies.forEach(function (enemy) {
-          if (defense.isEnemyInRange(enemy.getPosition()) && defense.canAttack(currentTime)) {
-            enemy.takeDamage(defense.attack(currentTime));
-            console.log("Enemy at position: ".concat(enemy.getPosition().x, ", ").concat(enemy.getPosition().y, " took damage!"));
-          }
-        });
+  // Támadások kezelése egyszerűsített logikával
+  DefenseManager.prototype.manageAttacks = function (enemies) {
+    var _this = this;
+    // Rendezés hatótávolság szerint
+    this.defenses.sort(function (a, b) {
+      return b.getRange() - a.getRange();
+    });
+    enemies.sort(function (a, b) {
+      return b.getRange() - a.getRange();
+    });
+    // Védekezési támadások
+    while (this.defenses.length > 0 && enemies.length > 0) {
+      var defense = this.defenses[0]; // A legnagyobb hatótávolságú védelmi egység
+      var enemy = enemies[0]; // Az első ellenség a sorban
+      if (defense.isEnemyInRange(enemy.getPosition())) {
+        enemy.takeDamage(defense.attack(Date.now())); // Védelmi egység támad
+        if (enemy.getHealth() <= 0) {
+          enemies.shift(); // Ellenség eltávolítása
+        }
+      }
+      // Ellenőrizd, ha a védelmi egység elpusztult
+      if (defense.getHealth() <= 0) {
+        this.defenses.shift(); // Védelmi egység eltávolítása
+      }
+    }
+    // Ha nincsenek védelmi egységek, a bázist támadják az ellenségek
+    if (this.defenses.length === 0) {
+      enemies.forEach(function (enemy) {
+        _this.base.takeDamage(enemy.getAttackPower());
+        console.log("Base attacked! Base health: ".concat(_this.base.getHealth()));
       });
-      this.hasAttackedThisRound = true;
     }
   };
-  DefenseManager.prototype.moveToReserve = function () {
-    this.reserveUnits = this.defenses.filter(function (defense) {
-      return defense.getType() !== 'Destroyed';
-    });
-    this.defenses = [];
-  };
-  DefenseManager.prototype.deployReserveUnits = function () {
-    var _this = this;
-    this.reserveUnits.forEach(function (unit) {
-      unit['position'] = {
-        x: _this.nextPlacementPosition.x,
-        y: _this.nextPlacementPosition.y
-      };
-      _this.defenses.push(unit);
-      _this.updatePlacementPosition();
-    });
-    this.reserveUnits = [];
-  };
+  // Védekezési egységek kirajzolása
   DefenseManager.prototype.renderDefenses = function (ctx) {
     var _this = this;
     this.defenses.forEach(function (defense) {
@@ -3920,8 +3933,8 @@ var DefenseManager = /** @class */function () {
       ctx.fillRect(defense.getPosition().x, defense.getPosition().y, _this.unitWidth, _this.unitHeight);
     });
   };
+  // Védelmi egységek visszaállítása egy kör végén
   DefenseManager.prototype.resetAttacks = function () {
-    this.hasAttackedThisRound = false;
     this.defenses.forEach(function (defense) {
       return defense.resetAttackStatus();
     });
@@ -4091,7 +4104,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "52344" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59605" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];

@@ -4,12 +4,14 @@ export class EnemyUnit {
     private type: string;
     private health: number;
     private speed: number;
+    private range: number;
     private attackPower: number;
     private position: { x: number, y: number };
 
-    constructor(type: string, health: number, speed: number, attackPower: number, startX: number, startY: number) {
+    constructor(type: string, health: number, range: number, speed: number, attackPower: number, startX: number, startY: number) {
         this.type = type;
         this.health = health;
+        this.range = range;
         this.speed = speed;
         this.attackPower = attackPower;
         this.position = { x: startX, y: startY };
@@ -26,6 +28,9 @@ export class EnemyUnit {
 
     public getHealth(): number {
         return this.health;
+    }
+    public getRange(): number {
+        return this.range;
     }
 
     public getAttackPower(): number {

@@ -19,16 +19,19 @@ export class GameCanvas {
         this.base = base;
 
         this.canvas.style.border = '1px solid #61dafb';
-        this.setCanvasSize();
-        window.addEventListener('resize', this.setCanvasSize.bind(this));  //keep track of window size change
+        this.setCanvasSize(); // Canvas méret beállítása az induláskor
+        window.addEventListener('resize', this.setCanvasSize.bind(this)); //keep track of window size change
     }
 
+    // Dinamikus canvas méret beállítása, minimum 50%-os lefedettséggel
     private setCanvasSize(): void {
-        const headerHeight = document.querySelector('header')?.clientHeight || 0;
-        const gameControlsHeight = document.querySelector('div')?.clientHeight || 0;
+        const minWidth = window.innerWidth * 0.5;  // Képernyő szélességének 50%-a
+        const minHeight = window.innerHeight * 0.5;  // Képernyő magasságának 50%-a
 
-        this.canvas.width = window.innerWidth;
-        this.canvas.height = window.innerHeight - headerHeight - gameControlsHeight - 20;
+        this.canvas.width = Math.max(minWidth, 800);  // Legalább 800px széles legyen
+        this.canvas.height = Math.max(minHeight, 600);  // Legalább 600px magas legyen
+
+        console.log(`Canvas size set to: ${this.canvas.width}px width, ${this.canvas.height}px height`);
     }
 
     public render(parentElement: HTMLElement): void {
@@ -38,11 +41,9 @@ export class GameCanvas {
     public update(): void {
         if (this.ctx) {
             this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-            // error searching
             this.ctx.fillStyle = 'purple';
             this.ctx.fillRect(this.canvas.width / 2 - 25, this.canvas.height / 2 - 25, 50, 50);
-    
-            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
             this.enemyManager.moveEnemies();
             this.enemyManager.attackBase(this.base);
             this.enemyManager.renderEnemies(this.ctx);

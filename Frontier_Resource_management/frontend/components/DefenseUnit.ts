@@ -1,14 +1,16 @@
 
 export class DefenseUnit {
     private type: string;
+    private health: number;
     private attackPower: number;
     private attackSpeed: number;
     private range: number;
     private position: { x: number, y: number };
     private lastAttackTime: number;
 
-    constructor(type: string, attackPower: number, attackSpeed: number, range: number, startX: number, startY: number) {
+    constructor(type: string, health: number, attackPower: number, attackSpeed: number, range: number, startX: number, startY: number) {
         this.type = type;
+        this.health = health;
         this.attackPower = attackPower;
         this.attackSpeed = attackSpeed;  // Time (in ms) between attacks
         this.range = range; 
@@ -37,7 +39,12 @@ export class DefenseUnit {
         console.log(`${this.type} attacked! Power: ${this.attackPower}`);
         return this.attackPower;
     }
-
+    public getRange(): number {
+        return this.range;
+    }
+    public getHealth(): number {
+        return this.health;
+    }
     // Get the type of defense unit
     public getType(): string {
         return this.type;

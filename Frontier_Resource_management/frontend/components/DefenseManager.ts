@@ -5,7 +5,6 @@ import { Base } from './Base';
 export class DefenseManager {
     private defenses: DefenseUnit[] = [];  
     private reserveUnits: DefenseUnit[] = []; 
-    private hasAttackedThisRound: boolean = false;
     private nextPlacementPosition = { x: 50, y: 200 };  
     private readonly unitWidth = 40;  
     private readonly unitHeight = 40;  
@@ -15,18 +14,17 @@ export class DefenseManager {
     constructor(canvasWidth: number, base: Base) {
         this.canvasWidth = canvasWidth;
         this.base = base;
-        this.nextPlacementPosition = {
-            x: 50,
-            y: 200
-        };
+        this.nextPlacementPosition = { x: 50, y: 200 };
     }
 
-    public placeDefenseUnit(type: string, attackPower: number, attackSpeed: number, range: number): void {
-        const newDefense = new DefenseUnit(type, attackPower, attackSpeed, range, this.nextPlacementPosition.x, this.nextPlacementPosition.y);
-        console.log(`New defense unit created at position: ${newDefense.getPosition().x}, ${newDefense.getPosition().y}`);
+    // Egyszerűsített védelmi egység elhelyezés
+    public placeDefenseUnit(type: string, health: number, attackPower: number, attackSpeed: number, range: number): void {
+        const newDefense = new DefenseUnit(type, health, attackPower, attackSpeed, range, this.nextPlacementPosition.x, this.nextPlacementPosition.y);
         this.defenses.push(newDefense);
         this.updatePlacementPosition();
     }
+
+    // Pozíció frissítése az új egységek számára
     private updatePlacementPosition(): void {
         this.nextPlacementPosition.x += this.unitWidth + 20;
 
@@ -36,34 +34,40 @@ export class DefenseManager {
         }
     }
 
-    public manageAttacks(enemies: EnemyUnit[], currentTime: number): void {
-        if (!this.hasAttackedThisRound) {
-            this.defenses.forEach(defense => {
-                enemies.forEach(enemy => {
-                    if (defense.isEnemyInRange(enemy.getPosition()) && defense.canAttack(currentTime)) {
-                        enemy.takeDamage(defense.attack(currentTime));
-                        console.log(`Enemy at position: ${enemy.getPosition().x}, ${enemy.getPosition().y} took damage!`);
-                    }
-                });
+    // Támadások kezelése egyszerűsített logikával
+    public manageAttacks(enemies: EnemyUnit[]): void {
+        // Rendezés hatótávolság szerint
+        this.defenses.sort((a, b) => b.getRange() - a.getRange());
+        enemies.sort((a, b) => b.getRange() - a.getRange());
+
+        // Védekezési támadások
+        while (this.defenses.length > 0 && enemies.length > 0) {
+            const defense = this.defenses[0];  // A legnagyobb hatótávolságú védelmi egység
+            const enemy = enemies[0];  // Az első ellenség a sorban
+
+            if (defense.isEnemyInRange(enemy.getPosition())) {
+                enemy.takeDamage(defense.attack(Date.now()));  // Védelmi egység támad
+                if (enemy.getHealth() <= 0) {
+                    enemies.shift();  // Ellenség eltávolítása
+                }
+            }
+
+            // Ellenőrizd, ha a védelmi egység elpusztult
+            if (defense.getHealth() <= 0) {
+                this.defenses.shift();  // Védelmi egység eltávolítása
+            }
+        }
+
+        // Ha nincsenek védelmi egységek, a bázist támadják az ellenségek
+        if (this.defenses.length === 0) {
+            enemies.forEach(enemy => {
+                this.base.takeDamage(enemy.getAttackPower());
+                console.log(`Base attacked! Base health: ${this.base.getHealth()}`);
             });
-            this.hasAttackedThisRound = true;
         }
     }
 
-    public moveToReserve(): void {
-        this.reserveUnits = this.defenses.filter(defense => defense.getType() !== 'Destroyed');
-        this.defenses = [];
-    }
-
-    public deployReserveUnits(): void {
-        this.reserveUnits.forEach(unit => {
-            unit['position'] = { x: this.nextPlacementPosition.x, y: this.nextPlacementPosition.y };
-            this.defenses.push(unit);
-            this.updatePlacementPosition();
-        });
-        this.reserveUnits = [];
-    }
-
+    // Védekezési egységek kirajzolása
     public renderDefenses(ctx: CanvasRenderingContext2D): void {
         this.defenses.forEach(defense => {
             ctx.fillStyle = 'blue';
@@ -71,8 +75,8 @@ export class DefenseManager {
         });
     }
 
+    // Védelmi egységek visszaállítása egy kör végén
     public resetAttacks(): void {
-        this.hasAttackedThisRound = false;
         this.defenses.forEach(defense => defense.resetAttackStatus());
     }
 
