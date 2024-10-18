@@ -3734,7 +3734,6 @@ var GameCanvas = /** @class */function () {
       this.enemyManager.attackBase(this.base);
       this.enemyManager.renderEnemies(this.ctx);
       var currentTime = Date.now();
-      // Helyesen használjuk az enemyManager-t, nem a defenseManager-t a getEnemies metódussal
       this.defenseManager.manageAttacks(this.enemyManager.getEnemies());
       this.defenseManager.renderDefenses(this.ctx);
       this.base.render(this.ctx);
@@ -3879,19 +3878,34 @@ var DefenseManager = /** @class */function () {
       y: 400
     };
   }
-  // Egyszerűsített védelmi egység elhelyezés
   DefenseManager.prototype.placeDefenseUnit = function (type, health, attackPower, attackSpeed, range) {
-    var newDefense = new DefenseUnit_1.DefenseUnit(type, health, attackPower, attackSpeed, range, this.nextPlacementPosition.x, this.nextPlacementPosition.y);
+    var totalUnitsPerRow = Math.min(this.defenses.length + 1, Math.floor(this.canvasWidth / (this.unitWidth + 20))); // Mennyi egység fér el egy sorban
+    var totalPlacedUnits = this.defenses.length; // Hány egység van már elhelyezve
+    // Számoljuk ki, melyik sorban van az egység
+    var currentRow = Math.floor(totalPlacedUnits / totalUnitsPerRow);
+    var unitsInRow = totalPlacedUnits % totalUnitsPerRow;
+    // A sor közepére igazított kezdő pozíció
+    var totalSpacing = (this.canvasWidth - totalUnitsPerRow * this.unitWidth) / (totalUnitsPerRow + 1); // Egyenlő távolságok az egységek között
+    var newX = totalSpacing + unitsInRow * (this.unitWidth + totalSpacing); // A pozíció számítása
+    var newY = this.nextPlacementPosition.y + currentRow * (this.unitHeight + 20); // Sor közötti távolság
+    var newDefense = new DefenseUnit_1.DefenseUnit(type, health, attackPower, attackSpeed, range, newX, newY);
     this.defenses.push(newDefense);
+    // Meghívjuk az updatePlacementPosition-t az új pozíció frissítéséhez
     this.updatePlacementPosition();
+    console.log("New defense unit created at position: ".concat(newDefense.getPosition().x, ", ").concat(newDefense.getPosition().y));
   };
-  // Pozíció frissítése az új egységek számára
   DefenseManager.prototype.updatePlacementPosition = function () {
-    this.nextPlacementPosition.x += this.unitWidth + 20;
-    if (this.nextPlacementPosition.x + this.unitWidth > this.canvasWidth) {
-      this.nextPlacementPosition.x = 50;
-      this.nextPlacementPosition.y += this.unitHeight + 10;
-    }
+    var unitsPerRow = Math.floor(this.canvasWidth / (this.unitWidth + 20)); // Egységek száma egy sorban
+    var indexInRow = this.defenses.length % unitsPerRow; // Az egység indexe a soron belül
+    var currentRow = Math.floor(this.defenses.length / unitsPerRow); // Az aktuális sor
+    // Az egység vízszintes pozíciója a soron belül, és az új sor kezdése
+    var spacing = (this.canvasWidth - unitsPerRow * this.unitWidth) / (unitsPerRow + 1);
+    var newX = spacing + indexInRow * (this.unitWidth + spacing);
+    var newY = this.nextPlacementPosition.y + currentRow * (this.unitHeight + 10);
+    this.nextPlacementPosition = {
+      x: newX,
+      y: newY
+    };
   };
   DefenseManager.prototype.manageAttacks = function (enemies) {
     var _this = this;
@@ -3910,20 +3924,18 @@ var DefenseManager = /** @class */function () {
           console.log("Enemy attacked: Remaining health ".concat(enemy.getHealth()));
           if (enemy.getHealth() <= 0) {
             console.log("Enemy destroyed!");
-            enemies.splice(j, 1); // Távolítsd el az ellenséget a listából
-            j--; // Mivel egy elem eltűnik, vissza kell lépnünk egy indexet
+            enemies.splice(j, 1);
+            j--;
           }
-          // Ha a védelmi egység elpusztult, azt is eltávolítjuk
           if (defense.getHealth() <= 0) {
             console.log("Defense unit destroyed!");
-            this.defenses.splice(i, 1); // Távolítsd el a védelmi egységet
-            i--; // Hasonlóan, vissza kell lépnünk egy indexet
-            break; // Kilépünk az aktuális védelmi egység támadásából
+            this.defenses.splice(i, 1);
+            i--;
+            break;
           }
         }
       }
     }
-    // Ha nincsenek többé védelmi egységek, a bázist támadják
     if (this.defenses.length === 0) {
       enemies.forEach(function (enemy) {
         _this.base.takeDamage(enemy.getAttackPower());
@@ -3931,7 +3943,6 @@ var DefenseManager = /** @class */function () {
       });
     }
   };
-  // Védekezési egységek kirajzolása
   DefenseManager.prototype.renderDefenses = function (ctx) {
     var _this = this;
     this.defenses.forEach(function (defense) {
@@ -3939,7 +3950,6 @@ var DefenseManager = /** @class */function () {
       ctx.fillRect(defense.getPosition().x, defense.getPosition().y, _this.unitWidth, _this.unitHeight);
     });
   };
-  // Védelmi egységek visszaállítása egy kör végén
   DefenseManager.prototype.resetAttacks = function () {
     this.defenses.forEach(function (defense) {
       return defense.resetAttackStatus();

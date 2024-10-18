@@ -49,7 +49,6 @@ export class GameCanvas {
             this.enemyManager.renderEnemies(this.ctx);
     
             const currentTime = Date.now();
-            // Helyesen használjuk az enemyManager-t, nem a defenseManager-t a getEnemies metódussal
             this.defenseManager.manageAttacks(this.enemyManager.getEnemies());  
             this.defenseManager.renderDefenses(this.ctx);
     
