@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Gallery Videos (Replace URLs with your YouTube video links)
     const videoUrls = [
-        "https://www.youtube.com/embed/VIDEO_ID_1",
+        "https://www.youtube.com/embed/jIP1lR0NFkI?si=a5wlBtO51X7ccklp",
         "https://www.youtube.com/embed/VIDEO_ID_2"
     ];
     
@@ -13,7 +12,6 @@ document.addEventListener('DOMContentLoaded', () => {
         videoGrid.appendChild(iframe);
     });
 
-    // Handle Suggestions
     const suggestionForm = document.getElementById('suggestionForm');
     const suggestionsList = document.getElementById('suggestionsList');
 
@@ -26,7 +24,6 @@ document.addEventListener('DOMContentLoaded', () => {
         suggestionInput.value = '';
     });
 
-    // Handle Discussion
     const discussionForm = document.getElementById('discussionForm');
     const discussionList = document.getElementById('discussionList');
 

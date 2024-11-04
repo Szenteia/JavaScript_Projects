@@ -76,7 +76,7 @@ footer svg {
     left: 0;
     height: 100%;
     transform: matrix
-    scaleY(3)
+    scaleY(4)
     scaleX(2.25);
     transform-origin: 
     bottom;
@@ -86,17 +86,22 @@ footer svg {
 
 ul {
     display: flex;
+    align-self: center;
     list-style: none;
     padding: 0;
     margin: 0;
 }
 
 .socials{
-    gap: 10px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
 }
 
 .socials a {
+    font-family: "Poppins", sans-serif;
     font-size: 18px;
+    color: #fff;
 }
 
 .links {
@@ -127,8 +132,8 @@ footer {
     position: relative; 
     color: #DDA0DD;
     display: flex;
+    justify-content:center;
     align-items: center;
-    justify-content: center;
     padding: 2.5rem 0;
     text-align: center;
     font-size: 1rem;
