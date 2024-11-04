@@ -3,17 +3,18 @@ body {
     color: #333;
     margin: 0;
     padding: 0;
-    background: #f4f4f4;
+    background: #556b7c;
 }
 
 header {
-    background: #333;
+    background: #7c96aa;
     color: #fff;
     padding: 2em;
     text-align: center;
 }
 
 main {
+    font-family: "Poppins", sans-serif;
     padding: 2em;
     display: grid;
     gap: 2em;
@@ -22,10 +23,10 @@ main {
 }
 
 section {
-    background: #fff;
+    background: #7c96aa;
     padding: 1em;
     border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 5px 10px rgba(48, 128, 78, 0.2);
 }
 
 #video-grid {
@@ -99,7 +100,7 @@ ul {
 }
 
 .links {
-    gap: 15px;
+    gap: 10px;
 }
 
 .legal {
