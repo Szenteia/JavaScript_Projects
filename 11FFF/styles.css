@@ -1,0 +1,172 @@
+body {
+    font-family: "Poppins", sans-serif;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    background: #f4f4f4;
+}
+
+header {
+    background: #333;
+    color: #fff;
+    padding: 2em;
+    text-align: center;
+}
+
+main {
+    padding: 2em;
+    display: grid;
+    gap: 2em;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+section {
+    background: #fff;
+    padding: 1em;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+#video-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1em;
+}
+
+#video-grid:has(img:hover)>img:not(:hover){
+    opacity: 0.5;
+}
+
+#video-grid iframe {
+    width: 100%;
+    border: none;
+}
+footer .background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+
+}
+
+footer .footer-content {
+    position: relative;
+    z-index: 1;
+}
+
+footer svg {
+    width: 100%;
+
+    transform-origin: bottom;
+    pointer-events: none;
+}
+.background svg {
+    z-index: -1;
+    top: -10px;
+    left: 0;
+    width: 100%;
+    height: 300px;
+    transform: scale(1.9);
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    transform: matrix
+    scaleY(3)
+    scaleX(2.25);
+    transform-origin: 
+    bottom;
+    display: block;
+    pointer-events: none;
+}
+
+ul {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.socials{
+    gap: 10px;
+}
+
+.socials a {
+    font-size: 18px;
+}
+
+.links {
+    gap: 15px;
+}
+
+.legal {
+    font-size: 12px;
+    margin: 0;
+}
+
+svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transform: matrix
+    scaleY(3.5)
+    scaleX(2.25);
+    transform-origin: 
+    bottom;
+    display: block;
+    pointer-events: none;
+}
+
+footer {
+    position: relative; 
+    color: #DDA0DD;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2.5rem 0;
+    text-align: center;
+    font-size: 1rem;
+    overflow: hidden;
+}
+
+@media (width > 420px) {
+    section {
+        align-items: center;
+        padding-left: 0;
+        gap: 20px;
+    } 
+    .links {
+        gap: 20px;
+    }
+}
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+}
+
+input, textarea {
+    padding: 0.5em;
+    font-size: 1em;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+button {
+    padding: 0.5em;
+    font-size: 1em;
+    border: none;
+    background: #333;
+    color: #fff;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+button:hover {
+    background: #07be01;
+}
