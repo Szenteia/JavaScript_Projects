@@ -6,12 +6,13 @@
   <link rel="icon" type="image/png" href="/sushi.png">
   <link rel="stylesheet" href="css/style.css">
   <title>SushiMan</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 </head>
 <body>
   <header>
     <nav class="header__nav">
       <div class="header__logo">
-        <h4>SushiMan</h4>
+        <h4 id="gsap1">SushiMan</h4>
         <div class="header__logo-overlay"></div>
       </div>
         <ul class="header__menu">
@@ -75,6 +76,29 @@
     </div>
   </div>
 </section>
+<script>
+  gsap.from("#gsap1", {
+    duration: 1.5, // Animáció időtartama
+    delay: 1, // Késleltetés 1 másodperc
+    x: "100%", // Animáció a jobb oldalra
+    opacity: 1, // Átlátszóság 1
+    ease: "power2.out", // Simítás
+    onComplete: function() { // Animáció befejezésekor
+      gsap.to("#gsap1", {
+        duration: 1.5, // Betűköz növelésének időtartama
+        letterSpacing: "1.8rem", // 3-szoros betűköz
+        ease: "power1.out",
+        onComplete: function() { // Betűköz növelése befejezésekor
+          gsap.to("#gsap1", {
+            duration: 2.9, // Betűköz visszaállításának időtartama
+            letterSpacing: "normal", // Normál betűköz
+            ease: "power1.out"
+          });
+        }
+      });
+    }
+  });
+</script>
   <script src="js/script.js" type="module"></script>
 </body>
 </html>
