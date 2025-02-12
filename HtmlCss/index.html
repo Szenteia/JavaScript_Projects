@@ -46,7 +46,8 @@
     <img 
     src="assets/sushi-1.png" 
     alt="sushi"/>
-    <h2>自<br>
+    <h2     
+    id="gsap2">自<br>
         由<br>
         が<br>
     </h2>
@@ -97,6 +98,25 @@
         }
       });
     }
+  });
+  gsap.utils.toArray("#gsap2").forEach(ikon => {
+    gsap.from(ikon, {
+      duration: 1, // Animáció időtartama
+      delay: Math.random() * 0.5, // Véletlenszerű késleltetés
+      y: "150%", // Animáció a képernyő aljára (vagy a végső pozícióig)
+      opacity: 1, // Átlátszóság 1
+      ease: "bounce.out", // Ugráló hatás
+      x: () => Math.random() * 40 - 20, // Eltolás balra/jobbra véletlenszerűen
+      onComplete: function() {
+        gsap.to(ikon, {
+          duration: 0.5,
+          x: () => Math.random() * 20 - 10,
+          yoyo: true, // oda-vissza mozgás
+          repeat: 2, // ismétlés
+          ease: "sine.inOut"
+        });
+      }
+    });
   });
 </script>
   <script src="js/script.js" type="module"></script>
