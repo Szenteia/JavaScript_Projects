@@ -12,33 +12,60 @@
             height: 100vh;
             margin: 0;
             overflow: hidden;
+            overflow-y: auto;
         }
         
         #networkCanvas {
             border: 2px solid #333;
             background: #000;
             border-radius: 2rem;
+            padding: 10px;
         }
 
         .controls {
             position: absolute;
             top: 20px;
             color: white;
-            border-radius: 1.5rem;
+            border-radius: 2.5rem;
+        }
+
+        .container{
+            display: flex;
+            justify-content: center;
+            flex: 1;
+            padding: 15px;
+            flex-wrap: wrap;
+        }
+
+        .container h4{
+            color: wheat;
+            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+            font-size: 36px;
+            font-weight: 500;
         }
     </style>
 </head>
 <body>
+    <div class="container">
+<div class="container">
     <div class="controls">
-        <button onclick="toggleGrowth()">Toggle Growth</button>
+        <button onclick="toggleGrowth()">Pause Growth</button>
     </div>
     <canvas id="networkCanvas"></canvas>
+</div>
+<div class="container">
+    <div class="text__container">
+        <h4 class="animText1">Imagine your mind creates all the good moods, the new ideas. This is how i see it happening</h4>
+    </div>
+</div>
+</div>
     <script>
+
         const canvas = document.getElementById('networkCanvas');
         const ctx = canvas.getContext('2d');
         
-        canvas.width = 800;
-        canvas.height = 600;
+        canvas.width = 500;
+        canvas.height = 500;
 
         class NeuralNetwork {
             constructor() {
