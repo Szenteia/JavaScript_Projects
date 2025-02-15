@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="/sushi.png">
+  <link rel="stylesheet" href="css/style.css">
+  <title>SushiMan</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.10.4/ScrollTrigger.min.js"></script>
+</head>
+<body>
+  <header>
+    <nav class="header__nav">
+      <div class="header__logo">
+        <h4 id="gsap1">SushiMan</h4>
+        <div class="header__logo-overlay"></div>
+      </div>
+        <ul class="header__menu">
+        <li>
+          <a href="#menu">Menu</a>
+        </li>
+        <li>
+          <a href="#food">Food</a>
+        </li>
+        <li>
+          <a href="#services">Services</a>
+        </li>
+        <li>
+          <a href="#about-us">About Us</a>
+        </li>
+        <li>
+          <img src="assets/search.svg" alt="search"/>
+        </li>
+
+        </ul>
+        <ul class="header__menu-mobile">
+          <li>
+            <img src="assets/menu.svg" alt="menu">
+          </li>
+        </ul>
+
+    </nav>
+  </header>
+<section class="hero">
+  <div class="hero-image">
+    <img 
+    src="assets/sushi-1.png" 
+    alt="sushi"/>
+    <h2     
+    id="gsap2">自<br>
+        由<br>
+        が<br>
+    </h2>
+    <div class="hero-image__overlay"></div>
+  </div>
+
+  <div class="hero-content">
+    <div class="hero-content-info">
+      <h1>Feel the taste of traditional Japanese cuisine</h1>
+      <p>Feel the taste of the most popular Japanese food from anywhere and anytime</p>
+      <div class="hero-content__buttons">
+        <button class="hero-content__order-button">Order Now</button>
+        <button class="hero-content__play-button">
+          <img src="assets/play-circle.svg" alt="play"> How to Order
+        </button>
+      </div>
+    </div>
+    <div class="hero-content__testimonial">
+      <div class="hero-content__customer flex center">
+        <h4>24<span>k+</span></h4>
+        <p>Happy Customers</p>
+      </div>
+      <div class="hero-content__review">
+        <img src="assets/user.png" alt="user">
+        <p>"this is the best Japanese food delivery service that existed"</p>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="about-us" 
+id="about-us">
+<div class="about-us__image">
+  <div class="about-us__image-sushi3">
+    <img src="assets/sushi-3.png" alt="sushi">
+  </div>
+
+  <button class="about-us__button">
+    Learn More
+
+    <img src="assets/arrow-up-right.svg" alt="learn more">
+  </button>
+
+  <div class="about-us__image-sushi2">
+    <img src="assets/sushi-2.png" alt="sushi">
+  </div>
+</div>
+
+<div class="about-us__content">
+  <p class="sushi__subtitle">About Us / 私たちに関しては</p>
+  <h3 class=sushi__title>Our mission is to bring Japan into your Home.</h3>
+  <p class="sushi__description">We will continue to provide the experience of Omotenashi, the Japanese mindset of hospitality, with our shopping and dining for our customers.</p>
+</div>
+</section>
+
+<script>
+  gsap.from("#gsap1", {
+    duration: 1.7, 
+    delay: 1, 
+    x: "100%", 
+    opacity: 1, // Átlátszóság 1
+    ease: "power2.out", // Simítás
+    onComplete: function() { 
+      gsap.to("#gsap1", {
+        duration: 1.8, 
+        letterSpacing: "1.8rem", 
+        ease: "power1.out",
+        onComplete: function() { 
+          gsap.to("#gsap1", {
+            duration: 3, 
+            letterSpacing: "normal", 
+            ease: "power1.out"
+          });
+        }
+      });
+    }
+  });
+  gsap.utils.toArray("#gsap2").forEach(ikon => {
+    gsap.from(ikon, {
+      duration: 1, // Animáció időtartama
+      delay: 1.5,
+      y: "150%", // Animáció a képernyő aljára (vagy a végső pozícióig)
+      opacity: 1, // Átlátszóság 1
+      ease: "bounce.out", 
+      x: () => Math.random() * 40 - 20, // Eltolás balra/jobbra véletlenszerűen
+      onComplete: function() {
+        gsap.to(ikon, {
+          duration: 0.4,
+          x: () => Math.random() * 10 - 10,
+          yoyo: true, // oda-vissza mozgás
+          repeat: 8, // ismétlés
+          ease: "sine.inOut"
+        });
+      }
+    });
+  });
+
+gsap.registerPlugin(ScrollTrigger);
+
+const aboutUsSection = document.querySelector("#about-us");
+const aboutBtn =document.querySelector("#about-us__button")
+
+gsap.from(".about-us__image-sushi3", {
+  x: -120, // Kezdetben balra kívül
+  opacity: 0, // Kezdetben láthatatlan
+  duration: 1, // Animáció hossza
+  scrollTrigger: {
+    trigger: aboutUsSection, // Az animáció akkor indul, amikor az about-us szekció láthatóvá válik
+    start: "top 85%", // Az animáció akkor indul, amikor a szekció teteje 80%-ban látható
+    end: "top 20%", // Az animáció vége
+    scrub: 1, // Sima scrollozás közbeni animáció
+  },
+});
+
+// Animáció az about-us__button elemhez
+gsap.from(".about-us__button", {
+  x: -100, // Kezdetben balra kívül
+  opacity: 0, // Kezdetben láthatatlan
+  duration: 1, // Animáció hossza
+  delay: 0.5, // Késleltetés az előző animációhoz képest
+  scrollTrigger: {
+    trigger: aboutUsSection, // Az animáció akkor indul, amikor az about-us szekció láthatóvá válik
+    start: "top 30%", // Az animáció akkor indul, amikor a szekció teteje 80%-ban látható
+    end: "top 10%", // Az animáció vége
+    scrub: 1, // Sima scrollozás közbeni animáció
+  },
+});
+
+// Animáció az about-us__image-sushi2 elemhez
+gsap.from(".about-us__image-sushi2", {
+  x: -100, // Kezdetben balra kívül
+  opacity: 0, // Kezdetben láthatatlan
+  duration: 1, // Animáció hossza
+  delay: 1, // Késleltetés az előző animációhoz képest
+  scrollTrigger: {
+    trigger: aboutUsSection, // Az animáció akkor indul, amikor az about-us szekció láthatóvá válik
+    start: "top 60%", // Az animáció akkor indul, amikor a szekció teteje 80%-ban látható
+    end: "top 20%", // Az animáció vége
+    scrub: 1, // Sima scrollozás közbeni animáció
+  },
+});
+</script>
+</body>
+</html>
