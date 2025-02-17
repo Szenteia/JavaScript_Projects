@@ -42,6 +42,7 @@
 
     </nav>
   </header>
+
 <section class="hero">
   <div class="hero-image">
     <img 
@@ -78,6 +79,7 @@
     </div>
   </div>
 </section>
+
 <section class="about-us" 
 id="about-us">
 <div class="about-us__image">
@@ -103,6 +105,31 @@ id="about-us">
 </div>
 </section>
 
+<section class="popular-foods" id="menu">
+  <h2 class="popular-foods__title">Popular Food / 人気</h2>
+  <div class="popular-foods__filters sushi__hide-scrollbar">
+    <button class="popular-foods__filter-btn active">All</button>
+    <button class="popular-foods__filter-btn">
+      <img src="/assets/sushi-9.png" alt="sushi 9"> Sushi
+    </button>
+    <button class="popular-foods__filter-btn">
+      <img src="/assets/sushi-8.png" alt="sushi 8"> Ramen
+    </button>
+    <button class="popular-foods__filter-btn">
+      <img src="/assets/sushi-7.png" alt="sushi 7"> Udon
+    </button>
+    <button class="popular-foods__filter-btn">
+      <img src="/assets/sushi-6.png" alt="sushi 6"> Danggo
+    </button>
+    <button class="popular-foods__filter-btn">All</button>
+  </div>
+  <div class="popular-foods__catalogue">
+
+  </div>
+  <button class="popular-foods__button">Explore Food
+    <img src="assets/arrow-right.svg" alt="arrow-right"/>
+  </button>
+</section>
 <script>
   gsap.from("#gsap1", {
     duration: 1.7, 
@@ -127,10 +154,10 @@ id="about-us">
   });
   gsap.utils.toArray("#gsap2").forEach(ikon => {
     gsap.from(ikon, {
-      duration: 1, // Animáció időtartama
+      duration: 1, 
       delay: 1.5,
       y: "150%", // Animáció a képernyő aljára (vagy a végső pozícióig)
-      opacity: 1, // Átlátszóság 1
+      opacity: 1, 
       ease: "bounce.out", 
       x: () => Math.random() * 40 - 20, // Eltolás balra/jobbra véletlenszerűen
       onComplete: function() {
@@ -151,42 +178,42 @@ const aboutUsSection = document.querySelector("#about-us");
 const aboutBtn =document.querySelector("#about-us__button")
 
 gsap.from(".about-us__image-sushi3", {
-  x: -120, // Kezdetben balra kívül
-  opacity: 0, // Kezdetben láthatatlan
-  duration: 1, // Animáció hossza
+  x: -120, 
+  opacity: 0, 
+  duration: 1, 
   scrollTrigger: {
-    trigger: aboutUsSection, // Az animáció akkor indul, amikor az about-us szekció láthatóvá válik
-    start: "top 85%", // Az animáció akkor indul, amikor a szekció teteje 80%-ban látható
-    end: "top 20%", // Az animáció vége
+    trigger: aboutUsSection, 
+    start: "top 85%", 
+    end: "top 20%", 
     scrub: 1, // Sima scrollozás közbeni animáció
   },
 });
 
 // Animáció az about-us__button elemhez
 gsap.from(".about-us__button", {
-  x: -100, // Kezdetben balra kívül
-  opacity: 0, // Kezdetben láthatatlan
-  duration: 1, // Animáció hossza
-  delay: 0.5, // Késleltetés az előző animációhoz képest
+  x: -100, 
+  opacity: 0, 
+  duration: 1, 
+  delay: 0.5, 
   scrollTrigger: {
-    trigger: aboutUsSection, // Az animáció akkor indul, amikor az about-us szekció láthatóvá válik
-    start: "top 30%", // Az animáció akkor indul, amikor a szekció teteje 80%-ban látható
-    end: "top 10%", // Az animáció vége
-    scrub: 1, // Sima scrollozás közbeni animáció
+    trigger: aboutUsSection, 
+    start: "top 30%", 
+    end: "top 10%", 
+    scrub: 1, 
   },
 });
 
 // Animáció az about-us__image-sushi2 elemhez
 gsap.from(".about-us__image-sushi2", {
-  x: -100, // Kezdetben balra kívül
-  opacity: 0, // Kezdetben láthatatlan
-  duration: 1, // Animáció hossza
-  delay: 1, // Késleltetés az előző animációhoz képest
+  x: -100, 
+  opacity: 0, 
+  duration: 1, 
+  delay: 1, 
   scrollTrigger: {
-    trigger: aboutUsSection, // Az animáció akkor indul, amikor az about-us szekció láthatóvá válik
-    start: "top 60%", // Az animáció akkor indul, amikor a szekció teteje 80%-ban látható
-    end: "top 20%", // Az animáció vége
-    scrub: 1, // Sima scrollozás közbeni animáció
+    trigger: aboutUsSection, 
+    start: "top 60%",
+    end: "top 20%", 
+    scrub: 1, 
   },
 });
 </script>
