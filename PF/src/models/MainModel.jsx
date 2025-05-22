@@ -9,14 +9,15 @@ Title: Large tv man
 import React, { useRef, useEffect } from 'react'
 import { useGLTF } from '@react-three/drei'
 import { useFrame, useThree } from '@react-three/fiber'
-import { a } from '@react-three'
+import { a } from '@react-spring/three'
 
 import MainModelScene from '../assets/3d/large_tv_man.glb'
 
 const MainModel = (props) => {
   const { nodes, materials } = useGLTF('/large_tv_man.glb')
+  const  mainModelRef = useRef();
   return (
-    <a.group {...props} dispose={null}>
+    <a.group ref={mainModelRef} {...props} >
       <primitive object={nodes.GLTF_created_0_rootJoint} />
       <skinnedMesh
         geometry={nodes.Object_7.geometry}
@@ -86,7 +87,5 @@ const MainModel = (props) => {
     </a.group>
   )
 }
-
-useGLTF.preload('/large_tv_man.glb')
 
 export default MainModel;
