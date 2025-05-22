@@ -15,7 +15,7 @@ import { a } from '@react-spring/three'
 import MainModelScene from '../assets/3d/large_tv_man.glb'
 
 const MainModel = (props) => {
-  const { nodes, materials } = useGLTF('/large_tv_man.glb')
+  const { nodes, materials } = useGLTF(MainModelScene);
   const  mainModelRef = useRef();
   return (
     <a.group ref={mainModelRef} {...props} >
