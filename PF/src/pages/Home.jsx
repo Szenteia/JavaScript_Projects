@@ -13,7 +13,10 @@ const Home = () => {
       camera={{near: 0.1, far: 1000}}
       >
         <Suspense fallback={<Loader/>}>
-
+        <directionalLight></directionalLight>
+        <ambientLight></ambientLight>
+        <SpotLight></SpotLight>
+        <hemisphereLight></hemisphereLight>
         </Suspense>
       </Canvas>
 
