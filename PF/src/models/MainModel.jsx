@@ -15,8 +15,8 @@ import { a } from '@react-spring/three'
 import MainModelScene from '../assets/3d/large_tv_man.glb'
 
 const MainModel = ({ isRotating, setIsRotating, ...props}) => {
-    const  mainModelRef = useRef();
-const { gl, viewport } = useThree();
+  const  mainModelRef = useRef();
+  const { gl, viewport } = useThree();
   const { nodes, materials } = useGLTF(MainModelScene);
   const lastX = useRef(0);
   const rotationSpeed = useRef(0);
@@ -73,6 +73,7 @@ lastX.current = clientX;
         if(Math.abs(rotationSpeed.current) < 0.001){
             rotationSpeed.current = 0;
         }
+        mainModelRef.current.rotation.y += rotationSpeed.current;
     } else {
         const rotation = mainModelRef.current.rotation.y;
         const normalizeRotation = ((rotation % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
@@ -91,7 +92,7 @@ lastX.current = clientX;
                 setCurrentStage(1);
                 break;
                 default:
-                    setCurrentStage(null);
+                setCurrentStage(null);
         }
     }
   })
