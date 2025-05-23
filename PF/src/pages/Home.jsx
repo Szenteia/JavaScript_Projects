@@ -31,10 +31,10 @@ const Home = () => {
       camera={{near: 0.1, far: 1000}}
       >
         <Suspense fallback={<Loader/>}>
-        <directionalLight></directionalLight>
-        <ambientLight></ambientLight>
+        <directionalLight position={[1,0.8,1]} intensity={4.5}/>
+        <ambientLight intensity={0.6}/>
         <spotLight position={[10, 10, 10]} angle={0.3} penumbra={1} intensity={2} castShadow />
-        <hemisphereLight></hemisphereLight>
+        <hemisphereLight skyColor="#b1e1ff" groundColor="#000000" intensity={1}/>
         <MainModel 
          position = {modelPosition}
          scale = {modelScale}
