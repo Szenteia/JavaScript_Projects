@@ -2,6 +2,7 @@ import { Suspense } from 'react'
 import { Canvas } from '@react-three/fiber'
 import Loader from '../components/Loader.jsx'
 import  MainModel  from '../models/MainModel'
+import Sky from '../models/Sky.jsx'
 
 const Home = () => {
   const adjustModelForScreenSize = () => {
@@ -35,6 +36,7 @@ const Home = () => {
         <ambientLight intensity={0.6}/>
         <spotLight position={[10, 10, 10]} angle={0.3} penumbra={1} intensity={2} castShadow />
         <hemisphereLight skyColor="#b1e1ff" groundColor="#000000" intensity={1}/>
+        <Sky />
         <MainModel 
          position = {modelPosition}
          scale = {modelScale}
