@@ -24,8 +24,25 @@ const Home = () => {
 
     return [screenScale, screenPosition, screenRotation];
   }
+  const adjustPlaneForScreenSize = () => {
+    let screenScale ; 
+    let screenPosition ;
+
+    if(window.innerWidth < 768) {
+      screenScale = [0.04,0.04,0.04];
+      screenPosition = [0, -1.5, 0];
+    } else {
+      screenScale = [0.08,0.08,0.08];
+      screenPosition = [0, -4, -4];
+    }
+
+    return [screenScale, screenPosition];
+  }
 
   const [modelScale, modelPosition, modelRotation] = adjustModelForScreenSize();
+
+  const [planeScale, planePosition]= adjustPlaneForScreenSize();
+
   return (
     <section className='w-full h-screen relative'>
       <div className='absolute top-28 left-0 right-0 z-10 flex items-center justify-center'>
@@ -39,15 +56,22 @@ const Home = () => {
         <ambientLight intensity={0.6}/>
         <spotLight position={[10, 10, 10]} angle={0.3} penumbra={1} intensity={2} castShadow />
         <hemisphereLight skyColor="#b1e1ff" groundColor="#000000" intensity={1}/>
-        <Plane />
+        <Plane 
+        isRotating ={isRotating}
+        position ={planePosition}
+        scale ={planeScale}
+        rotation={[0,20,0]}
+        />
+
         <Sky />
 
         <MainModel 
          position = {modelPosition}
          scale = {modelScale}
-         rotation = {modelRotation}/>
+         rotation = {modelRotation}
          isRotating={isRotating}
-         setIsRotation={setIsRotating}
+         setIsRotating={setIsRotating}
+         />
         </Suspense>
       </Canvas>
 
