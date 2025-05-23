@@ -1,4 +1,4 @@
-import { Suspense } from 'react'
+import { useState, Suspense } from 'react'
 import { Canvas } from '@react-three/fiber'
 import Loader from '../components/Loader.jsx'
 import  MainModel  from '../models/MainModel'
@@ -6,6 +6,9 @@ import Sky from '../models/Sky.jsx'
 import Plane from '../models/Plane.jsx'
 
 const Home = () => {
+
+  const [isRotating, setIsRotating] = useState(false);
+
   const adjustModelForScreenSize = () => {
     let screenScale = null; 
     let screenPosition = null;
@@ -28,8 +31,7 @@ const Home = () => {
       <div className='absolute top-28 left-0 right-0 z-10 flex items-center justify-center'>
         POPUP
       </div>
-      <Canvas className='
-      w-full h-screen bg-transparent'
+      <Canvas className={`w-full h-screen bg-transparent ${isRotating ? 'cursor-grabbing' : 'cursor-grab'}`}
       camera={{near: 0.1, far: 1000}}
       >
         <Suspense fallback={<Loader/>}>
@@ -44,6 +46,8 @@ const Home = () => {
          position = {modelPosition}
          scale = {modelScale}
          rotation = {modelRotation}/>
+         isRotating={isRotating}
+         setIsRotation={setIsRotating}
         </Suspense>
       </Canvas>
 
