@@ -65,7 +65,7 @@ const Home = () => {
         scale ={planeScale}
         rotation={[0,20.3,0]}
         />
-        <Meteor />
+        <Meteor isRotating={isRotating}/>
         <Sky isRotating={isRotating}/>
 
 <AlternativeModel
