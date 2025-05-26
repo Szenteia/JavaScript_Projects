@@ -6,6 +6,7 @@ import AlternativeModel from '../models/AltModel.jsx'
 import Sky from '../models/Sky.jsx'
 import Plane from '../models/Plane.jsx'
 import Meteor from '../models/Meteor.jsx'
+import HomeInfo from '../components/HomeInfo.jsx'
 
 const Home = () => {
 
@@ -49,7 +50,8 @@ const Home = () => {
   return (
     <section className='w-full h-screen relative'>
       <div className='absolute top-28 left-0 right-0 z-10 flex items-center justify-center text-white'>
-        POPUP
+        {currentStage && <HomeInfo currentStage={currentStage}/>
+        }
       </div>
       <Canvas className={`w-full h-screen bg-transparent ${isRotating ? 'cursor-grabbing' : 'cursor-grab'}`}
       camera={{near: 0.1, far: 1000}}
@@ -76,13 +78,7 @@ const Home = () => {
          setIsRotating={setIsRotating}
          setCurrentStage={setCurrentStage}
 />
-{/*         <MainModel 
-         position = {modelPosition}
-         scale = {modelScale}
-         rotation = {modelRotation}
-         isRotating={isRotating}
-         setIsRotating={setIsRotating}
-         /> */}
+
         </Suspense>
       </Canvas>
 
