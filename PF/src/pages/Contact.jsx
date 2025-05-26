@@ -2,7 +2,7 @@ import React from 'react'
 import { useState } from 'react';
 
 const Contact = () => {
-  const [form, setForm] = useState({'name: '', email:'', message: '' '})
+  const [form, setForm] = useState({name: '', email:'', message: '' })
 
   const handleChange = () => {};
   return (
