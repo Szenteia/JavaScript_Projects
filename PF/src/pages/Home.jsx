@@ -10,6 +10,7 @@ import Meteor from '../models/Meteor.jsx'
 const Home = () => {
 
   const [isRotating, setIsRotating] = useState(false);
+  const [currentStage, setCurrentStage] = useState(1);
 
   const adjustModelForScreenSize = () => {
     let screenScale = null; 
@@ -17,11 +18,11 @@ const Home = () => {
     let screenRotation = [0.1,0,0];
 
     if(window.innerWidth < 768) {
-      screenScale = [1.3, 1.3, 1.3];
-      screenPosition = [0, -2.2, -2.2];
+      screenScale = [1.1, 1.1, 1.1];
+      screenPosition = [0, -1.1, -2.2];
     } else {
-      screenScale = [1.9, 1.9, 1.9];
-      screenPosition = [0, -2.5, -4];
+      screenScale = [1.5, 1.5, 1.5];
+      screenPosition = [0, -1, -3.7];
     }
 
     return [screenScale, screenPosition, screenRotation];
@@ -32,10 +33,10 @@ const Home = () => {
 
     if(window.innerWidth < 768) {
       screenScale = [0.018,0.018,0.018];
-      screenPosition = [0, -1.9, 0];
+      screenPosition = [0, -2.6, 0];
     } else {
-      screenScale = [0.024,0.024,0.024];
-      screenPosition = [0, -2, 0];
+      screenScale = [0.023,0.023,0.023];
+      screenPosition = [0, -2.85, 0];
     }
 
     return [screenScale, screenPosition];
@@ -56,7 +57,7 @@ const Home = () => {
         <Suspense fallback={<Loader/>}>
         <directionalLight position={[1,0.9,1]} intensity={5.7}/>
         <ambientLight intensity={0.7}/>
-{/*         <spotLight position={[10, 10, 10]} angle={0.3} penumbra={1} intensity={2} castShadow /> */}
+
         <hemisphereLight skyColor="#b1e1ff" groundColor="#000000" intensity={2}/>
         <Plane 
         isRotating ={isRotating}
@@ -73,6 +74,7 @@ const Home = () => {
          rotation = {modelRotation}
          isRotating={isRotating}
          setIsRotating={setIsRotating}
+         setCurrentStage={setCurrentStage}
 />
 {/*         <MainModel 
          position = {modelPosition}

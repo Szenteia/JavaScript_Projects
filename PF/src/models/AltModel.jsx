@@ -14,7 +14,7 @@ import { a } from '@react-spring/three'
 
 import MainModelScene from '../assets/3d/altModel.glb'
 
-const AlternativeModel = ({ isRotating, setIsRotating, ...props}) => {
+const AlternativeModel = ({ isRotating, setIsRotating, setCurrentStage, ...props}) => {
   const  mainModelRef = useRef();
   const { gl, viewport } = useThree();
   const { nodes, materials } = useGLTF(MainModelScene);
