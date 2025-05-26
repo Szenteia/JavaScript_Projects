@@ -66,7 +66,7 @@ const Home = () => {
         rotation={[0,20.3,0]}
         />
         <Meteor />
-        <Sky />
+        <Sky isRotating={isRotating}/>
 
 <AlternativeModel
          position = {modelPosition}
