@@ -5,6 +5,7 @@ import Loader from '../components/Loader.jsx'
 import AlternativeModel from '../models/AltModel.jsx'
 import Sky from '../models/Sky.jsx'
 import Plane from '../models/Plane.jsx'
+import Meteor from '../models/Meteor.jsx'
 
 const Home = () => {
 
@@ -56,14 +57,14 @@ const Home = () => {
         <directionalLight position={[1,0.9,1]} intensity={5.7}/>
         <ambientLight intensity={0.7}/>
 {/*         <spotLight position={[10, 10, 10]} angle={0.3} penumbra={1} intensity={2} castShadow /> */}
-        <hemisphereLight skyColor="#b1e1ff" groundColor="#000000" intensity={1}/>
+        <hemisphereLight skyColor="#b1e1ff" groundColor="#000000" intensity={2}/>
         <Plane 
         isRotating ={isRotating}
         position ={planePosition}
         scale ={planeScale}
         rotation={[0,20.3,0]}
         />
-
+        <Meteor />
         <Sky />
 
 <AlternativeModel
