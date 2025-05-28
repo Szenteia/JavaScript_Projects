@@ -1,15 +1,45 @@
 import React, { useRef } from 'react'
 import { useState } from 'react';
+import emailjs from '@emailjs/browser';
 
 const Contact = () => {
   const formRef = useRef(null);
   const [form, setForm] = useState({name: '', email:'', message: '' })
   const [isLoading, setIsLoading] = useState(false)
 
-  const handleChange = () => {};
-  const handleFocus= () => {};
+  const handleChange = (e) => {
+    setForm({...form, [e.target.name]: e.target.value})
+  };
+
+  const handleFocus= (e) => {
+    e.preventDefault();
+    setIsLoading(true)
+  };
   const handleBlur = () => {};
-const handleSubmit = () => {};
+const handleSubmit = () => {
+
+  emailjs.send(
+ import.meta.env.Vite_App_EMAILJS_SERVICE_ID,
+ import.meta.env.Vite_App_EMAILJS_TEMPLATE_ID,
+  {
+    from_name: form.name,
+    to_name: "András",
+    form_email: "szenteia@gmail.com",
+    message: form.message
+  },
+  import.meta.env.Vite_App_EMAILJS_PUBLIC_KEY
+  //because it is async we need to call .then!
+  ).then(()=> {
+    setIsLoading(false);
+    setForm({ name:'', email:'', message:''});
+    //TODO: show success message, hide alert
+  }).catch((error)=> {
+    setIsLoading(false);
+    console.log(error);
+    //TODO show error message
+  }) 
+
+};
   return (
     <section className='relative flex lg:flex-row flex-col max-container'>
       <div className='flex-1 min-w-[50%] flex-col'>
