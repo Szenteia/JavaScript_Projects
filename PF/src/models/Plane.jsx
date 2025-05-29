@@ -33,3 +33,4 @@ const Plane = ({isRotating, ...props}) => {
 }
 
 export default Plane
+//"Luminaris Starship" (https://skfb.ly/QPX8) by iggy-design is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/).
