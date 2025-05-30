@@ -1,6 +1,10 @@
-import React, { useRef } from 'react'
+import React, { Suspense, useRef } from 'react'
 import { useState } from 'react';
 import emailjs from '@emailjs/browser';
+import { Canvas } from '@react-three/fiber';
+import  Loader  from '../components/Loader';
+import Dog from '../models/Dog'
+
 
 const Contact = () => {
   const formRef = useRef(null);
@@ -98,6 +102,24 @@ const handleSubmit = (e) => {
           {isLoading ? 'Sending...': 'Send Message'}
           </button>
         </form>
+      </div>
+      <div className='lg:w-1/2 w-full lg:h-auto md:h-[550px] h-[350px]'>
+      <Canvas camera={{
+        position: [0, 0 ,5],
+        fov: 75,
+        near: 0.1,
+        far: 1000
+
+        }}>
+          <directionalLight intensity={2.5} position={[0,0,0.6]}/>
+          <Suspense fallback={<Loader/>}>
+          <Dog 
+          position={[0.5,-3.35,-4]}
+          rotation={[12.7,-0.6,0]}
+          
+          />
+          </Suspense>
+      </Canvas>
       </div>
     </section>
   )
