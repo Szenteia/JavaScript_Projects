@@ -12,6 +12,8 @@ const Contact = () => {
 
   const [isLoading, setIsLoading] = useState(false)
 
+  const [currentAnimation, setCurrentAnimation] = useState('racoon|idle pose');
+
   const handleChange = (e) => {
     setForm({...form, [e.target.name]: 
       e.target.value })
@@ -20,6 +22,7 @@ const Contact = () => {
 const handleSubmit = (e) => {
     e.preventDefault();
     setIsLoading(true)
+    setCurrentAnimation('racoon|idle alerted pose');
   emailjs.send(
  import.meta.env.VITE_APP_EMAILJS_SERVICE_ID,
  import.meta.env.VITE_APP_EMAILJS_TEMPLATE_ID,
@@ -34,18 +37,22 @@ const handleSubmit = (e) => {
   ).then(()=> {
     setIsLoading(false);
     setForm({ name:'', email:'', message:''});
+    setTimeout(()=>{
+setCurrentAnimation('racoon|idle smell')
+    }, [3000])
     //TODO: show success message, hide alert
   }).catch((error)=> {
     setIsLoading(false);
+    setCurrentAnimation('racoon|idle pose');
     console.log(error);
     //TODO show error message
   }) 
 };
 
   const handleFocus= () => {
-
+    setCurrentAnimation('racoon|idle stretch');
   };
-  const handleBlur = () => {};
+  const handleBlur = () => {setCurrentAnimation('racoon|idle pose')};
 
 
   return (
@@ -106,15 +113,18 @@ const handleSubmit = (e) => {
       <div className='lg:w-1/2 w-full lg:h-auto md:h-[550px] h-[350px]'>
       <Canvas camera={{
         position: [0, 0 ,5],
-        fov: 75,
+        fov: 55,
         near: 0.1,
         far: 1000
 
         }}>
           <directionalLight intensity={2.5} position={[0,0,0.6]}/>
+          <ambientLight intensity={0.5}/>
           <Suspense fallback={<Loader/>}>
           <Dog 
-          position={[0.5,-3.35,-4]}
+          currentAnimation={currentAnimation}
+          
+          position={[0.5,0.55,2.5]}
           rotation={[12.7,-0.6,0]}
           
           />
