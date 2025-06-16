@@ -4,6 +4,8 @@ import emailjs from '@emailjs/browser';
 import { Canvas } from '@react-three/fiber';
 import  Loader  from '../components/Loader';
 import Dog from '../models/Dog'
+import useAlert from '../hooks/useAlert';
+import Alert from '../components/Alert';
 
 
 const Contact = () => {
@@ -13,6 +15,8 @@ const Contact = () => {
   const [isLoading, setIsLoading] = useState(false)
 
   const [currentAnimation, setCurrentAnimation] = useState('racoon|idle pose');
+
+  const { alert, showAlert, hideAlert } = useAlert();
 
   const handleChange = (e) => {
     setForm({...form, [e.target.name]: 
@@ -36,16 +40,27 @@ const handleSubmit = (e) => {
   //because it is async we need to call .then!
   ).then(()=> {
     setIsLoading(false);
-    setForm({ name:'', email:'', message:''});
+        showAlert({
+      show: true,
+      text: 'Message sent successfully',
+      type: 'success'
+    })
     setTimeout(()=>{
-setCurrentAnimation('racoon|idle smell')
+    hideAlert();
+    setCurrentAnimation('racoon|idle smell')
+    setForm({ name:'', email:'', message:''});
     }, [3000])
-    //TODO: show success message, hide alert
+
+
   }).catch((error)=> {
     setIsLoading(false);
     setCurrentAnimation('racoon|idle pose');
     console.log(error);
-    //TODO show error message
+      showAlert({
+      show: true,
+      text: 'I didnt recieve your message',
+      type: 'danger'
+    })
   }) 
 };
 
@@ -57,6 +72,9 @@ setCurrentAnimation('racoon|idle smell')
 
   return (
     <section className='relative flex lg:flex-row flex-col max-container'>
+      {alert.show && <Alert {...alert}/> }
+      <Alert {...alert}/>
+      
       <div className='flex-1 min-w-[50%] flex-col'>
         <h1 className='head-text'>Get in Touch</h1>
         <form 
