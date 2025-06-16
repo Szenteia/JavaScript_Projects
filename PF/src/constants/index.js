@@ -173,7 +173,7 @@ export const projects = [
     {
         iconUrl: threads,
         theme: 'btn-back-green',
-        name: 'Imagination of a working Neural system with CSS',
+        name: 'Neural system with CSS',
         description: 'Created a small project using CSS to generate connections like i imagine the neurat growth.',
         link: 'https://szenteia.github.io/JavaScript_Projects/neuralSys/index.html',
     },
