@@ -1,4 +1,4 @@
-import { meta, shopify, starbucks, tesla } from "../assets/images";
+
 import {
     contact,
     css,
@@ -100,7 +100,7 @@ export const experiences = [
     {
         title: "React.js Developer",
         company_name: "Starbucks",
-        icon: starbucks,
+
         iconBg: "#accbe1",
         date: "March 2020 - April 2021",
         points: [
@@ -113,7 +113,7 @@ export const experiences = [
     {
         title: "React Native Developer",
         company_name: "Tesla",
-        icon: tesla,
+
         iconBg: "#fbc3bc",
         date: "Jan 2021 - Feb 2022",
         points: [
@@ -126,7 +126,7 @@ export const experiences = [
     {
         title: "Web Developer",
         company_name: "Shopify",
-        icon: shopify,
+
         iconBg: "#b7e4c7",
         date: "Jan 2022 - Jan 2023",
         points: [
@@ -139,7 +139,7 @@ export const experiences = [
     {
         title: "Full stack Developer",
         company_name: "Meta",
-        icon: meta,
+
         iconBg: "#a2d2ff",
         date: "Jan 2023 - Present",
         points: [
