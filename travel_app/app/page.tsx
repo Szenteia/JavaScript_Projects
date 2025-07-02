@@ -1,7 +1,7 @@
-import Image from "next/image";
-
 export default function Home() {
   return (
-<h1>Hey yaa</h1>
+    <main className="min-h-screen flex items-center justify-center bg-gray-10">
+      <h1 className="font-bold text-green-50 text-4xl">Hey yaa</h1>
+    </main>
   );
 }
