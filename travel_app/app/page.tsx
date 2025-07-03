@@ -1,7 +1,17 @@
+import Camp from "@/components/Camp";
+import Hero from "@/components/Hero";
+import Guide from "@/components/Guide";
+import Features from "@/components/Features";
+import GetApp from "@/components/GetApp";
+
 export default function Home() {
   return (
-    <main className=" bg-gray-10 text-2xl">
-      <h1 className="font-bold text-green-50 text-4xl">Hey yaa</h1>
-    </main>
+<>
+    <Hero/>
+    <Camp/>
+    <Guide/>
+    <Features/>
+    <GetApp/>
+</>
   );
 }
