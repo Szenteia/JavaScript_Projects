@@ -15,35 +15,34 @@ export const PEOPLE_URL = [
   '/person-4.png',
 ];
 
-// FEATURES SECTION
 export const FEATURES = [
   {
-    title: 'Real maps can be offline',
+    title: 'Brazilian Jiu-Jitsu Classes',
     icon: '/map.svg',
     variant: 'green',
     description:
-      'We provide a solution for you to be able to use our application when climbing, yes offline maps you can use at any time there is no signal at the location',
+      'Master the art of leverage and technique with our Brazilian Jiu-Jitsu classes. Whether you’re a beginner or advanced, our sessions focus on real-world application, ground control, and submissions.',
   },
   {
-    title: 'Set an adventure schedule',
+    title: 'Women’s Self-Defense',
     icon: '/calendar.svg',
     variant: 'green',
     description:
-      "Schedule an adventure with friends. On holidays, there are many interesting offers from Hilink. That way, there's no more discussion",
+      'Build confidence and learn practical self-defense techniques designed specifically for women. Our classes focus on situational awareness, escapes, and empowering physical skills.',
   },
   {
-    title: 'Technology using augment reality',
+    title: 'Kids Martial Arts Program',
     icon: '/tech.svg',
     variant: 'green',
     description:
-      'Technology uses augmented reality as a guide to your hiking trail in the forest to the top of the mountain. Already supported by the latest technology without an internet connection',
+      'Fun and structured martial arts training for children to improve discipline, focus, and coordination. Taught by experienced coaches in a safe, encouraging environment.',
   },
   {
-    title: 'Many new locations every month',
+    title: 'Shoot Boxing Sessions',
     icon: '/location.svg',
     variant: 'orange',
     description:
-      'Lots of new locations every month, because we have a worldwide community of climbers who share their best experiences with climbing',
+      'A dynamic combat sport combining striking, throws, and standing submissions. Our shoot boxing classes are intense and technical—perfect for those looking to level up their stand-up game.',
   },
 ];
 
