@@ -1,213 +1,358 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Animated Neural Network</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <title>3D Neural Network Visualization</title>
     <style>
         body {
-            background: #1a1a1a;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
             margin: 0;
             overflow: hidden;
-            overflow-y: auto;
+            background: #000;
+            color: white;
+            font-family: 'Arial', sans-serif;
         }
         
-        #networkCanvas {
-            border: 2px solid #333;
-            background: #000;
-            border-radius: 2rem;
-            padding: 10px;
+        #container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
         }
-
-        .controls {
+        
+        #info {
             position: absolute;
             top: 20px;
-            color: white;
-            border-radius: 2.5rem;
-        }
-
-        .container{
-            display: flex;
-            justify-content: center;
-            flex: 1;
+            left: 20px;
+            background: rgba(0,0,0,0.7);
             padding: 15px;
-            flex-wrap: wrap;
-            justify-items:center;
-            line-height: 3.5rem;
+            border-radius: 10px;
+            max-width: 400px;
+            pointer-events: none;
         }
-
-        .container h4{
-            color: wheat;
-            font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-            font-size: 38px;
-            font-weight: 600;
-            font-stretch: expanded;
-            padding: 25px;
+        
+        #controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+        }
+        
+        button {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            backdrop-filter: blur(5px);
+        }
+        
+        button:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        .node-count {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.7);
+            padding: 10px 15px;
+            border-radius: 20px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-<div class="container">
-    <div class="controls">
-        <button onclick="toggleGrowth()">Pause Growth</button>
+    <div id="container"></div>
+    <div id="info">
+        <h2>Neural Network Visualization</h2>
+        <p>Watch as new neural connections form and evolve in real-time.</p>
+        <p>Each node represents a neuron, and each connection represents a synapse.</p>
     </div>
-    <canvas id="networkCanvas"></canvas>
-</div>
-<div class="container">
-    <div class="text__container">
-        <h4 class="animText1">Imagine your mind <br> creating all the good moods, <br>the new ideas and memories. <br> This is how i see it happening.</h4>
+    <div class="node-count" id="nodeCount">Nodes: 0 | Connections: 0</div>
+    <div id="controls">
+        <button id="toggleGrowth">Pause Growth</button>
+        <button id="reset">Reset Network</button>
     </div>
-</div>
-</div>
+
+    <!-- Three.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.11.4/dist/gsap.min.js"></script>
 
     <script>
+        // Wait for DOM to be fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Three.js scene
+            const scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x050505);
+            
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 30;
+            
+            const renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            document.getElementById('container').appendChild(renderer.domElement);
+            
+            // Add orbit controls
+            const controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            
+            // Add ambient light
+            const ambientLight = new THREE.AmbientLight(0x404040);
+            scene.add(ambientLight);
+            
+            // Add directional light
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+            directionalLight.position.set(1, 1, 1);
+            scene.add(directionalLight);
+            
+            // Add point light
+            const pointLight = new THREE.PointLight(0xffffff, 1, 100);
+            pointLight.position.set(10, 10, 10);
+            scene.add(pointLight);
 
-        const canvas = document.getElementById('networkCanvas');
-        const ctx = canvas.getContext('2d');
-        
-        canvas.width = 500;
-        canvas.height = 500;
-
-        class NeuralNetwork {
-            constructor() {
-                this.nodes = [];
-                this.connections = [];
-                this.growthEnabled = false;
-                this.initializeBaseNodes();
-            }
-
-            initializeBaseNodes() {
-                for(let i = 0; i < 3; i++) {
-                    this.addNode(
-                        canvas.width/2 + Math.random()*50 - 25,
-                        canvas.height/2 + Math.random()*50 - 25
-                    );
+            class NeuralNetwork3D {
+                constructor() {
+                    this.nodes = [];
+                    this.connections = [];
+                    this.growthEnabled = true;
+                    this.nodeGroup = new THREE.Group();
+                    this.connectionGroup = new THREE.Group();
+                    scene.add(this.nodeGroup);
+                    scene.add(this.connectionGroup);
+                    this.nodeCountElement = document.getElementById('nodeCount');
+                    this.initializeBaseNodes();
                 }
-            }
 
-            addNode(x, y) {
-                const node = {
-                    x: x,
-                    y: y,
-                    radius: 3,
-                    baseRadius: 3 + Math.random() * 4,
-                    color: `hsl(${Math.random() * 360}, 70%, 60%)`,
-                    scale: 1
-                };
-
-                // GSAP animations for node behavior
-                gsap.to(node, {
-                    x: x + gsap.utils.random(-40, 40),
-                    y: y + gsap.utils.random(-40, 40),
-                    duration: gsap.utils.random(3, 6),
-                    repeat: -1,
-                    yoyo: true,
-                    ease: "power1.inOut"
-                });
-
-                gsap.to(node, {
-                    scale: 1.5,
-                    duration: gsap.utils.random(1, 2),
-                    repeat: -1,
-                    yoyo: true,
-                    ease: "sine.inOut"
-                });
-
-                gsap.to(node, {
-                    color: `hsl(${Math.random() * 360}, 70%, 60%)`,
-                    duration: gsap.utils.random(4, 8),
-                    repeat: -1,
-                    yoyo: true,
-                    onUpdate: () => {
-                        node.color = node.color; // Force color update
+                initializeBaseNodes() {
+                    for(let i = 0; i < 5; i++) {
+                        this.addNode(
+                            Math.random() * 20 - 10,
+                            Math.random() * 20 - 10,
+                            Math.random() * 20 - 10
+                        );
                     }
-                });
-
-                this.nodes.push(node);
-            }
-
-            addConnection(node1, node2) {
-                const connection = {
-                    from: node1,
-                    to: node2,
-                    width: 0.5,
-                    alpha: 0.3
-                };
-
-                // GSAP connection animation
-                gsap.to(connection, {
-                    width: gsap.utils.random(0.5, 2),
-                    alpha: gsap.utils.random(0.2, 0.8),
-                    duration: gsap.utils.random(2, 4),
-                    repeat: -1,
-                    yoyo: true,
-                    ease: "sine.inOut"
-                });
-
-                this.connections.push(connection);
-            }
-
-            grow() {
-                if(!this.growthEnabled) return;
-
-                if(Math.random() < 0.05) {
-                    const baseNode = this.nodes[Math.floor(Math.random() * this.nodes.length)];
-                    this.addNode(
-                        baseNode.x + gsap.utils.random(-30, 30),
-                        baseNode.y + gsap.utils.random(-30, 30)
-                    );
+                    this.updateNodeCount();
                 }
 
-                if(Math.random() < 0.1 && this.nodes.length > 1) {
-                    const node1 = this.nodes[Math.floor(Math.random() * this.nodes.length)];
-                    const node2 = this.nodes[Math.floor(Math.random() * this.nodes.length)];
-                    if(node1 !== node2) {
-                        this.addConnection(node1, node2);
+                addNode(x, y, z) {
+                    const geometry = new THREE.SphereGeometry(0.3, 16, 16);
+                    const color = new THREE.Color().setHSL(Math.random(), 0.7, 0.6);
+                    const material = new THREE.MeshPhongMaterial({ 
+                        color: color,
+                        emissive: color.clone().multiplyScalar(0.5),
+                        emissiveIntensity: 0.5,
+                        shininess: 30
+                    });
+                    
+                    const sphere = new THREE.Mesh(geometry, material);
+                    sphere.position.set(x, y, z);
+                    this.nodeGroup.add(sphere);
+                    
+                    const node = {
+                        mesh: sphere,
+                        basePosition: new THREE.Vector3(x, y, z),
+                        targetPosition: new THREE.Vector3(
+                            x + (Math.random() * 4 - 2),
+                            y + (Math.random() * 4 - 2),
+                            z + (Math.random() * 4 - 2)
+                        ),
+                        color: color,
+                        scale: 1
+                    };
+                    
+                    // GSAP animations for node behavior
+                    gsap.to(node, {
+                        scale: 1.5,
+                        duration: gsap.utils.random(1, 3),
+                        repeat: -1,
+                        yoyo: true,
+                        ease: "sine.inOut",
+                        onUpdate: () => {
+                            node.mesh.scale.set(node.scale, node.scale, node.scale);
+                        }
+                    });
+                    
+                    // Animate position change
+                    setInterval(() => {
+                        gsap.to(node.targetPosition, {
+                            x: node.basePosition.x + (Math.random() * 6 - 3),
+                            y: node.basePosition.y + (Math.random() * 6 - 3),
+                            z: node.basePosition.z + (Math.random() * 6 - 3),
+                            duration: gsap.utils.random(3, 6),
+                            ease: "power1.inOut"
+                        });
+                    }, gsap.utils.random(3000, 6000));
+                    
+                    // Color animation
+                    gsap.to(node.color, {
+                        r: Math.random(),
+                        g: Math.random(),
+                        b: Math.random(),
+                        duration: gsap.utils.random(4, 8),
+                        repeat: -1,
+                        yoyo: true,
+                        ease: "sine.inOut",
+                        onUpdate: () => {
+                            node.mesh.material.color.copy(node.color);
+                            node.mesh.material.emissive.copy(node.color.clone().multiplyScalar(0.5));
+                        }
+                    });
+                    
+                    this.nodes.push(node);
+                    return node;
+                }
+
+                addConnection(node1, node2) {
+                    const geometry = new THREE.BufferGeometry();
+                    const material = new THREE.LineBasicMaterial({ 
+                        color: 0xffffff,
+                        transparent: true,
+                        opacity: 0.3,
+                        linewidth: 1
+                    });
+                    
+                    const positions = new Float32Array(6);
+                    positions[0] = node1.mesh.position.x;
+                    positions[1] = node1.mesh.position.y;
+                    positions[2] = node1.mesh.position.z;
+                    positions[3] = node2.mesh.position.x;
+                    positions[4] = node2.mesh.position.y;
+                    positions[5] = node2.mesh.position.z;
+                    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+                    
+                    const line = new THREE.Line(geometry, material);
+                    this.connectionGroup.add(line);
+                    
+                    const connection = {
+                        line: line,
+                        from: node1,
+                        to: node2,
+                        width: 0.5,
+                        alpha: 0.3
+                    };
+                    
+                    // GSAP connection animation
+                    gsap.to(connection, {
+                        width: gsap.utils.random(0.5, 2),
+                        alpha: gsap.utils.random(0.2, 0.8),
+                        duration: gsap.utils.random(2, 4),
+                        repeat: -1,
+                        yoyo: true,
+                        ease: "sine.inOut",
+                        onUpdate: () => {
+                            connection.line.material.opacity = connection.alpha;
+                            connection.line.material.linewidth = connection.width;
+                        }
+                    });
+                    
+                    this.connections.push(connection);
+                    this.updateNodeCount();
+                    return connection;
+                }
+
+                grow() {
+                    if(!this.growthEnabled || this.nodes.length >= 200) return;
+
+                    if(Math.random() < 0.03) {
+                        const baseNode = this.nodes[Math.floor(Math.random() * this.nodes.length)];
+                        const newNode = this.addNode(
+                            baseNode.basePosition.x + (Math.random() * 6 - 3),
+                            baseNode.basePosition.y + (Math.random() * 6 - 3),
+                            baseNode.basePosition.z + (Math.random() * 6 - 3)
+                        );
+                        
+                        // Connect new node to base node
+                        this.addConnection(baseNode, newNode);
+                    }
+
+                    if(Math.random() < 0.05 && this.nodes.length > 1) {
+                        const node1 = this.nodes[Math.floor(Math.random() * this.nodes.length)];
+                        const node2 = this.nodes[Math.floor(Math.random() * this.nodes.length)];
+                        if(node1 !== node2) {
+                            this.addConnection(node1, node2);
+                        }
                     }
                 }
+
+                updateNodeCount() {
+                    if (this.nodeCountElement) {
+                        this.nodeCountElement.textContent = `Nodes: ${this.nodes.length} | Connections: ${this.connections.length}`;
+                    }
+                }
+
+                reset() {
+                    this.nodes.forEach(node => {
+                        this.nodeGroup.remove(node.mesh);
+                        node.mesh.geometry.dispose();
+                        node.mesh.material.dispose();
+                    });
+                    
+                    this.connections.forEach(conn => {
+                        this.connectionGroup.remove(conn.line);
+                        conn.line.geometry.dispose();
+                        conn.line.material.dispose();
+                    });
+                    
+                    this.nodes = [];
+                    this.connections = [];
+                    this.initializeBaseNodes();
+                }
+
+                update() {
+                    // Update node positions
+                    this.nodes.forEach(node => {
+                        node.mesh.position.lerp(node.targetPosition, 0.05);
+                    });
+                    
+                    // Update connection positions
+                    this.connections.forEach(conn => {
+                        const positions = conn.line.geometry.attributes.position.array;
+                        positions[0] = conn.from.mesh.position.x;
+                        positions[1] = conn.from.mesh.position.y;
+                        positions[2] = conn.from.mesh.position.z;
+                        positions[3] = conn.to.mesh.position.x;
+                        positions[4] = conn.to.mesh.position.y;
+                        positions[5] = conn.to.mesh.position.z;
+                        conn.line.geometry.attributes.position.needsUpdate = true;
+                    });
+                }
             }
 
-            draw() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const neuralNetwork = new NeuralNetwork3D();
 
-                // Draw connections
-                this.connections.forEach(conn => {
-                    ctx.beginPath();
-                    ctx.moveTo(conn.from.x, conn.from.y);
-                    ctx.lineTo(conn.to.x, conn.to.y);
-                    ctx.strokeStyle = `rgba(255, 255, 255, ${conn.alpha})`;
-                    ctx.lineWidth = conn.width;
-                    ctx.stroke();
-                });
-
-                // Draw nodes
-                this.nodes.forEach(node => {
-                    ctx.beginPath();
-                    ctx.arc(node.x, node.y, node.baseRadius * node.scale, 0, Math.PI * 2);
-                    ctx.fillStyle = node.color;
-                    ctx.fill();
-                });
+            // Animation loop
+            function animate() {
+                requestAnimationFrame(animate);
+                neuralNetwork.grow();
+                neuralNetwork.update();
+                controls.update();
+                renderer.render(scene, camera);
             }
-        }
 
-        const network = new NeuralNetwork();
+            // Event listeners
+            document.getElementById('toggleGrowth').addEventListener('click', function() {
+                neuralNetwork.growthEnabled = !neuralNetwork.growthEnabled;
+                this.textContent = neuralNetwork.growthEnabled ? 'Pause Growth' : 'Resume Growth';
+            });
 
-        function animate() {
-            network.grow();
-            network.draw();
-            requestAnimationFrame(animate);
-        }
+            document.getElementById('reset').addEventListener('click', function() {
+                neuralNetwork.reset();
+            });
 
-        function toggleGrowth() {
-            network.growthEnabled = !network.growthEnabled;
-        }
+            // Handle window resize
+            window.addEventListener('resize', function() {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
 
-        animate();
-        setTimeout(() => network.growthEnabled = true, 1000);
+            // Start animation
+            animate();
+        });
     </script>
 </body>
 </html>
