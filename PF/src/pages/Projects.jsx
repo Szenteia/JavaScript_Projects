@@ -12,7 +12,7 @@ const Projects = () => {
       </h1>
 
       <div className='mt-5 flex flex-col gap-3 text-slate-500'>
-        <p>I focused on Frontend and Gamification solutions, combined with CSS and React based solutions for my ideas to become reality. I enjoyed the working process, and the skills I learned on the way.</p>
+        <p>I focused mainly on Frontend solutions, combined with CSS and React based solutions for my ideas to become reality. I enjoyed the working process, and the skills I learned on the way.</p>
       </div>
 
       <div className='flex flex-wrap my-20 gap-16'>
