@@ -1,60 +1,121 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
 body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 90vh;
+    min-height: 100vh;
     flex-direction: column;
+    background-color: #2c2c2c;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 20px;
 }
+
 #title {
-    font-size: 1rem;
-    background-color:#774040;
-    margin-bottom: 20px;
+    font-size: 1.5rem;
+    background-color: #774040;
     color: beige;
     font-weight: bold;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 12px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.3s ease;
+    margin-bottom: 20px;
 }
+
+#title:hover {
+    background-color: #a85a5a;
+}
+
+#rules-holder {
+    background-color: #774040;
+    border-radius: 10px;
+    padding: 20px;
+    border: 2px dotted beige;
+    color: beige;
+    font-weight: bold;
+    max-width: 90vw;
+    width: 400px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
 #rules {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    background-color: #774040;
+    gap: 8px;
+}
+#scoreboard {
+    margin-bottom: 15px;
+    background-color: #5e2e2e;
+    padding: 10px;
     border-radius: 10px;
-    padding: 20px;
-    border-style: dotted;
-    border-color: beige;
     color: beige;
     font-weight: bold;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    margin-bottom: 20px;
-
+    text-align: center;
 }
-
+#scoreboard p {
+    margin: 5px 0;
+}
 #game {
-    background-color: #774040; /* Default background color */
+    background-color: #774040;
     border-radius: 10px;
     display: none;
     padding: 20px;
+    color: beige;
+    font-weight: bold;
     flex-direction: column;
-    color: beige;
-    font-weight: bold;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-
-}
-#rules-holder {
-    position: fixed;
-    top: 0;
-    right: 0;
-    background-color: #774040;
-    border-radius: 10px;
-    padding: 20px;
-    border-style: dotted;
-    border-color: beige;
-    color: beige;
-    font-weight: bold;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    margin-bottom: 20px;
+    align-items: center;
+    gap: 10px;
+    max-width: 90vw;
+    width: 400px;
+    text-align: center;
 }
 
-button{
-    margin: 2px;
+button {
+    margin: 5px;
+    padding: 10px 15px;
+    font-size: 1rem;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    background-color: beige;
+    color: #774040;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #e6d8a8;
+}
+
+.game-button {
+    width: 100%;
+    max-width: 300px;
+}
+
+@media (max-width: 480px) {
+    #title {
+        font-size: 1.2rem;
+        text-align: center;
+    }
+
+    #rules-holder, #game {
+        padding: 15px;
+        font-size: 0.9rem;
+    }
+
+    button {
+        font-size: 0.9rem;
+    }
+
+    .game-button {
+        width: 100%;
+        max-width: none;
+    }
 }
