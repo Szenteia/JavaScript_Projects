@@ -51,7 +51,7 @@ export const FOOTER_LINKS = [
   {
     title: 'Learn More',
     links: [
-      'About Hilink',
+      'About MartialArtsPécs',
       'Press Releases',
       'Environment',
       'Jobs',
@@ -61,15 +61,15 @@ export const FOOTER_LINKS = [
   },
   {
     title: 'Our Community',
-    links: ['Climbing xixixi', 'Hiking hilink', 'Hilink kinthill'],
+    links: ['brazilian jiu-jitsu', 'kids Martial Arts', 'Shoot Boxing', 'Women self-defense'],
   },
 ];
 
 export const FOOTER_CONTACT_INFO = {
   title: 'Contact Us',
   links: [
-    { label: 'Admin Officer', value: '123-456-7890' },
-    { label: 'Email Officer', value: 'hilink@akinthil.com' },
+    { label: 'Developer', value: 'SzenteiA' },
+    { label: 'Email', value: 'szenteia@gmail.com' },
   ],
 };
 
