@@ -1,5 +1,5 @@
 
-import meteorScene from '../assets/3d/meteor.glb';
+import meteorScene from '../assets/3d/meteor-optimized.glb';
 import { useGLTF } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import { useEffect, useRef} from 'react';

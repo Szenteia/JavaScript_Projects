@@ -6,7 +6,7 @@ import { useGLTF } from '@react-three/drei'
 import { useFrame, useThree } from '@react-three/fiber'
 import { a } from '@react-spring/three'
 
-import MainModelScene from '../assets/3d/altModel.glb'
+import MainModelScene from '../assets/3d/altModel-optimized.glb'
 
 const AlternativeModel = ({ isRotating, setIsRotating, setCurrentStage, ...props}) => {
   const  mainModelRef = useRef();

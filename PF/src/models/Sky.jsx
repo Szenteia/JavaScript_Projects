@@ -3,7 +3,7 @@ import { useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 
 /* import skyScene from '../assets/3d/sky.glb' */
-import skyScene2 from '../assets/3d/sky2.glb'
+import skyScene2 from '../assets/3d/sky2-optimized.glb'
 
 const Sky = ({ isRotating }) => {
     const sky = useGLTF(skyScene2);

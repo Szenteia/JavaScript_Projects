@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react'
 import { useAnimations, useGLTF } from '@react-three/drei'
-import PlaneScene from '../assets/3d/Plane.glb'
+import PlaneScene from '../assets/3d/Plane-optimized.glb'
 
 const Plane = ({isRotating, ...props}) => {
   const ref= useRef();
