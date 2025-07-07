@@ -1,7 +1,7 @@
 import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { FOOTER_CONTACT_INFO, FOOTER_LINKS } from '@/constants'
+import { FOOTER_CONTACT_INFO, FOOTER_LINKS, SOCIALS } from '@/constants'
 
 const Footer = () => {
   return (
@@ -38,8 +38,22 @@ const Footer = () => {
                 ))}
               </FooterColumn>
             </div>
+            <div className='flex flex-col gap-5'>
+              <FooterColumn title={SOCIALS.title}>
+                <ul className='regular-14 flex gap-4 text-gray-30'>
+                  {SOCIALS.links.map((link)=>(
+                    <Link href="/"
+                    key={link}>
+                      <Image src={link} alt='logo' width={24} height={24}/>
+                    </Link>
+                  ))}
+                </ul>
+              </FooterColumn>
+            </div>
           </div>
         </div>
+        <div className='border bg-gray-20'/>
+        <p className='regulaer-14 w-full text-center text-gray-30'>2025 Martial Arts Pécs | All rights reserved</p>
       </div>
     </footer>
   )
