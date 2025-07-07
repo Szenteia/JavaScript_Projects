@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <!-- Fekete háttér -->
+  <rect width="100%" height="100%" fill="none"/>
+  
+  <!-- MATYÓ MOTÍVUM (Arany keret + geometria) -->
+  <rect x="50" y="50" width="100" height="100" fill="none" stroke="#FFD700" stroke-width="4"/>
+  <path d="M50,100 L150,100 M100,50 L100,150" stroke="#FFD700" stroke-width="3"/>
+  <circle cx="100" cy="100" r="30" fill="none" stroke="#FFD700" stroke-width="2"/>
+  
+  <!-- BJJ GUARD (Arany sziluett) -->
+  <g fill="none" stroke="#FFD700" stroke-width="3" stroke-linecap="round">
+    <!-- Lábak (Guard pozíció) -->
+    <path d="M70,130 Q100,110 130,130"/>
+    <!-- Karok (Ellenfél fogása) -->
+    <path d="M70,80 L130,80"/>
+    <!-- Fej (Pont) -->
+    <circle cx="100" cy="70" r="5" fill="#FFD700"/>
+  </g>
+  
+  <!-- CÍM (Arany-fekete) -->
+  <text x="100" y="180" font-family="Arial Black" font-size="16" text-anchor="middle" fill="#FFD700">
+     BJJ 
+  </text>
+</svg>

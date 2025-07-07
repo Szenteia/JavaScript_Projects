@@ -47,7 +47,7 @@ const interval = setInterval(() => {
     <nav className='flexBetween max-container padding-container relative z-20 py-2'>
       <Link href='/'>
         <div ref={logoRef}>
-          <Image src='/hilink-logo.svg' alt='logo' width={80} height={29} />
+          <Image src='/newlogo2.svg' alt='logo' width={90} height={35} />
         </div>
       </Link>
 

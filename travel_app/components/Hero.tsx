@@ -10,7 +10,7 @@ const Hero = () => {
     />
     <h1 className='bold-52 lg:bold-88'>Martial Arts Pécs</h1>
     <p className='regular-16 mt-6 text-gray-30 xl:max-w-[520px]'>
-      We will have a look at Pécs's interesting and continously growing martial art repertoire. Mainly focusing on traditional martial arts.
+      We will have a look at Pécs's interesting and continously growing martial art repertoire. Mainly focusing on traditional martial arts. Today You can have a look at a fresh Team in Pécs.
     </p>
     <div className='my-11 flex flex-wrap gap-5'>
       <div className='flex items-center gap-2'>
@@ -25,7 +25,7 @@ const Hero = () => {
         ))}
       </div>
       <p className='bold-16 lg:bold-20 text-blue-70'>
-        130K
+        1K
         <span className='regular-16 lg:regular-20 ml-1'>Excellent reviews</span>
       </p>
     </div>
@@ -48,7 +48,7 @@ const Hero = () => {
               <p className='regular-16 text-gray-20'>Location</p>
               <Image src="/close.svg" alt='close' width={24} height={24}/>
             </div>
-            <p className='bold-20 text-white'>BJJ</p>
+            <p className='bold-20 text-white'>Pécs</p>
           </div>
 
               <div className='flexBetween flex'>
