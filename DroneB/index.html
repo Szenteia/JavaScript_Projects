@@ -51,7 +51,7 @@
                 <!-- Navigáció -->
                 <div class="hidden md:flex space-x-8">
                     <a href="#" class="font-medium hover:text-primary transition" data-i18n="nav.home">Home</a>
-                    <a href="#" class="font-medium hover:text-primary transition" data-i18n="nav.design">Design</a>
+                    <a href="#design" class="font-medium hover:text-primary transition" data-i18n="nav.design">Design</a>
                     <a href="#" class="font-medium hover:text-primary transition" data-i18n="nav.production">Production</a>
                     <a href="#" class="font-medium hover:text-primary transition" data-i18n="nav.gallery">Gallery</a>
                 </div>
@@ -75,7 +75,7 @@
         <div id="mobile-menu" class="md:hidden hidden bg-white shadow-lg">
             <div class="container mx-auto px-4 py-3 flex flex-col space-y-3">
                 <a href="#" class="py-2 font-medium hover:text-primary transition" data-i18n="nav.home">Home</a>
-                <a href="#" class="py-2 font-medium hover:text-primary transition" data-i18n="nav.design">Design</a>
+                <a href="#design" class="py-2 font-medium hover:text-primary transition" data-i18n="nav.design">Design</a>
                 <a href="#" class="py-2 font-medium hover:text-primary transition" data-i18n="nav.production">Production</a>
                 <a href="#" class="py-2 font-medium hover:text-primary transition" data-i18n="nav.gallery">Gallery</a>
             </div>
@@ -150,9 +150,14 @@
                 </div>
             </div>
         </section>
-        <section class="flex flex-col overflow-hidden ">
-            <div class="flex bg-black rounded-lg">
-                <H1 class="text-3xl text-gray-500 p-3">Research & Design</H1>
+                    <!-- Design -->
+        <section class="flex flex-col overflow-hidden">
+            
+            <div class="flex bg-black rounded-lg items-center justify-center transition relative bg-cover bg-center opacity-70" 
+            style="background-image: url('/assets/drone1.svg')"
+            id="design">
+
+                <H1 class="text-3xl text-gray-500 p-3" data-i18n="main.research.h1">Research & Design</H1>
             </div>
 
         </section>
@@ -185,7 +190,7 @@
             </div>
             <div>
                 <h4 class="font-bold mb-4" data-i18n="footer.contact">Contact</h4>
-                <p class="text-gray-400 mb-2">projekt.drone@example.com</p>
+                <p class="text-gray-400 mb-2">szenteia@gmail.com</p>
                 <div class="flex space-x-4">
                     <a href="#" class="text-gray-400 hover:text-white transition">
                         <span class="sr-only">GitHub</span>
@@ -197,7 +202,7 @@
             </div>
         </div>
         <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p data-i18n="footer.copyright">&copy; 2023 DronePro Project. All rights reserved.</p>
+            <p data-i18n="footer.copyright">@ 2025 DronePro Project. All rights reserved.</p>
         </div>
     </div>
 </footer>
@@ -229,10 +234,11 @@
                 "projects.card3.title": "Assembly",
                 "projects.card3.desc": "Physical implementation",
                 "projects.card3.link": "Details",
+                "main.research.h1": "Research & Design",
                 "footer.desc": "Hobby project about building a DIY ground drone.",
                 "footer.links": "Links",
                 "footer.contact": "Contact",
-                "footer.copyright": "&copy; 2023 DronePro Project. All rights reserved."
+                "footer.copyright": "@ 2025 DronePro Project. All rights reserved."
             },
             hu: {
                 "page-title": "Drone Projekt | Kezdőlap",
@@ -257,10 +263,11 @@
                 "projects.card3.title": "Összeszerelés",
                 "projects.card3.desc": "A drone fizikai megvalósítása",
                 "projects.card3.link": "Részletek",
+                "main.research.h1": "Keresés & Tervezés",
                 "footer.desc": "Hobbi projekt a házilag készített ground drone fejlesztéséről.",
                 "footer.links": "Linkek",
                 "footer.contact": "Kapcsolat",
-                "footer.copyright": "&copy; 2023 DronePro Projekt. Minden jog fenntartva."
+                "footer.copyright": "@ 2025 DronePro Projekt. Minden jog fenntartva."
             }
         };
 
