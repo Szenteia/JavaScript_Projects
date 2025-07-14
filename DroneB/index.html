@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="hu" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drone Projekt | Kezdőlap</title>
+    <meta name="description" content="Házilag készített ground drone projekt dokumentációja">
+    
+    <!-- Tailwind CSS 3 CDN (Production) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Egyedi Tailwind konfiguráció -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#10b981',
+                        dark: '#1e293b',
+                        light: '#f8fafc'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- GSAP CDN (későbbi animációkhoz) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+    
+    <style>
+        /* Egyedi CSS ha szükséges */
+        .hero-gradient {
+            background: linear-gradient(135deg, rgba(59,130,246,0.15) 0%, rgba(16,185,129,0.1) 100%);
+        }
+    </style>
+</head>
+<body class="bg-light font-sans antialiased text-dark min-h-screen flex flex-col">
+    <!-- Fejléc -->
+    <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-md shadow-sm">
+        <nav class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="#" class="text-2xl font-bold text-primary">Drone<span class="text-secondary">Pro</span></a>
+            
+            <!-- Navigáció asztali nézet -->
+            <div class="hidden md:flex space-x-8">
+                <a href="#" class="font-medium hover:text-primary transition">Kezdőlap</a>
+                <a href="#" class="font-medium hover:text-primary transition">Tervezés</a>
+                <a href="#" class="font-medium hover:text-primary transition">Gyártás</a>
+                <a href="#" class="font-medium hover:text-primary transition">Tesztelés</a>
+                <a href="#" class="font-medium hover:text-primary transition">Galéria</a>
+            </div>
+            
+            <!-- Mobil menü gomb -->
+            <button id="mobile-menu-button" class="md:hidden text-dark">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+        </nav>
+        
+        <!-- Mobil navigáció (elrejtve alapból) -->
+        <div id="mobile-menu" class="md:hidden hidden bg-white shadow-lg">
+            <div class="container mx-auto px-4 py-3 flex flex-col space-y-3">
+                <a href="#" class="py-2 font-medium hover:text-primary transition">Kezdőlap</a>
+                <a href="#" class="py-2 font-medium hover:text-primary transition">Tervezés</a>
+                <a href="#" class="py-2 font-medium hover:text-primary transition">Gyártás</a>
+                <a href="#" class="py-2 font-medium hover:text-primary transition">Tesztelés</a>
+                <a href="#" class="py-2 font-medium hover:text-primary transition">Galéria</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Fő tartalom -->
+    <main class="flex-grow">
+        <!-- Hero szekció -->
+        <section class="hero-gradient py-20">
+            <div class="container mx-auto px-4">
+                <div class="max-w-3xl mx-auto text-center">
+                    <h1 class="text-4xl md:text-5xl font-bold mb-6">Házilag készített <span class="text-primary">Ground Drone</span> projekt</h1>
+                    <p class="text-lg text-gray-600 mb-8">A projekt teljes dokumentációja a tervezéstől a megvalósításig</p>
+                    <div class="flex flex-col sm:flex-row justify-center gap-4">
+                        <a href="#projects" class="bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-lg font-medium transition shadow-md">Projektek megtekintése</a>
+                        <a href="#" class="border border-primary text-primary hover:bg-primary/10 px-6 py-3 rounded-lg font-medium transition">További információk</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Projektek szekció -->
+        <section id="projects" class="py-20">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl font-bold mb-12 text-center">Projekt fázisok</h2>
+                
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Projekt kártya 1 -->
+                    <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
+                        <div class="h-48 bg-gray-200 flex items-center justify-center">
+                            <span class="text-gray-500">Kép helye</span>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold mb-2">Keresés & Tervezés</h3>
+                            <p class="text-gray-600 mb-4">Az alapötlettől a részletes tervekig</p>
+                            <a href="#" class="text-primary font-medium hover:underline">Részletek</a>
+                        </div>
+                    </div>
+                    
+                    <!-- Projekt kártya 2 -->
+                    <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
+                        <div class="h-48 bg-gray-200 flex items-center justify-center">
+                            <span class="text-gray-500">Kép helye</span>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold mb-2">Alkatrészek beszerzése</h3>
+                            <p class="text-gray-600 mb-4">A legjobb komponensek kiválasztása</p>
+                            <a href="#" class="text-primary font-medium hover:underline">Részletek</a>
+                        </div>
+                    </div>
+                    
+                    <!-- Projekt kártya 3 -->
+                    <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
+                        <div class="h-48 bg-gray-200 flex items-center justify-center">
+                            <span class="text-gray-500">Kép helye</span>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold mb-2">Összeszerelés</h3>
+                            <p class="text-gray-600 mb-4">A drone fizikai megvalósítása</p>
+                            <a href="#" class="text-primary font-medium hover:underline">Részletek</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Lábléc -->
+    <footer class="bg-dark text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">DronePro</h3>
+                    <p class="text-gray-400">Hobbi projekt a házilag készített ground drone fejlesztéséről és dokumentációjáról.</p>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-4">Linkek</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Kezdőlap</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Projekt fázisok</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Galéria</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-4">Kapcsolat</h4>
+                    <p class="text-gray-400 mb-2">projekt.drone@example.com</p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition">
+                            <span class="sr-only">GitHub</span>
+                            <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd" />
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2023 DronePro Projekt. Minden jog fenntartva.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Saját JS -->
+    <script>
+        // Mobil menü kezelése
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+        
+        // GSAP inicializálása későbbi használatra
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Az oldal betöltődött, készen áll a GSAP használatára!');
+            
+            // Alap animáció példa
+            gsap.from('header', { duration: 0.8, y: -50, opacity: 0, ease: 'power2.out' });
+            gsap.from('.hero-gradient h1', { duration: 1, y: 30, opacity: 0, delay: 0.3, ease: 'back.out' });
+        });
+    </script>
+</body>
+</html>
