@@ -151,16 +151,67 @@
             </div>
         </section>
                     <!-- Design -->
-        <section class="flex flex-col overflow-hidden">
+<section class="flex flex-col overflow-hidden">
+    <div class="flex bg-black rounded-lg items-center justify-center transition relative bg-cover bg-center opacity-70" 
+        style="background-image: url('/assets/drone1.svg')"
+        id="design">
+        <H1 class="text-3xl text-gray-500 p-3" data-i18n="main.research.h1">Research & Design</H1>
+    </div>
+    
+    <div class="flex flex-col lg:flex-row bg-black text-white p-4 gap-4 lg:gap-8">
+        <!-- Left Column - Content + Interactive List -->
+        <div class="flex-1 flex flex-col">
+            <div class="mb-4" data-i18n="main.research.content"></div>
             
-            <div class="flex bg-black rounded-lg items-center justify-center transition relative bg-cover bg-center opacity-70" 
-            style="background-image: url('/assets/drone1.svg')"
-            id="design">
-
-                <H1 class="text-3xl text-gray-500 p-3" data-i18n="main.research.h1">Research & Design</H1>
+            <div class="grid gap-2 mt-4 w-full md:w-1/2 lg:w-full">
+                <!-- Item 1 -->
+                <div class="group relative">
+                    <div class="font-bold cursor-pointer py-2 px-8 bg-gray-800 rounded-lg group-hover:bg-gray-700 transition" 
+                         data-i18n="main.research.items.item1.title">
+                        Item 1 Title
+                    </div>
+                    <div class="hidden group-hover:block absolute z-10 w-full md:w-4/6 mt-1 p-3 bg-gray-900 rounded-lg shadow-lg">
+                        <div class="text-sm" data-i18n="main.research.items.item1.details">
+                            Item 1 detailed description appears here on hover
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Item 2 -->
+                <div class="group relative">
+                    <div class="font-bold cursor-pointer py-2 px-8 bg-gray-800 rounded-lg group-hover:bg-gray-700 transition" 
+                         data-i18n="main.research.items.item2.title">
+                        Item 2 Title
+                    </div>
+                    <div class="hidden group-hover:block absolute z-10 w-full mt-1 p-3 bg-gray-900 rounded-lg shadow-lg">
+                        <div class="text-sm" data-i18n="main.research.items.item2.details">
+                            Item 2 detailed description appears here on hover
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Item 3 -->
+                <div class="group relative">
+                    <div class="font-bold cursor-pointer py-2 px-8 bg-gray-800 rounded-lg group-hover:bg-gray-700 transition" 
+                         data-i18n="main.research.items.item3.title">
+                        Item 3 Title
+                    </div>
+                    <div class="hidden group-hover:block absolute z-10 w-full mt-1 p-3 bg-gray-900 rounded-lg shadow-lg">
+                        <div class="text-sm" data-i18n="main.research.items.item3.details">
+                            Item 3 detailed description appears here on hover
+                        </div>
+                    </div>
+                </div>
             </div>
-
-        </section>
+        </div>
+        
+        <!-- Right Column - Image (only on lg+) -->
+        <div class="hidden lg:block lg:w-1/2 lg:min-w-[50%]">
+            <img src="/assets/item1.jpg" alt="Research visual" 
+                 class=" max-w-[400px] h-full max-h-[400px] object-cover rounded-lg opacity-90 sticky top-4">
+        </div>
+    </div>
+</section>
     </main>
 
 <!-- Lábléc -->
@@ -238,6 +289,9 @@
                 "projects.card3.desc": "Physical implementation",
                 "projects.card3.link": "Details",
                 "main.research.h1": "Research & Design",
+                "main.research.content":"Objects that are worth paying attention to. What can be extracted from what? What is it good for?",
+                "main.research.items.item1.title":"Old Mouse",
+                "main.research.items.item1.details":"optical sensor, microswitch for line tracking",
                 "footer.desc": "A hobby project about building a DIY ground drone. Hopefully many more interesting thoughts will be collected in the coming months.",
                 "footer.links": "Links",
                 "footer.contact": "Contact",
@@ -267,6 +321,9 @@
                 "projects.card3.desc": "A drone fizikai megvalósítása",
                 "projects.card3.link": "Részletek",
                 "main.research.h1": "Keresés & Tervezés",
+                "main.research.content":"Tárgyak, amiket érdemes figyelni. Miből mit lehet kinyerni ? Mire jó ?",
+                "main.research.items.item1.title":"Régi egér",
+                "main.research.items.item1.details":"optikai szenzor, mikrokapcsoló	vonalkövetéshez",
                 "footer.desc": "Hobbi projekt egy házilag készített földi drone fejlesztéséről. Remélhetőleg, sok érdekesség és tanulság gyűlik össze itt a jövőben erről az izgalmas kalandról.",
                 "footer.links": "Linkek",
                 "footer.contact": "Kapcsolat",
