@@ -52,6 +52,35 @@
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
         }
+    #design {
+    position: relative;
+    overflow: hidden;
+    height: 'min-h-[100px]'; /* Adjust based on your needs */
+  }
+  
+  .toxic-wave {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 200%; /* Extra width for seamless looping */
+    height: 30%; /* Fills 30% of container */
+    background: linear-gradient(90deg, 
+      #4ecdc4, 
+      #48b1bf, 
+      #3a7bd5, 
+      #4ecdc4); /* Toxic blue-green gradient */
+    opacity: 0.8;
+    animation: wave 15s linear infinite;
+    filter: blur(1px);
+  }
+  
+  @keyframes wave {
+    0% { transform: translateX(0) translateY(0) skewY(0deg); }
+    25% { transform: translateX(-25%) translateY(-5px) skewY(1deg); }
+    50% { transform: translateX(-50%) translateY(0) skewY(0deg); }
+    75% { transform: translateX(-25%) translateY(5px) skewY(-1deg); }
+    100% { transform: translateX(0) translateY(0) skewY(0deg); }
+  }
     </style>
 </head>
 <body class="bg-light font-sans antialiased text-dark min-h-screen flex flex-col">
@@ -175,7 +204,7 @@
     <div class="flex bg-black rounded-lg items-center justify-center transition relative bg-cover bg-center opacity-70" 
         style="background-image: url('/assets/drone1.svg')"
         id="design">
-        <H1 class="text-3xl text-gray-500 p-3" data-i18n="main.research.h1">Research & Design</H1>
+        <H1 class="text-3xl text-white p-3" data-i18n="main.research.h1">Research & Design</H1>
     </div>
     
     <div class="flex flex-col lg:flex-row bg-black text-white p-4 gap-4 lg:gap-8">
@@ -234,8 +263,8 @@
 </section>
 
 <section>
-        <div class="flex bg-black rounded-lg items-center justify-center transition relative bg-cover bg-center opacity-70" 
-        style="background-image: url('/assets/drone3.svg')"
+        <div class="flex flex-col  rounded-lg items-center justify-center transition relative bg-center opacity-70" 
+        style="background-image: url('/assets/robot.svg')"
         id="assembly">
         <H1 class="text-3xl text-gray-500 p-3" data-i18n="main.assembly.h1">Assembly</H1>
     </div>
@@ -427,7 +456,7 @@
             gsap.from('header', { duration: 0.9, y: -50, opacity: 0, ease: 'power2.out' });
             gsap.from('.hero-gradient h1', { duration: 1.2, y: 40, opacity: 0, delay: 0.4, ease: 'back.out' });
         });
-// Add this inside your DOMContentLoaded event listener
+
 const assemblySection = document.getElementById('assembly');
 if (assemblySection) {
   const observer = new IntersectionObserver((entries) => {
@@ -479,92 +508,105 @@ if (assemblySection) {
 
   observer.observe(assemblySection);
 }
-        // Set initial position (off-screen to the left)
-        gsap.set(gear, {
-            x: -100,
-            y: 100,
-            rotation: 0
-        });
-        
-        // Create the animation timeline
-        const gearAnimation = gsap.timeline({repeat: 1});
-        
-        // Animation path
-        gearAnimation
-            // First diagonal across the screen
-            .to(gear, {
-                x: window.innerWidth + 100,
-                y: window.innerHeight * 0.4,
-                rotation: 360,
-                duration: 6,
-                ease: "none"
-            })
-            // Back across the screen a bit lower
-            .to(gear, {
-                x: -100,
-                y: window.innerHeight * 0.6,
-                rotation: 720,
-                duration: 8,
-                ease: "none"
-            })
-            // Across again even lower
-            .to(gear, {
-                x: window.innerWidth + 100,
-                y: window.innerHeight * 0.8,
-                rotation: 1080,
-                duration: 10,
-                ease: "none"
-            })
-            // Final pass disappearing at bottom
-            .to(gear, {
-                x: -100,
-                y: window.innerHeight + 100,
-                rotation: 1440,
-                duration: 12,
-                ease: "none"
-            });
-            
-        // Make the gear rotate continuously
-        gsap.to(gear, {
+
+// Set initial position (off-screen to the left)
+gsap.set(gear, {
+    x: -100,
+    y: 100,
+    rotation: 0
+});
+
+// Create the animation timeline (plays once)
+const createGearAnimation = () => {
+    return gsap.timeline()
+        // First diagonal across the screen
+        .to(gear, {
+            x: window.innerWidth + 100,
+            y: window.innerHeight * 0.4,
             rotation: 360,
-            duration: 4,
-            repeat: -1,
+            duration: 6,
             ease: "none"
+        })
+        // Back across the screen a bit lower
+        .to(gear, {
+            x: -100,
+            y: window.innerHeight * 0.6,
+            rotation: 720,
+            duration: 8,
+            ease: "none"
+        })
+        // Across again even lower
+        .to(gear, {
+            x: window.innerWidth + 100,
+            y: window.innerHeight * 0.8,
+            rotation: 1080,
+            duration: 10,
+            ease: "none"
+        })
+        // Final pass disappearing at bottom
+        .to(gear, {
+            x: -100,
+            y: window.innerHeight + 100,
+            rotation: 1440,
+            duration: 12,
+            ease: "none",
+            onComplete: () => {
+                // Remove gear after animation completes if you want
+                // gear.remove();
+            }
         });
-        
-        // Handle window resize
-        window.addEventListener('resize', function() {
-            gearAnimation.progress(0).kill();
-            gearAnimation
-                .to(gear, {
-                    x: window.innerWidth + 100,
-                    y: window.innerHeight * 0.2,
-                    rotation: 360,
-                    duration: 5,
-                    ease: "none"
-                })
-                .to(gear, {
-                    x: -100,
-                    y: window.innerHeight * 0.4,
-                    rotation: 720,
-                    duration: 5,
-                    ease: "none"
-                })
-                .to(gear, {
-                    x: window.innerWidth + 100,
-                    y: window.innerHeight * 0.6,
-                    rotation: 1080,
-                    duration: 5,
-                    ease: "none"
-                })
-                .to(gear, {
-                    x: -100,
-                    y: window.innerHeight + 100,
-                    rotation: 1440,
-                    duration: 5,
-                    ease: "none"
-                });
-        });
+};
+
+// Start the initial animation
+let gearAnimation = createGearAnimation();
+
+// Handle window resize
+const handleResize = () => {
+    // Kill existing animation
+    gearAnimation.kill();
+    
+    // Reset position
+    gsap.set(gear, {
+        x: -100,
+        y: 100,
+        rotation: 0
+    });
+    
+    // Create new animation with updated positions
+    gearAnimation = createGearAnimation();
+};
+
+// Debounced resize handler
+let resizeTimeout;
+window.addEventListener('resize', () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(handleResize, 100);
+});
+
+// Remove the continuous rotation tween since we're handling rotation in the timeline
+// This was causing conflict with the timeline rotation
 </script>
+</style>
+<!-- <script>
+document.addEventListener('DOMContentLoaded', function() {
+  const designSection = document.getElementById('design');
+  if (!designSection) return;
+
+  // Create toxic wave
+  const wave = document.createElement('div');
+  wave.className = 'toxic-wave';
+  designSection.appendChild(wave);
+
+  // Add subtle color variation
+  setInterval(() => {
+    const hue = Math.random() * 20 + 160; // Between 160-180 (blue-green)
+    wave.style.background = `linear-gradient(90deg, 
+      hsl(${hue}, 70%, 60%), 
+      hsl(${hue + 10}, 75%, 55%), 
+      hsl(${hue + 5}, 80%, 50%), 
+      hsl(${hue}, 70%, 60%))`;
+  }, 3000); // Change color every 3 seconds
+});
+</script> --> //NOT Satisfied at all with the vawe
 </body>
 </html>
