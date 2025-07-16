@@ -39,9 +39,29 @@
         .lang-switcher {
             cursor: pointer;
         }
+        
+        /* Gear styles */
+        .gear {
+            position: fixed;
+            z-index: 10;
+            opacity: 0.7;
+            filter: drop-shadow(0 0 5px rgba(0,0,0,0.3));
+        }
+        
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body class="bg-light font-sans antialiased text-dark min-h-screen flex flex-col">
+        <!-- Animated Gear -->
+    <svg class="gear" width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M55.5 30C55.5 43.8071 43.8071 55.5 30 55.5C16.1929 55.5 4.5 43.8071 4.5 30C4.5 16.1929 16.1929 4.5 30 4.5C43.8071 4.5 55.5 16.1929 55.5 30Z" stroke="#6B7280" stroke-width="3"/>
+        <path d="M30 4.5V0M30 60V55.5M55.5 30H60M0 30H4.5M49.9706 10.0294L52.4264 7.57359M7.57359 52.4264L10.0294 49.9706M49.9706 49.9706L52.4264 52.4264M7.57359 7.57359L10.0294 10.0294" stroke="#6B7280" stroke-width="3"/>
+        <path d="M30 12V0M30 60V48M48 30H60M0 30H12M42.4264 17.5736L52.4264 7.57359M7.57359 52.4264L17.5736 42.4264M42.4264 42.4264L52.4264 52.4264M7.57359 7.57359L17.5736 17.5736" stroke="#6B7280" stroke-width="3"/>
+        <circle cx="30" cy="30" r="10" fill="#9CA3AF"/>
+    </svg>
     <!-- Fejléc -->
     <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-md shadow-sm">
         <nav class="container mx-auto px-4 py-4 flex justify-between items-center">
@@ -120,7 +140,7 @@
                         <div class="p-6">
                             <h3 class="text-xl font-bold mb-2" data-i18n="projects.card1.title">Research & Design</h3>
                             <p class="text-gray-600 mb-4" data-i18n="projects.card1.desc">From concept to detailed plans</p>
-                            <a href="#" class="text-primary font-medium hover:underline" data-i18n="projects.card1.link">Details</a>
+                            <a href="#design" class="text-primary font-medium hover:underline" data-i18n="projects.card1.link">Details</a>
                         </div>
                     </div>
                     
@@ -150,7 +170,7 @@
                 </div>
             </div>
         </section>
-                    <!-- Design -->
+    <!-- Design -->
 <section class="flex flex-col overflow-hidden">
     <div class="flex bg-black rounded-lg items-center justify-center transition relative bg-cover bg-center opacity-70" 
         style="background-image: url('/assets/drone1.svg')"
@@ -212,6 +232,14 @@
         </div>
     </div>
 </section>
+
+<section>
+        <div class="flex bg-black rounded-lg items-center justify-center transition relative bg-cover bg-center opacity-70" 
+        style="background-image: url('/assets/drone3.svg')"
+        id="assembly">
+        <H1 class="text-3xl text-gray-500 p-3" data-i18n="main.assembly.h1">Assembly</H1>
+    </div>
+</section>
     </main>
 
 <!-- Lábléc -->
@@ -233,8 +261,8 @@
                         <h4 class="font-bold mb-4" data-i18n="footer.links">Links</h4>
                         <ul class="space-y-2">
                             <li><a href="#" class="text-gray-400 hover:text-white transition" data-i18n="nav.home">Home</a></li>
-                            <li><a href="#" class="text-gray-400 hover:text-white transition" data-i18n="nav.design">Design</a></li>
-                            <li><a href="#" class="text-gray-400 hover:text-white transition" data-i18n="nav.gallery">Gallery</a></li>
+                            <li><a href="#design" class="text-gray-400 hover:text-white transition" data-i18n="nav.design">Design</a></li>
+                            <li><a href="#assembly" class="text-gray-400 hover:text-white transition" data-i18n="nav.gallery">Gallery</a></li>
                         </ul>
                     </div>
                 </div>
@@ -270,8 +298,8 @@
                 "logo": "Drone<span class='text-secondary'>Pro</span>",
                 "nav.home": "Home",
                 "nav.design": "Design",
-                "nav.production": "Production",
-                "nav.gallery": "Gallery",
+                "nav.production": "Component Sourcing",
+                "nav.gallery": "Assembly",
                 "hero.title.part1": "DIY",
                 "hero.title.part2": "Ground Drone",
                 "hero.title.part3": "Project",
@@ -296,6 +324,7 @@
                 "main.research.items.item2.details":"Li-ion battery, fan, display LEDs for battery - charging, cooling",
                 "main.research.items.item3.title":"DVD drive",
                 "main.research.items.item3.details":"small motor, tray mover - precise arm movement",
+                "main.assembly.h1":"Assembly",
                 "footer.desc": "A hobby project about building a DIY ground drone. Hopefully many more interesting thoughts will be collected in the coming months.",
                 "footer.links": "Links",
                 "footer.contact": "Contact",
@@ -306,8 +335,8 @@
                 "logo": "Drone<span class='text-secondary'>Pro</span>",
                 "nav.home": "Kezdőlap",
                 "nav.design": "Tervezés",
-                "nav.production": "Gyártás",
-                "nav.gallery": "Galéria",
+                "nav.production": "Alapanyag gyűjtés",
+                "nav.gallery": "Megvalósítás",
                 "hero.title.part1": "Házilag készített",
                 "hero.title.part2": "Ground Drone",
                 "hero.title.part3": "Projekt",
@@ -332,6 +361,7 @@
                 "main.research.items.item2.details":"Li-ion akksi, ventilátor, kijelző LED-ek -  akkutöltés, hűtés",
                 "main.research.items.item3.title":"DVD-meghajtó",
                 "main.research.items.item3.details":"kis motor, tálcamozgató  -  precíz kar mozgatása",
+                "main.assembly.h1":"Megvalósítás",
                 "footer.desc": "Hobbi projekt egy házilag készített földi drone fejlesztéséről. Remélhetőleg, sok érdekesség és tanulság gyűlik össze itt a jövőben erről az izgalmas kalandról.",
                 "footer.links": "Linkek",
                 "footer.contact": "Kapcsolat",
@@ -394,9 +424,147 @@
             switchLanguage('en');
             
             // GSAP animációk
-            gsap.from('header', { duration: 0.8, y: -50, opacity: 0, ease: 'power2.out' });
-            gsap.from('.hero-gradient h1', { duration: 1, y: 30, opacity: 0, delay: 0.3, ease: 'back.out' });
+            gsap.from('header', { duration: 0.9, y: -50, opacity: 0, ease: 'power2.out' });
+            gsap.from('.hero-gradient h1', { duration: 1.2, y: 40, opacity: 0, delay: 0.4, ease: 'back.out' });
         });
-    </script>
+// Add this inside your DOMContentLoaded event listener
+const assemblySection = document.getElementById('assembly');
+if (assemblySection) {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        // Create and style the lightning bolt
+        const lightning = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        lightning.innerHTML = `
+          <path d="M12 3L7 12H12L8 21L19 10H14L18 3H12Z" fill="yellow" stroke="white" stroke-width="0.5"/>
+        `;
+        lightning.setAttribute("viewBox", "0 0 24 24");
+        lightning.style.cssText = `
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%) scale(3);
+          z-index: 100;
+          opacity: 0;
+          filter: drop-shadow(0 0 10px yellow);
+          pointer-events: none;
+        `;
+        document.body.appendChild(lightning);
+
+        // Lightning animation timeline
+        const lightningTL = gsap.timeline({
+          onComplete: () => {
+            lightning.remove(); // Ensure removal
+          }
+        });
+
+        lightningTL
+          .to(lightning, {
+            opacity: 1,
+            duration: 0.1,
+            ease: "power2.out"
+          })
+          .to(lightning, {
+            opacity: 0,
+            duration: 0.3,
+            delay: 1.6,
+            ease: "power2.in"
+          });
+
+        // Only trigger once
+        observer.unobserve(assemblySection);
+      }
+    });
+  }, { threshold: 0.5 });
+
+  observer.observe(assemblySection);
+}
+        // Set initial position (off-screen to the left)
+        gsap.set(gear, {
+            x: -100,
+            y: 100,
+            rotation: 0
+        });
+        
+        // Create the animation timeline
+        const gearAnimation = gsap.timeline({repeat: 1});
+        
+        // Animation path
+        gearAnimation
+            // First diagonal across the screen
+            .to(gear, {
+                x: window.innerWidth + 100,
+                y: window.innerHeight * 0.4,
+                rotation: 360,
+                duration: 6,
+                ease: "none"
+            })
+            // Back across the screen a bit lower
+            .to(gear, {
+                x: -100,
+                y: window.innerHeight * 0.6,
+                rotation: 720,
+                duration: 8,
+                ease: "none"
+            })
+            // Across again even lower
+            .to(gear, {
+                x: window.innerWidth + 100,
+                y: window.innerHeight * 0.8,
+                rotation: 1080,
+                duration: 10,
+                ease: "none"
+            })
+            // Final pass disappearing at bottom
+            .to(gear, {
+                x: -100,
+                y: window.innerHeight + 100,
+                rotation: 1440,
+                duration: 12,
+                ease: "none"
+            });
+            
+        // Make the gear rotate continuously
+        gsap.to(gear, {
+            rotation: 360,
+            duration: 4,
+            repeat: -1,
+            ease: "none"
+        });
+        
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            gearAnimation.progress(0).kill();
+            gearAnimation
+                .to(gear, {
+                    x: window.innerWidth + 100,
+                    y: window.innerHeight * 0.2,
+                    rotation: 360,
+                    duration: 5,
+                    ease: "none"
+                })
+                .to(gear, {
+                    x: -100,
+                    y: window.innerHeight * 0.4,
+                    rotation: 720,
+                    duration: 5,
+                    ease: "none"
+                })
+                .to(gear, {
+                    x: window.innerWidth + 100,
+                    y: window.innerHeight * 0.6,
+                    rotation: 1080,
+                    duration: 5,
+                    ease: "none"
+                })
+                .to(gear, {
+                    x: -100,
+                    y: window.innerHeight + 100,
+                    rotation: 1440,
+                    duration: 5,
+                    ease: "none"
+                });
+        });
+</script>
 </body>
 </html>
