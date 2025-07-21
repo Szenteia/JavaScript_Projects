@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>rendeléskezelő dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body{
+            font-family: 'Inter', sans-serif;
+        }
+
+    ::-webkit-scrollbar{
+        width: 8px;
+        height: 8px;
+    }
+    ::-webkit-scrollbar-track{
+        background: #2d3748;
+    }
+    ::-webkit-scrollbar-thumb {
+        background: #4A5568;
+        border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background: #6B7280;
+    }
+    .f-background {
+
+    height: 60px;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><text x="10" y="50" font-size="50" font-family="Arial" fill="white">F</text></svg>');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    margin-left: 60px ;
+    }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    spacing: {
+                        '32px': '32px',
+                        '80px': '80px',
+                        '126px': '126px',
+                        '320px': '320px',
+                        '352px': '352px',
+                        '1440px': '1440px',
+                        '1216px': '1216px',
+                        '1344px': '1344px',
+                        '1346px': '1346px'
+                    },
+                    colors: {
+                        'festlane_dark': '#251A3D',
+                        'festlane_black': '#1C1C1C'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-gray-900 text-gray-100 flex">
+
+<aside class="w-320px bg-festlane_dark flex flex-col h-1440px p-4">
+    <div class="flex items-center mb-8 f-background">
+
+    </div>
+
+    <nav class="flex-1">
+        <ul>
+            <li class="mb-2">
+                <a href="#" class="flex items-center p-2 h-full hover:bg-gray-300  text-white font-semibold ">
+                    <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.925 5.283a1 1 0 001.03 0L21 8m-2 11H5a2 2 0 01-2-2V7a2 2 0 012-2h14a2 2 0 012 2v10a2 2 0 01-2 2z"></path></svg>
+                    Beérkezett
+                    <span class="ml-auto bg-gray-700 text-gray-300 text-xs font-semibold px-2.5 py-0.5 rounded-full">11</span>
+                </a>
+            </li>
+            <li class="mb-2">
+                <a href="#" class="flex items-center p-2 rounded-lg text-gray-300 hover:bg-gray-500 text-white font-semibold">
+                    <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v4a1 1 0 001 1h4a1 1 0 001-1V7m0 10v3m-3-3v3m0-3h3m-3 0h-3m3 0H8m3 0h4m-4-7V5a2 2 0 012-2h4a2 2 0 012 2v2a2 2 0 01-2 2h-4a2 2 0 01-2-2z"></path></svg>
+                    Elkészítés alatt
+                    <span class="ml-auto bg-gray-700 text-gray-300 text-xs font-semibold px-2.5 py-0.5 rounded-full">9</span>
+                </a>
+            </li>
+            <li class="mb-2">
+                <a href="#" class="flex items-center p-2 rounded-lg text-gray-300 hover:bg-gray-500 text-white font-semibold">
+                    <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Átvehető
+                    <span class="ml-auto bg-gray-700 text-gray-300 text-xs font-semibold px-2.5 py-0.5 rounded-full">7</span>
+                </a>
+            </li>
+            <li class="mb-2">
+                <a href="#" class="flex items-center p-2 rounded-lg text-gray-300 hover:bg-gray-500 text-white font-semibold">
+                    <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Teljesített
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="mt-auto">
+        <ul>
+            <li class="mb-2">
+                <a href="#" class="flex items-center p-2 rounded-lg text-gray-300 hover:bg-gray-500 text-white font-semibold">
+                    <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10V8a2 2 0 012-2h4a2 2 0 012 2v2"></path></svg>
+                    Analitika
+                </a>
+            </li>
+            <li class="mb-2">
+                <a href="#" class="flex items-center p-2 rounded-lg text-gray-300 hover:bg-gray-500 text-white font-semibold">
+                    <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.526.326 1.042.022 1.574-.633z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    Beállítások
+                </a>
+            </li>
+            <li class="mb-2">
+                <a href="#" class="flex items-center p-2 rounded-lg text-gray-300 hover:bg-gray-500 text-white font-semibold">
+                    <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 0A9.002 9.002 0 0115 12.721m0 0V21m0 0H9.721m0 0A9.002 9.002 0 015.636 18.364l3.536-3.536m0 0A9.002 9.002 0 0112.721 9m0 0V3m0 0H21m0 0H12.721"></path></svg>
+                    Support
+                </a>
+            </li>
+            <li>
+                <a href="#" class="flex items-center p-2 rounded-lg text-gray-300 hover:bg-gray-500 text-white font-semibold">
+                    <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                    Kilépés
+                </a>
+            </li>
+        </ul>
+    </div>
+</aside>
+
+<main class="flex-1 overflow-auto w-1216 h-1344 m-t 126px p-b-80px bg-white p-6">
+
+</main>
+
+</body>
+</html>
