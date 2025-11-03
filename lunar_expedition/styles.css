@@ -1,0 +1,213 @@
+:root {
+  color-scheme: dark;
+  --bg-gradient: radial-gradient(circle at top, #362a69 0%, #1a1238 50%, #090512 100%);
+  --accent: #ffdc5c;
+  --accent-secondary: #7ae3ff;
+  --panel-bg: rgba(23, 16, 46, 0.85);
+  --text-primary: #f6f2ff;
+  --text-secondary: #b3a7ff;
+  --success: #88ffb7;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Oxygen', system-ui, sans-serif;
+  background: var(--bg-gradient);
+  color: var(--text-primary);
+  overflow: hidden;
+  min-height: 100vh;
+}
+
+canvas#experience {
+  display: block;
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  outline: none;
+  z-index: 0;
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(160deg, rgba(33, 11, 58, 0.95), rgba(7, 3, 16, 0.9));
+  transition: opacity 0.4s ease;
+  z-index: 10;
+}
+
+.overlay:not(.active) {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.overlay__card {
+  max-width: 460px;
+  padding: 2.5rem;
+  background: rgba(16, 10, 32, 0.85);
+  border-radius: 24px;
+  border: 2px solid rgba(136, 101, 255, 0.3);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.45);
+  text-align: center;
+}
+
+.overlay__card h1 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(1.8rem, 2.6vw, 2.6rem);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 1.25rem;
+  color: var(--accent);
+  text-shadow: 0 0 14px rgba(255, 255, 255, 0.35);
+}
+
+.overlay__card p {
+  line-height: 1.6;
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+}
+
+.overlay__card ul {
+  list-style: none;
+  text-align: left;
+  margin-bottom: 2rem;
+}
+
+.overlay__card li {
+  margin: 0.4rem 0;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.overlay__card li span {
+  font-family: 'Orbitron', sans-serif;
+  color: var(--accent-secondary);
+  letter-spacing: 0.04em;
+}
+
+.overlay__card button {
+  font-family: 'Orbitron', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: linear-gradient(135deg, #7d55ff, #ff66c4);
+  color: #0a0318;
+  border: none;
+  border-radius: 999px;
+  padding: 0.85rem 2.8rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: transform 0.2s ease, filter 0.2s ease;
+  box-shadow: 0 10px 30px rgba(111, 60, 255, 0.45);
+}
+
+.overlay__card button:hover {
+  transform: translateY(-3px) scale(1.03);
+  filter: brightness(1.1);
+}
+
+.hud {
+  position: fixed;
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+  padding: 1.25rem 1.5rem;
+  top: 0;
+  left: 0;
+  right: 0;
+  justify-content: space-between;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.hud__panel {
+  background: var(--panel-bg);
+  border-radius: 18px;
+  padding: 1rem 1.25rem;
+  min-width: 200px;
+  border: 1px solid rgba(148, 115, 255, 0.35);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+.hud__panel h2 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+  color: var(--accent-secondary);
+}
+
+.hud__stat {
+  display: grid;
+  grid-template-columns: 60px 1fr auto;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.65rem;
+  font-size: 0.9rem;
+}
+
+.hud__bar {
+  position: relative;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+
+.hud__bar-fill {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, #00ffa9, #7bf8ff);
+  transition: width 0.2s ease;
+}
+
+.hud__bar-fill--health {
+  background: linear-gradient(90deg, #ff66c4, #ffa857);
+}
+
+.hud__list {
+  list-style: none;
+  display: grid;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.hud__log {
+  flex: 1;
+  max-width: 320px;
+}
+
+.hud__log ul {
+  list-style: none;
+  max-height: 180px;
+  overflow-y: auto;
+  display: grid;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+}
+
+.hud__log li {
+  color: var(--success);
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: 0.05em;
+}
+
+@media (max-width: 900px) {
+  .hud {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .hud__panel {
+    width: 100%;
+  }
+}
