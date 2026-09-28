@@ -8,20 +8,26 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&family=Oxygen:wght@400;700&display=swap" rel="stylesheet">
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.161.0/examples/jsm/"
+      }
+    }
+  </script>
 </head>
 <body>
   <div id="overlay" class="overlay active">
     <div class="overlay__card">
-      <h1>Lunar Looney Expedition</h1>
-      <p>
-        Welcome to the toon-tinted Moon! Collect <strong>materials</strong>, <strong>O<sub>2</sub> gas packs</strong>,
-        and <strong>survival kits</strong> to keep your crew alive in this cosmic cartoon.
-      </p>
-      <ul>
+      <h1 id="overlayTitle">Lunar Looney Expedition</h1>
+      <p id="overlayMessage">Collect 8 materials, then return to the glowing base before your suit fails.</p>
+      <ul id="controlsHelp">
         <li><span>Click</span> to deploy to the surface.</li>
         <li><span>W A S D</span> to jet-hop around.</li>
         <li><span>Mouse</span> to look.</li>
         <li><span>E</span> to interact with nearby supplies.</li>
+        <li><span>Q / F</span> to use an O<sub>2</sub> pack / survival kit.</li>
       </ul>
       <button id="startButton" type="button">Launch Expedition</button>
     </div>
@@ -55,6 +61,7 @@
     </div>
     <div class="hud__panel hud__log">
       <h2>Mission Log</h2>
+      <p id="missionObjective" class="hud__objective">Collect materials: 0 / 8</p>
       <ul id="logEntries"></ul>
     </div>
   </div>
