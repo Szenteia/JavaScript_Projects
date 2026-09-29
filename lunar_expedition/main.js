@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
 import { createMoonSurface } from './terrain.js';
 import { createWreckedBase } from './environment.js';
+import { createSalvageModel, SALVAGE_VARIANTS } from './salvage.js';
 
 const canvas = document.getElementById('experience');
 const overlay = document.getElementById('overlay');
@@ -34,12 +35,10 @@ scene.background = new THREE.Color(0x05070b);
 scene.fog = new THREE.FogExp2(0x11151a, 0.0045);
 
 const collectibleGeometry = {
-  materials: new THREE.BoxGeometry(1.7, 1.1, 1.4),
   oxygen: new THREE.CylinderGeometry(0.65, 0.65, 2.1, 12),
   survival: new THREE.BoxGeometry(1.9, 0.9, 1.5),
 };
 const collectibleMaterials = {
-  materials: new THREE.MeshStandardMaterial({ color: 0x957c61, metalness: 0.65, roughness: 0.54, emissive: 0x3a1c0a, emissiveIntensity: 0.25 }),
   oxygen: new THREE.MeshStandardMaterial({ color: 0x91a9ab, metalness: 0.72, roughness: 0.38, emissive: 0x07546b, emissiveIntensity: 0.4 }),
   survival: new THREE.MeshStandardMaterial({ color: 0x8e774f, metalness: 0.45, roughness: 0.64, emissive: 0x50320d, emissiveIntensity: 0.22 }),
 };
@@ -197,13 +196,16 @@ function createLights() {
   scene.add(lightGroup);
 }
 
-function spawnCollectible(type, position) {
-  const mesh = new THREE.Mesh(collectibleGeometry[type], collectibleMaterials[type]);
+function spawnCollectible(type, position, variant = null) {
+  const mesh = type === 'materials'
+    ? createSalvageModel(variant)
+    : new THREE.Mesh(collectibleGeometry[type], collectibleMaterials[type]);
   mesh.position.copy(position);
   mesh.position.y = terrainHeightAt(position.x, position.z) + 1.5;
   mesh.castShadow = true;
   mesh.receiveShadow = true;
   mesh.userData = {
+    ...mesh.userData,
     type,
     baseY: mesh.position.y,
     speed: 0.6 + Math.random() * 0.6,
@@ -227,7 +229,8 @@ function populateCollectibles() {
       do {
         pos = new THREE.Vector3((Math.random() - 0.5) * 360, 0, (Math.random() - 0.5) * 360);
       } while (structureColliders.some((site) => Math.hypot(pos.x - site.x, pos.z - site.z) < site.radius + 3));
-      spawnCollectible(type, pos);
+      // Six copies of each salvage model, with the same material reward.
+      spawnCollectible(type, pos, type === 'materials' ? SALVAGE_VARIANTS[i % SALVAGE_VARIANTS.length] : null);
     }
   });
 }
@@ -240,7 +243,7 @@ function collectItem(mesh) {
   switch (mesh.userData.type) {
     case 'materials':
       inventory.materials += 1;
-      label = 'materials';
+      label = mesh.userData.label;
       break;
     case 'oxygen':
       inventory.oxygenPacks += 1;
@@ -279,9 +282,10 @@ function updateCollectibles(delta) {
   const pulsate = Math.sin(performance.now() * 0.003) * 0.12;
   collectibles.forEach((item) => {
     if (!item.userData.collected) {
-      item.rotation.x += delta * 0.6;
-      item.rotation.y += delta * 0.8;
-      item.position.y = item.userData.baseY + Math.sin(performance.now() * 0.0018 * item.userData.speed) * 0.6 + pulsate;
+      const isSalvage = item.userData.type === 'materials';
+      if (!isSalvage) item.rotation.x += delta * 0.6;
+      item.rotation.y += delta * (isSalvage ? 0.28 : 0.8);
+      item.position.y = item.userData.baseY + Math.sin(performance.now() * 0.0018 * item.userData.speed) * (isSalvage ? 0.14 : 0.6) + (isSalvage ? 0 : pulsate);
     }
   });
 }
