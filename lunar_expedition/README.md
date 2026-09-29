@@ -1,6 +1,6 @@
 # Lunar Expedition
 
-A desktop browser prototype built with Three.js. Collect eight orange materials and return to the glowing base ring before suit integrity reaches zero. The cyan oxygen packs and purple survival kits go into your inventory; use them when needed.
+A desktop browser prototype built with Three.js. Explore a wrecked lunar outpost, collect eight salvage materials, and return to the marked landing pad before suit integrity reaches zero. Oxygen packs and survival kits go into your inventory; use them when needed.
 
 ## Run
 
@@ -11,16 +11,16 @@ cd lunar_expedition
 python3 -m http.server 8000
 ```
 
-Open `http://localhost:8000`. The browser needs access to jsDelivr for Three.js and to threejs.org for the gradient textures.
+Open `http://localhost:8000`. The browser needs access to jsDelivr for Three.js and must support WebGL and pointer lock.
 
 ## Controls
 
 - Click **Launch Expedition** to lock the mouse. Press **Esc** to pause.
-- **WASD** or arrow keys: move; mouse: look; **Space**: jump.
+- **W / S**: forward / backward; **A / D**: strafe left / right. Arrow keys work too. Mouse: look; **Space**: jump.
 - **E**: collect the nearest supply within range.
 - **Q**: use one oxygen pack; **F**: use one survival kit.
-- Once you have eight materials, return to the yellow ring around the cyan beacon.
+- Once you have eight materials, return to the marked landing pad and orange beacon.
 
 ## Next steps
 
-Touch controls, in-game guidance for nearby supplies, deterministic terrain generation, and automated browser smoke tests remain to be implemented.
+Touch controls, in-game guidance for nearby supplies, and automated WebGL browser smoke tests remain to be implemented. The terrain and debris layout are deterministic; supplies still spawn randomly on each run.
