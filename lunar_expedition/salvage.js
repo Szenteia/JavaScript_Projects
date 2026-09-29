@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
 export const SALVAGE_VARIANTS = ['powerCore', 'electronics', 'scrapFrame'];
 
@@ -92,8 +93,31 @@ function scrapFrame() {
   return group;
 }
 
-// Clone only scene nodes: all copies share the templates' geometry and materials.
-const templates = { powerCore: powerCore(), electronics: electronics(), scrapFrame: scrapFrame() };
+function batchParts(group) {
+  const batches = new Map();
+  group.userData.partCount = group.children.length;
+  for (const mesh of group.children) {
+    mesh.updateMatrix();
+    const geometry = mesh.geometry.clone().applyMatrix4(mesh.matrix);
+    if (!batches.has(mesh.material)) batches.set(mesh.material, []);
+    batches.get(mesh.material).push(geometry);
+  }
+  group.clear();
+  for (const [material, geometries] of batches) {
+    const merged = mergeGeometries(geometries);
+    if (!merged) throw new Error('Unable to merge salvage geometry');
+    part(group, merged, material);
+    for (const geometry of geometries) geometry.dispose();
+  }
+  return group;
+}
+
+// Batch by material once; clones share the finished geometry and materials.
+const templates = {
+  powerCore: batchParts(powerCore()),
+  electronics: batchParts(electronics()),
+  scrapFrame: batchParts(scrapFrame()),
+};
 
 export function createSalvageModel(variant) {
   if (!templates[variant]) throw new Error(`Unknown salvage variant: ${variant}`);
