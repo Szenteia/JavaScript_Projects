@@ -1,9 +1,14 @@
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.module.js';
-import { PointerLockControls } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/jsm/controls/PointerLockControls.js';
+import * as THREE from 'three';
+import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
+import { createMoonSurface } from './terrain.js';
 
 const canvas = document.getElementById('experience');
 const overlay = document.getElementById('overlay');
 const startButton = document.getElementById('startButton');
+const overlayTitle = document.getElementById('overlayTitle');
+const overlayMessage = document.getElementById('overlayMessage');
+const controlsHelp = document.getElementById('controlsHelp');
+const missionObjective = document.getElementById('missionObjective');
 
 const oxygenBar = document.getElementById('oxygenBar');
 const oxygenLabel = document.getElementById('oxygenLabel');
@@ -32,11 +37,24 @@ const gradientFiveTone = textureLoader.load('https://threejs.org/examples/textur
 gradientFiveTone.minFilter = THREE.NearestFilter;
 gradientFiveTone.magFilter = THREE.NearestFilter;
 
+const collectibleGeometry = new THREE.DodecahedronGeometry(1.6, 0);
+const collectibleMaterials = {
+  materials: new THREE.MeshToonMaterial({ color: 0xff8e6e, gradientMap: gradientFiveTone, emissive: 0x973028, emissiveIntensity: 0.55 }),
+  oxygen: new THREE.MeshToonMaterial({ color: 0x72faff, gradientMap: gradientFiveTone, emissive: 0x1a7db5, emissiveIntensity: 0.55 }),
+  survival: new THREE.MeshToonMaterial({ color: 0xb777ff, gradientMap: gradientFiveTone, emissive: 0x4b2196, emissiveIntensity: 0.55 }),
+};
+
 const camera = new THREE.PerspectiveCamera(72, window.innerWidth / window.innerHeight, 0.1, 1200);
 scene.add(camera);
 
 const controls = new PointerLockControls(camera, renderer.domElement);
-controls.getObject().position.set(0, 6, 25);
+const EYE_HEIGHT = 5.5;
+const MATERIALS_GOAL = 8;
+const BASE_RADIUS = 11;
+const WORLD_LIMIT = 395;
+const basePosition = new THREE.Vector3(0, 0, 25);
+let terrainHeightAt;
+let missionState = 'ready';
 
 const clock = new THREE.Clock();
 const movementVelocity = new THREE.Vector3();
@@ -48,7 +66,6 @@ const keys = {
   backward: false,
   left: false,
   right: false,
-  jump: false,
 };
 
 const inventory = {
@@ -59,9 +76,10 @@ const inventory = {
 
 let oxygen = 100;
 let health = 100;
-let timeSinceOxygenUse = 0;
+let lastHudValues = '';
 
 const collectibles = [];
+const structureColliders = [];
 const tempVector = new THREE.Vector3();
 
 function log(message, color = null) {
@@ -75,6 +93,9 @@ function log(message, color = null) {
 }
 
 function updateHud() {
+  const values = [Math.round(oxygen), Math.round(health), inventory.materials, inventory.oxygenPacks, inventory.survivalKits].join(':');
+  if (values === lastHudValues) return;
+  lastHudValues = values;
   oxygenBar.style.width = `${oxygen.toFixed(0)}%`;
   oxygenLabel.textContent = `${oxygen.toFixed(0)}%`;
   healthBar.style.width = `${health.toFixed(0)}%`;
@@ -82,32 +103,57 @@ function updateHud() {
   materialsCount.textContent = inventory.materials;
   oxygenPacksCount.textContent = inventory.oxygenPacks;
   survivalKitsCount.textContent = inventory.survivalKits;
+  missionObjective.textContent = inventory.materials < MATERIALS_GOAL
+    ? `Collect materials: ${inventory.materials} / ${MATERIALS_GOAL}`
+    : 'Return to the glowing base!';
 }
 
-function createMoonSurface() {
-  const geometry = new THREE.PlaneGeometry(800, 800, 240, 240);
-  const position = geometry.attributes.position;
-  for (let i = 0; i < position.count; i += 1) {
-    const x = position.getX(i);
-    const y = position.getY(i);
-    const ridge = Math.sin(x * 0.045) + Math.cos(y * 0.055);
-    const crater = Math.sin((x * y) * 0.0002) * 5;
-    const noise = (Math.random() - 0.5) * 1.4;
-    position.setZ(i, ridge + crater + noise);
-  }
-  geometry.computeVertexNormals();
+function finishMission(won) {
+  if (missionState !== 'running') return;
+  missionState = won ? 'won' : 'lost';
+  overlayTitle.textContent = won ? 'Mission accomplished!' : 'Expedition failed';
+  overlayMessage.textContent = won
+    ? `You brought ${inventory.materials} materials safely back to base.`
+    : 'Your suit integrity reached zero. Give the expedition another try.';
+  controlsHelp.hidden = true;
+  startButton.textContent = 'New expedition';
+  overlay.classList.add('active');
+  controls.unlock();
+}
 
-  const material = new THREE.MeshToonMaterial({
-    color: 0x302357,
-    gradientMap: gradientThreeTone,
-    emissive: new THREE.Color(0x12071f),
-    emissiveIntensity: 0.25,
-  });
+function useOxygenPack() {
+  if (missionState !== 'running' || inventory.oxygenPacks === 0 || oxygen >= 100) return;
+  inventory.oxygenPacks -= 1;
+  oxygen = Math.min(100, oxygen + 55);
+  log('Used an O₂ pack!', '#7ae3ff');
+  updateHud();
+}
 
-  const surface = new THREE.Mesh(geometry, material);
-  surface.rotation.x = -Math.PI / 2;
-  surface.receiveShadow = true;
-  scene.add(surface);
+function useSurvivalKit() {
+  if (missionState !== 'running' || inventory.survivalKits === 0 || health >= 100) return;
+  inventory.survivalKits -= 1;
+  health = Math.min(100, health + 35);
+  log('Used a survival kit!', '#88ffb7');
+  updateHud();
+}
+
+function createBase() {
+  const base = new THREE.Group();
+  const ring = new THREE.Mesh(
+    new THREE.TorusGeometry(BASE_RADIUS, 0.5, 10, 48),
+    new THREE.MeshBasicMaterial({ color: 0xffdc5c }),
+  );
+  ring.rotation.x = -Math.PI / 2;
+  base.add(ring);
+
+  const beacon = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.65, 1.2, 10, 12),
+    new THREE.MeshBasicMaterial({ color: 0x7ae3ff }),
+  );
+  beacon.position.y = 5;
+  base.add(beacon);
+  base.position.set(basePosition.x, terrainHeightAt(basePosition.x, basePosition.z) + 0.6, basePosition.z);
+  scene.add(base);
 }
 
 function createCraters() {
@@ -205,15 +251,18 @@ function createGlowStructures() {
     const radius = 1.2 + Math.random() * 1.8;
     const geometry = new THREE.CylinderGeometry(radius, radius * 0.75, height, 12, 1, false);
     const tower = new THREE.Mesh(geometry, glowMaterial);
-    tower.position.set((Math.random() - 0.5) * 260, height / 2, (Math.random() - 0.5) * 260);
+    const x = (Math.random() - 0.5) * 260;
+    const z = (Math.random() - 0.5) * 260;
+    tower.position.set(x, terrainHeightAt(x, z) + height / 2, z);
     tower.rotation.y = Math.random() * Math.PI;
     tower.castShadow = true;
     scene.add(tower);
+    structureColliders.push({ x, z, radius: radius + 1.5 });
 
     const haloGeom = new THREE.TorusGeometry(radius * 2.8, 0.28, 16, 60);
     const haloMaterial = new THREE.MeshBasicMaterial({ color: 0xffdc5c });
     const halo = new THREE.Mesh(haloGeom, haloMaterial);
-    halo.position.set(tower.position.x, height * 0.75, tower.position.z);
+    halo.position.set(x, tower.position.y + height * 0.25, z);
     halo.rotation.x = Math.PI / 2;
     halo.userData = { baseY: halo.position.y, speed: 0.4 + Math.random() * 0.4 };
     scene.add(halo);
@@ -246,34 +295,9 @@ function createLights() {
 }
 
 function spawnCollectible(type, position) {
-  const geometry = new THREE.DodecahedronGeometry(1.6, 0);
-  let color;
-  let emissive;
-  switch (type) {
-    case 'materials':
-      color = 0xff8e6e;
-      emissive = 0x973028;
-      break;
-    case 'oxygen':
-      color = 0x72faff;
-      emissive = 0x1a7db5;
-      break;
-    case 'survival':
-    default:
-      color = 0xb777ff;
-      emissive = 0x4b2196;
-      break;
-  }
-  const material = new THREE.MeshToonMaterial({
-    color,
-    gradientMap: gradientFiveTone,
-    emissive,
-    emissiveIntensity: 0.55,
-  });
-
-  const mesh = new THREE.Mesh(geometry, material);
+  const mesh = new THREE.Mesh(collectibleGeometry, collectibleMaterials[type]);
   mesh.position.copy(position);
-  mesh.position.y = 3.2 + Math.random() * 1.8;
+  mesh.position.y = terrainHeightAt(position.x, position.z) + 3.2;
   mesh.castShadow = true;
   mesh.receiveShadow = true;
   mesh.userData = {
@@ -318,12 +342,10 @@ function collectItem(mesh) {
       break;
     case 'oxygen':
       inventory.oxygenPacks += 1;
-      oxygen = Math.min(100, oxygen + 25);
       label = 'O₂ gas pack';
       break;
     case 'survival':
       inventory.survivalKits += 1;
-      health = Math.min(100, health + 18);
       label = 'survival kit';
       break;
     default:
@@ -339,14 +361,16 @@ function collectItem(mesh) {
 
 function attemptInteract() {
   tempVector.copy(controls.getObject().position);
-  collectibles.forEach((item) => {
-    if (!item.userData.collected) {
-      const distance = tempVector.distanceTo(item.position);
-      if (distance < 6) {
-        collectItem(item);
-      }
+  let nearest = null;
+  let nearestDistance = 6;
+  for (const item of collectibles) {
+    const distance = Math.hypot(tempVector.x - item.position.x, tempVector.z - item.position.z);
+    if (distance < nearestDistance) {
+      nearest = item;
+      nearestDistance = distance;
     }
-  });
+  }
+  if (nearest) collectItem(nearest);
 }
 
 function updateCollectibles(delta) {
@@ -380,28 +404,19 @@ function updateDust(delta) {
 }
 
 function degradeVitals(delta) {
-  if (!controls.isLocked) {
-    return;
-  }
+  if (missionState !== 'running' || !controls.isLocked) return;
   oxygen = Math.max(0, oxygen - delta * 1.2);
-  timeSinceOxygenUse += delta;
 
   if (oxygen <= 0) {
     health = Math.max(0, health - delta * 6);
   }
 
-  if (timeSinceOxygenUse > 12 && inventory.oxygenPacks > 0 && oxygen < 45) {
-    inventory.oxygenPacks -= 1;
-    oxygen = Math.min(100, oxygen + 55);
-    timeSinceOxygenUse = 0;
-    log('Auto-injected an O₂ pack!', '#7ae3ff');
-  }
-
   updateHud();
+  if (health <= 0) finishMission(false);
 }
 
 function handleMovement(delta) {
-  if (!controls.isLocked) return;
+  if (missionState !== 'running' || !controls.isLocked) return;
 
   movementVelocity.x -= movementVelocity.x * 6.0 * delta;
   movementVelocity.z -= movementVelocity.z * 6.0 * delta;
@@ -411,26 +426,45 @@ function handleMovement(delta) {
   direction.x = Number(keys.right) - Number(keys.left);
   direction.normalize();
 
-  const baseSpeed = 30;
+  const baseSpeed = 85;
   movementVelocity.x += direction.x * baseSpeed * delta;
   movementVelocity.z += direction.z * baseSpeed * delta;
 
   controls.moveRight(movementVelocity.x * delta);
   controls.moveForward(-movementVelocity.z * delta);
 
-  controls.getObject().position.y += movementVelocity.y * delta;
+  const position = controls.getObject().position;
+  position.x = THREE.MathUtils.clamp(position.x, -WORLD_LIMIT, WORLD_LIMIT);
+  position.z = THREE.MathUtils.clamp(position.z, -WORLD_LIMIT, WORLD_LIMIT);
+  for (const obstacle of structureColliders) {
+    const dx = position.x - obstacle.x;
+    const dz = position.z - obstacle.z;
+    const distance = Math.hypot(dx, dz);
+    if (distance < obstacle.radius) {
+      const scale = obstacle.radius / (distance || 1);
+      position.x = obstacle.x + (distance ? dx : 1) * scale;
+      position.z = obstacle.z + dz * scale;
+    }
+  }
+  position.y += movementVelocity.y * delta;
 
-  if (controls.getObject().position.y < 5.5) {
+  const ground = terrainHeightAt(position.x, position.z) + EYE_HEIGHT;
+  if (position.y <= ground) {
     movementVelocity.y = 0;
-    controls.getObject().position.y = 5.5;
+    position.y = ground;
     canJump = true;
+  }
+
+  if (inventory.materials >= MATERIALS_GOAL &&
+      Math.hypot(position.x - basePosition.x, position.z - basePosition.z) < BASE_RADIUS) {
+    finishMission(true);
   }
 }
 
 function animate() {
   requestAnimationFrame(animate);
 
-  const delta = clock.getDelta();
+  const delta = Math.min(clock.getDelta(), 0.05);
   handleMovement(delta);
   updateCollectibles(delta);
   updateLights(delta);
@@ -442,6 +476,8 @@ function animate() {
 
 function setupEventListeners() {
   document.addEventListener('keydown', (event) => {
+    if (event.code === 'Space' || event.code.startsWith('Arrow')) event.preventDefault();
+    if (missionState !== 'running' || !controls.isLocked) return;
     switch (event.code) {
       case 'ArrowUp':
       case 'KeyW':
@@ -460,13 +496,19 @@ function setupEventListeners() {
         keys.right = true;
         break;
       case 'Space':
-        if (canJump) {
+        if (canJump && !event.repeat) {
           movementVelocity.y += 9;
           canJump = false;
         }
         break;
       case 'KeyE':
-        attemptInteract();
+        if (!event.repeat) attemptInteract();
+        break;
+      case 'KeyQ':
+        if (!event.repeat) useOxygenPack();
+        break;
+      case 'KeyF':
+        if (!event.repeat) useSurvivalKit();
         break;
       default:
         break;
@@ -497,15 +539,31 @@ function setupEventListeners() {
   });
 
   startButton.addEventListener('click', () => {
+    if (missionState === 'won' || missionState === 'lost') {
+      window.location.reload();
+      return;
+    }
     controls.lock();
   });
 
   controls.addEventListener('lock', () => {
+    missionState = 'running';
     overlay.classList.remove('active');
   });
 
   controls.addEventListener('unlock', () => {
+    if (missionState === 'running') {
+      missionState = 'paused';
+      overlayTitle.textContent = 'Expedition paused';
+      overlayMessage.textContent = 'Return to the surface when you are ready.';
+      startButton.textContent = 'Resume expedition';
+    }
+    keys.forward = keys.backward = keys.left = keys.right = false;
     overlay.classList.add('active');
+  });
+
+  window.addEventListener('blur', () => {
+    keys.forward = keys.backward = keys.left = keys.right = false;
   });
 
   window.addEventListener('resize', () => {
@@ -516,7 +574,11 @@ function setupEventListeners() {
 }
 
 function init() {
-  createMoonSurface();
+  const terrain = createMoonSurface(gradientThreeTone);
+  terrainHeightAt = terrain.heightAt;
+  scene.add(terrain.mesh);
+  controls.getObject().position.set(basePosition.x, terrainHeightAt(basePosition.x, basePosition.z) + EYE_HEIGHT, basePosition.z);
+  createBase();
   createCraters();
   createStarField();
   createDustParticles();
