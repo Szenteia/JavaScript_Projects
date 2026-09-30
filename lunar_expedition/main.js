@@ -3,6 +3,8 @@ import { PointerLockControls } from 'three/addons/controls/PointerLockControls.j
 import { createMoonSurface } from './terrain.js';
 import { createWreckedBase } from './environment.js';
 import { createSalvageModel, SALVAGE_VARIANTS } from './salvage.js';
+import { createEarthSky } from './earth.js';
+import { createSupplyModel } from './supplies.js';
 
 const canvas = document.getElementById('experience');
 const overlay = document.getElementById('overlay');
@@ -34,14 +36,6 @@ const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x05070b);
 scene.fog = new THREE.FogExp2(0x11151a, 0.0045);
 
-const collectibleGeometry = {
-  oxygen: new THREE.CylinderGeometry(0.65, 0.65, 2.1, 12),
-  survival: new THREE.BoxGeometry(1.9, 0.9, 1.5),
-};
-const collectibleMaterials = {
-  oxygen: new THREE.MeshStandardMaterial({ color: 0x91a9ab, metalness: 0.72, roughness: 0.38, emissive: 0x07546b, emissiveIntensity: 0.4 }),
-  survival: new THREE.MeshStandardMaterial({ color: 0x8e774f, metalness: 0.45, roughness: 0.64, emissive: 0x50320d, emissiveIntensity: 0.22 }),
-};
 
 const camera = new THREE.PerspectiveCamera(72, window.innerWidth / window.innerHeight, 0.1, 1200);
 scene.add(camera);
@@ -55,6 +49,8 @@ const WORLD_LIMIT = 395;
 const basePosition = new THREE.Vector3(0, 0, 25);
 let terrainHeightAt;
 let missionState = 'ready';
+let earthSky;
+let starField;
 
 const clock = new THREE.Clock();
 const movementVelocity = new THREE.Vector3();
@@ -144,7 +140,7 @@ function createStarField() {
   const positions = new Float32Array(starCount * 3);
   for (let i = 0; i < starCount; i += 1) {
     const ix = i * 3;
-    const radius = 600 + Math.random() * 600;
+    const radius = 900 + Math.random() * 200;
     const theta = Math.random() * Math.PI * 2;
     const phi = Math.acos((Math.random() * 2) - 1);
     positions[ix] = radius * Math.sin(phi) * Math.cos(theta);
@@ -160,10 +156,12 @@ function createStarField() {
     transparent: true,
     opacity: 0.65,
     fog: false,
+    depthWrite: false,
   });
 
   const stars = new THREE.Points(starGeometry, starMaterial);
   scene.add(stars);
+  return stars;
 }
 
 const lightGroup = new THREE.Group();
@@ -199,7 +197,7 @@ function createLights() {
 function spawnCollectible(type, position, variant = null) {
   const mesh = type === 'materials'
     ? createSalvageModel(variant)
-    : new THREE.Mesh(collectibleGeometry[type], collectibleMaterials[type]);
+    : createSupplyModel(type);
   mesh.position.copy(position);
   mesh.position.y = terrainHeightAt(position.x, position.z) + 1.5;
   mesh.castShadow = true;
@@ -279,13 +277,10 @@ function attemptInteract() {
 }
 
 function updateCollectibles(delta) {
-  const pulsate = Math.sin(performance.now() * 0.003) * 0.12;
   collectibles.forEach((item) => {
     if (!item.userData.collected) {
-      const isSalvage = item.userData.type === 'materials';
-      if (!isSalvage) item.rotation.x += delta * 0.6;
-      item.rotation.y += delta * (isSalvage ? 0.28 : 0.8);
-      item.position.y = item.userData.baseY + Math.sin(performance.now() * 0.0018 * item.userData.speed) * (isSalvage ? 0.14 : 0.6) + (isSalvage ? 0 : pulsate);
+      item.rotation.y += delta * 0.28;
+      item.position.y = item.userData.baseY + Math.sin(performance.now() * 0.0018 * item.userData.speed) * 0.14;
     }
   });
 }
@@ -359,6 +354,8 @@ function animate() {
 
   const delta = Math.min(clock.getDelta(), 0.05);
   handleMovement(delta);
+  earthSky.update(delta, camera.position);
+  starField.position.copy(camera.position);
   updateCollectibles(delta);
   updateLights();
   degradeVitals(delta);
@@ -471,7 +468,9 @@ function init() {
   scene.add(terrain.mesh);
   controls.getObject().position.set(basePosition.x, terrainHeightAt(basePosition.x, basePosition.z) + EYE_HEIGHT, basePosition.z);
   structureColliders.push(...createWreckedBase(scene, terrainHeightAt));
-  createStarField();
+  starField = createStarField();
+  earthSky = createEarthSky();
+  scene.add(earthSky.root);
   createLights();
   populateCollectibles();
   setupEventListeners();
