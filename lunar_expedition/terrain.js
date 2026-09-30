@@ -9,6 +9,87 @@ const CRATERS = [
   [20, -168, 38], [-18, 168, 31], [205, 8, 36], [-220, -12, 32],
 ];
 
+function noise(x, y) {
+  const ix = Math.floor(x), iy = Math.floor(y);
+  const fx = x - ix, fy = y - iy;
+  const u = fx * fx * (3 - 2 * fx), v = fy * fy * (3 - 2 * fy);
+  const hash = (a, b) => {
+    const n = Math.sin(a * 127.1 + b * 311.7) * 43758.5453;
+    return n - Math.floor(n);
+  };
+  return THREE.MathUtils.lerp(
+    THREE.MathUtils.lerp(hash(ix, iy), hash(ix + 1, iy), u),
+    THREE.MathUtils.lerp(hash(ix, iy + 1), hash(ix + 1, iy + 1), u), v,
+  );
+}
+
+// Seamless, deterministic regolith relief; mipmaps soften distant grains.
+function createRegolithTexture() {
+  const size = 256;
+  const data = new Uint8Array(size * size * 4);
+  const hash = (x, y) => {
+    x = (x + size) % size; y = (y + size) % size;
+    const n = Math.sin(x * 127.1 + y * 311.7) * 43758.5453;
+    return n - Math.floor(n);
+  };
+  for (let y = 0; y < size; y += 1) {
+    for (let x = 0; x < size; x += 1) {
+      const grain = hash(x, y);
+      const clump = (hash(x - 1, y) + hash(x + 1, y) + hash(x, y - 1) + hash(x, y + 1)) / 4;
+      const value = Math.round(150 + grain * 65 + clump * 30);
+      const i = (y * size + x) * 4;
+      data[i] = data[i + 1] = data[i + 2] = value; data[i + 3] = 255;
+    }
+  }
+  const texture = new THREE.DataTexture(data, size, size);
+  texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+  texture.repeat.set(80, 80);
+  texture.magFilter = THREE.LinearFilter;
+  texture.minFilter = THREE.LinearMipmapLinearFilter;
+  texture.generateMipmaps = true;
+  texture.needsUpdate = true;
+  return texture;
+}
+
+function createHorizon(material) {
+  // Square rings share every edge vertex with the playable grid: no seam or overlap.
+  const radii = [HALF, 440, 520, 650, 850, 1200];
+  const ringSize = SEGMENTS * 4;
+  const positions = [], colors = [], indices = [];
+  for (const edge of radii) {
+    for (let i = 0; i < ringSize; i += 1) {
+      const side = Math.floor(i / SEGMENTS), t = (i % SEGMENTS) / SEGMENTS;
+      const along = -edge + 2 * edge * t;
+      const x = side === 0 ? along : side === 1 ? edge : side === 2 ? -along : -edge;
+      const z = side === 0 ? -edge : side === 1 ? along : side === 2 ? edge : -along;
+      const blend = THREE.MathUtils.smoothstep(edge, 400, 650);
+      const ridge = 14 + noise(x * 0.006, z * 0.006) * 32 + noise(x * 0.018, z * 0.018) * 8;
+      positions.push(x, THREE.MathUtils.lerp(heightAtPoint(x, z), ridge, blend), z);
+      const shade = 0.20 + noise(x * 0.015, z * 0.015) * 0.07;
+      colors.push(shade, shade, shade * 1.02);
+    }
+  }
+  for (let ring = 0; ring < radii.length - 1; ring += 1) {
+    for (let i = 0; i < ringSize; i += 1) {
+      const next = (i + 1) % ringSize;
+      const a = ring * ringSize + i, b = ring * ringSize + next;
+      const c = (ring + 1) * ringSize + i, d = (ring + 1) * ringSize + next;
+      indices.push(a, b, c, b, d, c);
+    }
+  }
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+  geometry.setIndex(indices);
+  geometry.computeVertexNormals();
+  const horizon = new THREE.Mesh(geometry, material.clone());
+  // The lunar horizon must remain a silhouette against the sky without atmospheric fog.
+  horizon.material.fog = false;
+  horizon.material.map = horizon.material.bumpMap = null;
+  horizon.name = 'distant-lunar-ridges';
+  return horizon;
+}
+
 function heightAtPoint(x, z) {
   let height = Math.sin(x * 0.037) * 2.3 + Math.cos(z * 0.041) * 1.8;
   height += Math.sin(x * 0.115 + z * 0.075) * 0.55;
@@ -39,7 +120,7 @@ export function createMoonSurface() {
     const height = heightAtPoint(x, z);
     position.setZ(i, height);
     heights[i] = height;
-    const variation = 0.8 + (Math.sin(x * 0.17) * Math.cos(z * 0.19) + 1) * 0.09;
+    const variation = 0.82 + noise(x * 0.025, z * 0.025) * 0.16 + noise(x * 0.14, z * 0.14) * 0.05;
     baseColor.copy(craterColor).lerp(regolithColor, THREE.MathUtils.smoothstep(height, -3.5, -1)).multiplyScalar(variation);
     colors[i * 3] = baseColor.r;
     colors[i * 3 + 1] = baseColor.g;
@@ -48,8 +129,12 @@ export function createMoonSurface() {
   geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
   geometry.computeVertexNormals();
 
+  const regolith = createRegolithTexture();
   const material = new THREE.MeshStandardMaterial({
     vertexColors: true,
+    map: regolith,
+    bumpMap: regolith,
+    bumpScale: 0.075,
     roughness: 1,
     metalness: 0,
   });
@@ -73,5 +158,5 @@ export function createMoonSurface() {
       : b * (1 - u) + c * (u + v - 1) + d * (1 - v);
   }
 
-  return { mesh, heightAt };
+  return { mesh, horizon: createHorizon(material), heightAt };
 }
