@@ -115,6 +115,20 @@ canvas#experience {
   filter: brightness(1.1);
 }
 
+[hidden] { display: none !important; }
+.loading .hud { visibility: hidden; }
+.overlay__card button:disabled {
+  opacity: 0.45;
+  cursor: wait;
+  transform: none;
+}
+#loadingProgress {
+  width: 100%;
+  height: 8px;
+  margin-bottom: 2rem;
+  accent-color: var(--accent);
+}
+
 .hud {
   position: fixed;
   display: flex;

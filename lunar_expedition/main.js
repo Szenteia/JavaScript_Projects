@@ -6,6 +6,7 @@ import { createSalvageModel, SALVAGE_VARIANTS } from './salvage.js';
 import { createEarthSky } from './earth.js';
 import { createSupplyModel } from './supplies.js';
 import { createSkyEvents } from './sky-events.js';
+import { createRenderQuality } from './render-quality.js';
 
 const canvas = document.getElementById('experience');
 const overlay = document.getElementById('overlay');
@@ -30,8 +31,12 @@ renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.35;
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+// The outpost and sun are static; animated pickups do not cast baked shadows.
+renderer.shadowMap.autoUpdate = false;
+renderer.shadowMap.needsUpdate = true;
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.25));
 renderer.setSize(window.innerWidth, window.innerHeight);
+const renderQuality = createRenderQuality(renderer.getPixelRatio(), (ratio) => renderer.setPixelRatio(ratio));
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x05070b);
@@ -49,7 +54,7 @@ const BASE_RADIUS = 11;
 const WORLD_LIMIT = 395;
 const basePosition = new THREE.Vector3(0, 0, 25);
 let terrainHeightAt;
-let missionState = 'ready';
+let missionState = 'loading';
 let earthSky;
 let skyEvents;
 let starField;
@@ -202,7 +207,7 @@ function spawnCollectible(type, position, variant = null) {
     : createSupplyModel(type);
   mesh.position.copy(position);
   mesh.position.y = terrainHeightAt(position.x, position.z) + 1.5;
-  mesh.castShadow = true;
+  mesh.traverse((part) => { if (part.isMesh) part.castShadow = false; });
   mesh.receiveShadow = true;
   mesh.userData = {
     ...mesh.userData,
@@ -354,8 +359,13 @@ function handleMovement(delta) {
 function animate() {
   requestAnimationFrame(animate);
 
-  const delta = Math.min(clock.getDelta(), 0.05);
-  handleMovement(delta);
+  const frameDelta = clock.getDelta();
+  if (missionState !== 'running' || !controls.isLocked || document.hidden) return;
+  renderQuality.update(frameDelta);
+  // Preserve real-time speed below 20 FPS while keeping physics steps stable.
+  const delta = Math.min(frameDelta, 0.2);
+  const steps = Math.max(1, Math.ceil(delta / 0.025));
+  for (let step = 0; step < steps; step += 1) handleMovement(delta / steps);
   earthSky.update(delta, camera.position);
   skyEvents.update(delta, missionState === 'running' && controls.isLocked);
   starField.position.copy(camera.position);
@@ -431,6 +441,7 @@ function setupEventListeners() {
   });
 
   startButton.addEventListener('click', () => {
+    if (missionState === 'loading') return;
     if (missionState === 'won' || missionState === 'lost') {
       window.location.reload();
       return;
@@ -462,16 +473,19 @@ function setupEventListeners() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
+    if (missionState !== 'running') renderer.render(scene, camera);
   });
 }
 
-function init() {
+export async function prepareMission(report) {
+  await report(15, 'Holdfelszín és horizont előkészítése…');
   const terrain = createMoonSurface();
   terrain.mesh.material.map.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
   terrainHeightAt = terrain.heightAt;
   scene.add(terrain.mesh);
   scene.add(terrain.horizon);
   controls.getObject().position.set(basePosition.x, terrainHeightAt(basePosition.x, basePosition.z) + EYE_HEIGHT, basePosition.z);
+  await report(35, 'Holdbázis és felszerelések összeállítása…');
   structureColliders.push(...createWreckedBase(scene, terrainHeightAt));
   starField = createStarField();
   earthSky = createEarthSky();
@@ -480,9 +494,43 @@ function init() {
   scene.add(skyEvents.root);
   createLights();
   populateCollectibles();
+  await report(60, 'Földtextúra és felszíni anyagok betöltése…');
+  await earthSky.ready;
+  earthSky.update(0, camera.position);
+  starField.position.copy(camera.position);
+  // Upload even offscreen textures before the first active frame.
+  const textures = new Set();
+  scene.traverse((object) => {
+    if (!object.material) return;
+    for (const value of Object.values(object.material)) if (value?.isTexture) textures.add(value);
+    for (const uniform of Object.values(object.material.uniforms || {})) {
+      if (uniform.value?.isTexture) textures.add(uniform.value);
+    }
+  });
+  textures.forEach((texture) => renderer.initTexture(texture));
+  await report(80, 'Grafika és árnyékok előkészítése…');
+  // Include future visitors so their first appearance does not compile a new shader.
+  skyEvents.root.children.forEach((visitor) => { visitor.visible = true; });
+  const culling = new Map();
+  scene.traverse((object) => {
+    if (object.isMesh || object.isPoints) {
+      culling.set(object, object.frustumCulled);
+      object.frustumCulled = false;
+    }
+  });
+  try {
+    await renderer.compileAsync(scene, camera);
+    // Warm geometry buffers too, including objects outside the starting view.
+    renderer.render(scene, camera);
+  } finally {
+    culling.forEach((value, object) => { object.frustumCulled = value; });
+    skyEvents.root.children.forEach((visitor) => { visitor.visible = false; });
+  }
+  renderer.render(scene, camera);
+  await report(100, 'A misszió készen áll.');
+  missionState = 'ready';
   setupEventListeners();
   updateHud();
+  clock.start();
   animate();
 }
-
-init();

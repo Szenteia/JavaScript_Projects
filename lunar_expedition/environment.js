@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
 const hull = new THREE.MeshStandardMaterial({ color: 0xa7a9a2, metalness: 0.62, roughness: 0.55 });
 const scarred = new THREE.MeshStandardMaterial({ color: 0x4b4b48, metalness: 0.48, roughness: 0.85 });
@@ -185,15 +186,42 @@ function scatterDebris(scene, heightAt, colliders) {
 }
 
 export function createWreckedBase(scene, heightAt) {
-  landingPad(scene, heightAt);
+  const root = new THREE.Group();
+  root.name = 'static-outpost';
+  landingPad(root, heightAt);
   const colliders = [
-    habitat(scene, heightAt, 28, 18, false),
-    habitat(scene, heightAt, -47, -42, true),
-    lander(scene, heightAt, -94, 79),
-    commsTower(scene, heightAt, 76, -76),
-    solarFarm(scene, heightAt, 98, 61),
-    supplyOutpost(scene, heightAt, -25, 116),
+    habitat(root, heightAt, 28, 18, false),
+    habitat(root, heightAt, -47, -42, true),
+    lander(root, heightAt, -94, 79),
+    commsTower(root, heightAt, 76, -76),
+    solarFarm(root, heightAt, 98, 61),
+    supplyOutpost(root, heightAt, -25, 116),
   ];
+  // Batch each site separately to retain useful frustum culling and its point light.
+  root.updateMatrixWorld(true);
+  for (const site of root.children) {
+    const inverse = site.matrixWorld.clone().invert();
+    const buckets = new Map();
+    const parts = [];
+    site.traverse((part) => {
+      if (!part.isMesh) return;
+      const geometry = part.geometry.clone().applyMatrix4(inverse.clone().multiply(part.matrixWorld));
+      if (!buckets.has(part.material)) buckets.set(part.material, []);
+      buckets.get(part.material).push(geometry);
+      parts.push(part);
+    });
+    for (const [material, geometries] of buckets) {
+      const geometry = mergeGeometries(geometries);
+      if (!geometry) throw new Error('Could not batch outpost geometry');
+      geometry.computeBoundingSphere();
+      const mesh = new THREE.Mesh(geometry, material);
+      mesh.castShadow = mesh.receiveShadow = true;
+      site.add(mesh);
+      geometries.forEach((temporary) => temporary.dispose());
+    }
+    parts.forEach((part) => { part.removeFromParent(); part.geometry.dispose(); });
+  }
+  scene.add(root);
   scatterDebris(scene, heightAt, colliders);
   return colliders;
 }
