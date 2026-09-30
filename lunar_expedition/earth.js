@@ -79,12 +79,23 @@ export function createEarthSky() {
   atmosphere.name = 'earth-atmosphere';
   axis.add(atmosphere);
 
-  new THREE.TextureLoader().load(EARTH_TEXTURE, (texture) => {
-    texture.colorSpace = THREE.SRGBColorSpace;
-    uniforms.surfaceMap.value = texture;
-    fallback.dispose();
-  }, undefined, () => {
-    console.warn('Earth texture unavailable; using the blue planet fallback.');
+  const ready = new Promise((resolve) => {
+    let settled = false;
+    const finish = (status) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timeout);
+      resolve(status);
+    };
+    // A failed or stalled CDN must not leave the loading screen stuck forever.
+    const timeout = setTimeout(() => finish('fallback'), 12000);
+    new THREE.TextureLoader().load(EARTH_TEXTURE, (texture) => {
+      if (settled) { texture.dispose(); return; }
+      texture.colorSpace = THREE.SRGBColorSpace;
+      uniforms.surfaceMap.value = texture;
+      fallback.dispose();
+      finish('loaded');
+    }, undefined, () => finish('fallback'));
   });
 
   let elapsed = 0;
@@ -100,5 +111,5 @@ export function createEarthSky() {
     surface.rotation.y = 0.7 + elapsed * 0.006;
   }
 
-  return { root, update };
+  return { root, update, ready };
 }

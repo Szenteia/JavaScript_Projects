@@ -16,6 +16,12 @@ Two ambient alien visitors repeat while the expedition is active: a broad, cyan-
 
 ## Run
 
+The initial “Felkészülés a misszióra” screen remains visible while models, terrain, Earth imagery, GPU textures, shaders and geometry buffers are prepared. Launch stays disabled until preparation finishes. Earth imagery has a 12-second timeout and a blue-globe fallback; failed startup offers a retry. Progress represents preparation stages, not downloaded bytes.
+
+Performance: static outpost geometry is batched per site/material (131 scene meshes become 33, including the two existing debris instances). Sun shadows are rendered once; hovering supplies do not cast stale shadows. The initial pixel ratio is capped at 1.25 instead of 2; on a display with devicePixelRatio 2 this draws about 61% fewer pixels. After warmup, sustained frame rates below 45 progressively reduce the internal resolution to 60% of the initial ratio. Geometry and HUD remain unchanged. Rendering stops while paused, before launch and on hidden tabs.
+
+Movement uses small physics substeps so frame rates below 20 do not automatically slow the simulation. Frame stalls above 200 ms are capped to avoid large collision jumps.
+
 Serve this folder over HTTP (ES modules do not reliably load from `file://`):
 
 ```sh

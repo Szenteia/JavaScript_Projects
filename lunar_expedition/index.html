@@ -17,19 +17,20 @@
     }
   </script>
 </head>
-<body>
+<body class="loading">
   <div id="overlay" class="overlay active">
     <div class="overlay__card">
-      <h1 id="overlayTitle">Lunar Expedition</h1>
-      <p id="overlayMessage">Search the ruined outpost for 8 salvage materials, then return to the marked landing pad before your suit fails.</p>
-      <ul id="controlsHelp">
+      <h1 id="overlayTitle">Felkészülés a misszióra</h1>
+      <p id="overlayMessage" role="status" aria-live="polite">Rendszerek és modellek betöltése…</p>
+      <progress id="loadingProgress" max="100" value="5" aria-label="A misszió betöltése"></progress>
+      <ul id="controlsHelp" hidden>
         <li><span>Click</span> to deploy to the surface.</li>
         <li><span>W A S D</span> to move through the wreckage.</li>
         <li><span>Mouse</span> to look.</li>
         <li><span>E</span> to interact with nearby supplies.</li>
         <li><span>Q / F</span> to use an O<sub>2</sub> pack / survival kit.</li>
       </ul>
-      <button id="startButton" type="button">Launch Expedition</button>
+      <button id="startButton" type="button" disabled>Betöltés…</button>
     </div>
   </div>
 
@@ -68,6 +69,6 @@
 
   <canvas id="experience"></canvas>
 
-  <script type="module" src="main.js"></script>
+  <script type="module" src="bootstrap.js"></script>
 </body>
 </html>
