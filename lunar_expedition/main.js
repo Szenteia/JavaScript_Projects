@@ -5,6 +5,7 @@ import { createWreckedBase } from './environment.js';
 import { createSalvageModel, SALVAGE_VARIANTS } from './salvage.js';
 import { createEarthSky } from './earth.js';
 import { createSupplyModel } from './supplies.js';
+import { createSkyEvents } from './sky-events.js';
 
 const canvas = document.getElementById('experience');
 const overlay = document.getElementById('overlay');
@@ -50,6 +51,7 @@ const basePosition = new THREE.Vector3(0, 0, 25);
 let terrainHeightAt;
 let missionState = 'ready';
 let earthSky;
+let skyEvents;
 let starField;
 
 const clock = new THREE.Clock();
@@ -355,6 +357,7 @@ function animate() {
   const delta = Math.min(clock.getDelta(), 0.05);
   handleMovement(delta);
   earthSky.update(delta, camera.position);
+  skyEvents.update(delta, missionState === 'running' && controls.isLocked);
   starField.position.copy(camera.position);
   updateCollectibles(delta);
   updateLights();
@@ -464,13 +467,17 @@ function setupEventListeners() {
 
 function init() {
   const terrain = createMoonSurface();
+  terrain.mesh.material.map.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
   terrainHeightAt = terrain.heightAt;
   scene.add(terrain.mesh);
+  scene.add(terrain.horizon);
   controls.getObject().position.set(basePosition.x, terrainHeightAt(basePosition.x, basePosition.z) + EYE_HEIGHT, basePosition.z);
   structureColliders.push(...createWreckedBase(scene, terrainHeightAt));
   starField = createStarField();
   earthSky = createEarthSky();
   scene.add(earthSky.root);
+  skyEvents = createSkyEvents();
+  scene.add(skyEvents.root);
   createLights();
   populateCollectibles();
   setupEventListeners();
