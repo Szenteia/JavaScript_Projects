@@ -218,6 +218,10 @@ canvas#experience {
   font-size: 0.85rem;
 }
 
+#droneStatus { color: #79e89a; }
+#droneStatus[data-state="pending"] { color: #ffd58a; }
+#droneStatus[data-state="alert"] { color: #ff987d; }
+
 .hud__log li {
   color: var(--success);
   font-family: 'Orbitron', sans-serif;
