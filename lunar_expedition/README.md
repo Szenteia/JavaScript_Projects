@@ -33,6 +33,10 @@ Open `http://localhost:8000`. The browser needs access to jsDelivr for Three.js 
 
 ## Controls
 
+Drop-Bot patrols a small loop north of the landing pad. Its detailed model has an open hopper, disposal chute, four wheels, grippers, sensor eyes and antenna; geometry is batched by material. The first drop is salvage after 6 active seconds, followed by alternating salvage and tetrahedral steel caltrops every 12 seconds. Salvage uses the existing three variants and E pickup, adding one mission material. Caltrops have orange warning collars and inflict 18 suit-integrity damage on contact, with a shared 2-second damage cooldown. Jump above their tips to avoid contact. F uses one repair kit to restore up to 35 integrity, capped at 100; full-integrity use consumes nothing. Q oxygen use is unchanged. Reaching zero integrity ends the expedition even with oxygen remaining.
+
+The bot, drop timers and hazard cooldown freeze with the mission. Extra salvage expires after 75 active seconds (at most 6 tracked pickups); hazards expire after 90 seconds and reuse a 10-item geometry-sharing pool. Caltrops buffers/shaders are warmed behind the loading screen. Robot movement and drops cast no new dynamic shadows.
+
 - Click **Launch Expedition** to lock the mouse. Press **Esc** to pause.
 - **W / S**: forward / backward; **A / D**: strafe left / right. Arrow keys work too. Mouse: look; **Space**: jump.
 - **E**: collect the nearest supply within range.
