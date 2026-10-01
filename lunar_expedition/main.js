@@ -7,6 +7,7 @@ import { createEarthSky } from './earth.js';
 import { createSupplyModel } from './supplies.js';
 import { createSkyEvents } from './sky-events.js';
 import { createRenderQuality } from './render-quality.js';
+import { createDropBotSystem } from './drop-bot.js';
 
 const canvas = document.getElementById('experience');
 const overlay = document.getElementById('overlay');
@@ -57,6 +58,7 @@ let terrainHeightAt;
 let missionState = 'loading';
 let earthSky;
 let skyEvents;
+let dropBot;
 let starField;
 
 const clock = new THREE.Clock();
@@ -136,7 +138,7 @@ function useSurvivalKit() {
   if (missionState !== 'running' || inventory.survivalKits === 0 || health >= 100) return;
   inventory.survivalKits -= 1;
   health = Math.min(100, health + 35);
-  log('Used a survival kit!', '#88ffb7');
+  log('Used a repair kit: restored up to 35% suit integrity!', '#88ffb7');
   updateHud();
 }
 
@@ -219,6 +221,7 @@ function spawnCollectible(type, position, variant = null) {
 
   scene.add(mesh);
   collectibles.push(mesh);
+  return mesh;
 }
 
 function populateCollectibles() {
@@ -256,7 +259,7 @@ function collectItem(mesh) {
       break;
     case 'survival':
       inventory.survivalKits += 1;
-      label = 'survival kit';
+      label = 'suit repair kit (F)';
       break;
     default:
       break;
@@ -350,6 +353,14 @@ function handleMovement(delta) {
     canJump = true;
   }
 
+  const damage = dropBot.contactDamage(position, EYE_HEIGHT);
+  if (damage) {
+    health = Math.max(0, health - damage);
+    log(`Caltrops puncture! −${damage}% suit integrity. Use F to repair.`, '#ff987d');
+    updateHud();
+    if (health <= 0) finishMission(false);
+  }
+
   if (inventory.materials >= MATERIALS_GOAL &&
       Math.hypot(position.x - basePosition.x, position.z - basePosition.z) < BASE_RADIUS) {
     finishMission(true);
@@ -364,6 +375,7 @@ function animate() {
   renderQuality.update(frameDelta);
   // Preserve real-time speed below 20 FPS while keeping physics steps stable.
   const delta = Math.min(frameDelta, 0.2);
+  dropBot.update(delta);
   const steps = Math.max(1, Math.ceil(delta / 0.025));
   for (let step = 0; step < steps; step += 1) handleMovement(delta / steps);
   earthSky.update(delta, camera.position);
@@ -494,6 +506,21 @@ export async function prepareMission(report) {
   scene.add(skyEvents.root);
   createLights();
   populateCollectibles();
+  dropBot = createDropBotSystem({
+    heightAt: terrainHeightAt,
+    spawnMaterial: (position, index) => spawnCollectible('materials', position, SALVAGE_VARIANTS[index % SALVAGE_VARIANTS.length]),
+    removeMaterial: (mesh) => {
+      scene.remove(mesh);
+      const index = collectibles.indexOf(mesh);
+      if (index !== -1) collectibles.splice(index, 1);
+    },
+    onDrop: (type) => log(type === 'material'
+      ? 'Drop-Bot ejected salvage. Collect it with E.'
+      : 'Drop-Bot ejected caltrops! Watch your step.', type === 'material' ? '#88ffb7' : '#ff987d'),
+  });
+  scene.add(dropBot.root);
+  structureColliders.push(dropBot.collider);
+  log('Drop-Bot patrols north of the landing pad: salvage or sharp surprises. F repairs your suit.');
   await report(60, 'Földtextúra és felszíni anyagok betöltése…');
   await earthSky.ready;
   earthSky.update(0, camera.position);
@@ -511,6 +538,7 @@ export async function prepareMission(report) {
   await report(80, 'Grafika és árnyékok előkészítése…');
   // Include future visitors so their first appearance does not compile a new shader.
   skyEvents.root.children.forEach((visitor) => { visitor.visible = true; });
+  dropBot.setPreloading(true);
   const culling = new Map();
   scene.traverse((object) => {
     if (object.isMesh || object.isPoints) {
@@ -525,6 +553,7 @@ export async function prepareMission(report) {
   } finally {
     culling.forEach((value, object) => { object.frustumCulled = value; });
     skyEvents.root.children.forEach((visitor) => { visitor.visible = false; });
+    dropBot.setPreloading(false);
   }
   renderer.render(scene, camera);
   await report(100, 'A misszió készen áll.');
