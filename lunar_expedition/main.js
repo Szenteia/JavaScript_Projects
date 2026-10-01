@@ -8,6 +8,7 @@ import { createSupplyModel } from './supplies.js';
 import { createSkyEvents } from './sky-events.js';
 import { createRenderQuality } from './render-quality.js';
 import { createDropBotSystem } from './drop-bot.js';
+import { createScannerDrone } from './scanner-drone.js';
 
 const canvas = document.getElementById('experience');
 const overlay = document.getElementById('overlay');
@@ -16,6 +17,7 @@ const overlayTitle = document.getElementById('overlayTitle');
 const overlayMessage = document.getElementById('overlayMessage');
 const controlsHelp = document.getElementById('controlsHelp');
 const missionObjective = document.getElementById('missionObjective');
+const droneStatus = document.getElementById('droneStatus');
 
 const oxygenBar = document.getElementById('oxygenBar');
 const oxygenLabel = document.getElementById('oxygenLabel');
@@ -59,6 +61,7 @@ let missionState = 'loading';
 let earthSky;
 let skyEvents;
 let dropBot;
+let scannerDrone;
 let starField;
 
 const clock = new THREE.Clock();
@@ -378,6 +381,7 @@ function animate() {
   dropBot.update(delta);
   const steps = Math.max(1, Math.ceil(delta / 0.025));
   for (let step = 0; step < steps; step += 1) handleMovement(delta / steps);
+  if (missionState === 'running') scannerDrone.update(delta, camera.position);
   earthSky.update(delta, camera.position);
   skyEvents.update(delta, missionState === 'running' && controls.isLocked);
   starField.position.copy(camera.position);
@@ -508,6 +512,7 @@ export async function prepareMission(report) {
   populateCollectibles();
   dropBot = createDropBotSystem({
     heightAt: terrainHeightAt,
+    obstacles: structureColliders,
     spawnMaterial: (position, index) => spawnCollectible('materials', position, SALVAGE_VARIANTS[index % SALVAGE_VARIANTS.length]),
     removeMaterial: (mesh) => {
       scene.remove(mesh);
@@ -519,8 +524,23 @@ export async function prepareMission(report) {
       : 'Drop-Bot ejected caltrops! Watch your step.', type === 'material' ? '#88ffb7' : '#ff987d'),
   });
   scene.add(dropBot.root);
-  structureColliders.push(dropBot.collider);
-  log('Drop-Bot patrols north of the landing pad: salvage or sharp surprises. F repairs your suit.');
+  structureColliders.push(...dropBot.colliders);
+  log(`${dropBot.count} Drop-Bots patrol the surface. Green eyes: material; red eyes: caltrops. F repairs your suit.`);
+  scene.updateMatrixWorld(true);
+  scannerDrone = createScannerDrone({
+    heightAt: terrainHeightAt,
+    occluders: [terrain.mesh, scene.getObjectByName('static-outpost')],
+    onState: (state) => {
+      droneStatus.textContent = state === 'pending' ? 'DRONE: contact detected…' : 'DRONE: ALERT';
+      droneStatus.dataset.state = state;
+      log(state === 'pending' ? 'Scanner contact! Alert signal pending…' : 'DRONE ALERT — your position has been marked.', state === 'pending' ? '#ffd58a' : '#ff987d');
+    },
+    onAlert: (detail) => {
+      // Future attack systems can subscribe; this version stops at the alert.
+      window.dispatchEvent(new CustomEvent('lunar:drone-alert', { detail }));
+    },
+  });
+  scene.add(scannerDrone.root);
   await report(60, 'Földtextúra és felszíni anyagok betöltése…');
   await earthSky.ready;
   earthSky.update(0, camera.position);
