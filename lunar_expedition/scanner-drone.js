@@ -58,7 +58,7 @@ function createModel() {
 export function createScannerDrone({ heightAt, occluders = [], random = Math.random, onState = () => {}, onAlert = () => {} }) {
   const root = new THREE.Group(); root.name = 'scanner-system';
   const { model, lamp, rotors } = createModel(); root.add(model);
-  const radius = 12, altitude = 24;
+  const radius = 18, altitude = 24;
   const beamMaterial = new THREE.MeshBasicMaterial({ color: 0x39ff70, transparent: true, opacity: 0.055, depthWrite: false, side: THREE.DoubleSide });
   const beam = new THREE.Mesh(new THREE.CylinderGeometry(0, radius, 1, 32, 1, true), beamMaterial); root.add(beam);
   const footprintGeometry = new THREE.CircleGeometry(radius, 48); footprintGeometry.rotateX(-Math.PI / 2);
@@ -70,7 +70,7 @@ export function createScannerDrone({ heightAt, occluders = [], random = Math.ran
   const ray = new THREE.Raycaster(), direction = new THREE.Vector3(), dummy = new THREE.Object3D();
   const lastContact = new THREE.Vector3();
   const route = createScanRoute(random);
-  let target = Math.floor(random() * route.length), elapsed = 0, pendingUntil = Infinity;
+  let target = Math.floor(random() * route.length), elapsed = 0;
   let state = 'scanning';
   model.position.copy(route[target]);
   target = (target + 1) % route.length;
@@ -113,13 +113,11 @@ export function createScannerDrone({ heightAt, occluders = [], random = Math.ran
         direction.copy(playerPosition).sub(model.position); const distance = direction.length();
         ray.set(model.position, direction.normalize()); ray.far = Math.max(0, distance - 0.25);
         if (!ray.intersectObjects(occluders, true).length) {
-          lastContact.copy(playerPosition); pendingUntil = elapsed + 3; setState('pending');
+          lastContact.copy(playerPosition);
+          setState('alert'); lamp.color.set(0xff3434);
+          onAlert({ position: lastContact.clone(), time: elapsed });
         }
       }
-    }
-    if (state === 'pending' && elapsed >= pendingUntil) {
-      setState('alert'); lamp.color.set(0xff3434);
-      onAlert({ position: lastContact.clone(), time: elapsed });
     }
     beam.visible = footprint.visible = state !== 'alert';
     // Preserve the light count so ALERT does not trigger fresh shader variants.
