@@ -531,9 +531,9 @@ export async function prepareMission(report) {
     heightAt: terrainHeightAt,
     occluders: [terrain.mesh, scene.getObjectByName('static-outpost')],
     onState: (state) => {
-      droneStatus.textContent = state === 'pending' ? 'DRONE: contact detected…' : 'DRONE: ALERT';
+      droneStatus.textContent = 'DRONE: ALERT';
       droneStatus.dataset.state = state;
-      log(state === 'pending' ? 'Scanner contact! Alert signal pending…' : 'DRONE ALERT — your position has been marked.', state === 'pending' ? '#ffd58a' : '#ff987d');
+      log('DRONE ALERT — your position has been marked.', '#ff987d');
     },
     onAlert: (detail) => {
       // Future attack systems can subscribe; this version stops at the alert.

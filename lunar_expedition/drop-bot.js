@@ -109,7 +109,7 @@ export function createDropBotSystem({ heightAt, spawnMaterial, removeMaterial, o
     && obstacles.every((o) => Math.hypot(x - o.x, z - o.z) > radius + o.radius + 7)
     && robots.every((r) => Math.hypot(x - r.x, z - r.z) > radius + r.radius + 12);
   for (let i = 0; i < count; i += 1) {
-    const radius = 8 + random() * 4;
+    const radius = 32 + random() * 16;
     let x, z, placed = false;
     for (let attempt = 0; attempt < 200; attempt += 1) {
       x = (random() - 0.5) * 340; z = (random() - 0.5) * 340;
@@ -166,7 +166,7 @@ export function createDropBotSystem({ heightAt, spawnMaterial, removeMaterial, o
       }
     }
     for (const robot of robots) {
-      const angle = robot.phase + elapsed * 0.9 / robot.radius;
+      const angle = robot.phase + elapsed * 3.6 / robot.radius;
       robot.mesh.position.set(robot.x + Math.cos(angle) * robot.radius, 0, robot.z + Math.sin(angle) * robot.radius);
       robot.mesh.position.y = heightAt(robot.mesh.position.x, robot.mesh.position.z);
       robot.mesh.rotation.y = Math.PI - angle;
