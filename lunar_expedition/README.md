@@ -31,6 +31,8 @@ python3 -m http.server 8000
 
 Open `http://localhost:8000`. The browser needs access to jsDelivr for Three.js and must support WebGL and pointer lock.
 
+Local runtime modules are mapped to a shared release query in `index.html`, including the dynamic `main.js` import and its transitive `base-armory.js` dependency. Bootstrap and CSS use that same query. When publishing changes, bump every occurrence of the release value in `index.html` together so an updated entry point does not reuse incompatible unversioned modules from the browser cache. Three.js remains pinned to r161. After a deployment, Ctrl+Shift+R can refresh an older cached HTML entry page.
+
 ## Controls
 
 A small abandoned landing site sits near the Earth-facing edge at (-104, -360). Its 17-unit diameter is roughly twice the scanner drone's full footprint. A dark, terrain-conforming surface and faint rim become visible only within 32 units, fading to full visibility within 18. It adds two draws when nearby, with no beacon, map marker, new lights or mission reward. The named `remote-landing-site` anchor is reserved for a future curious event; this version has no trigger. Its geometry and shaders are warmed behind the loading screen.

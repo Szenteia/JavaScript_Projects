@@ -4,15 +4,28 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Lunar Expedition</title>
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css?v=20261003-armory-1" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&family=Oxygen:wght@400;700&display=swap" rel="stylesheet">
+  <!-- Bump the shared release version in local URLs when publishing changes. -->
   <script type="importmap">
     {
       "imports": {
         "three": "https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.module.js",
-        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.161.0/examples/jsm/"
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.161.0/examples/jsm/",
+        "./main.js": "./main.js?v=20261003-armory-1",
+        "./terrain.js": "./terrain.js?v=20261003-armory-1",
+        "./environment.js": "./environment.js?v=20261003-armory-1",
+        "./base-armory.js": "./base-armory.js?v=20261003-armory-1",
+        "./salvage.js": "./salvage.js?v=20261003-armory-1",
+        "./earth.js": "./earth.js?v=20261003-armory-1",
+        "./supplies.js": "./supplies.js?v=20261003-armory-1",
+        "./sky-events.js": "./sky-events.js?v=20261003-armory-1",
+        "./render-quality.js": "./render-quality.js?v=20261003-armory-1",
+        "./drop-bot.js": "./drop-bot.js?v=20261003-armory-1",
+        "./scanner-drone.js": "./scanner-drone.js?v=20261003-armory-1",
+        "./landing-site.js": "./landing-site.js?v=20261003-armory-1"
       }
     }
   </script>
@@ -74,6 +87,6 @@
   <p id="interactionHint" class="interaction-hint" role="status" hidden></p>
   <canvas id="experience"></canvas>
 
-  <script type="module" src="bootstrap.js"></script>
+  <script type="module" src="bootstrap.js?v=20261003-armory-1"></script>
 </body>
 </html>
