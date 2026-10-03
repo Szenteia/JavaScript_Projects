@@ -285,14 +285,8 @@ function collectItem(mesh) {
 function attemptInteract() {
   const result = baseArmory.interact(camera.position);
   if (result) {
-    const messages = {
-      activated: 'Bázisajtó: a keret zöldre váltott. Újabb E: tápellátás.',
-      powered: 'Bázisajtó: folyamatos zöld fény. Újabb E: nyitás.',
-      opening: 'Bázisajtó nyitása. Egy lézerpisztoly van a rekeszben!',
-      pistol: 'Lézerpisztoly felvéve! A fegyver a készletedben van.',
-    };
-    if (messages[result]) log(messages[result], '#88ffb7');
     if (result === 'pistol') {
+      log('Lézerpisztoly felvéve! A fegyver a készletedben van.', '#88ffb7');
       inventory.laserPistol = true;
       updateHud();
     }

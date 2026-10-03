@@ -16,16 +16,20 @@ function fixture() {
 test('three door activations, timed opening, and exactly one weapon pickup', () => {
   const { armory, position } = fixture();
   const frame = armory.root.children.find((part) => part.material?.color.getHex() === 0xb29663);
-  assert.match(armory.prompt(position), /1\/3/);
+  assert.equal(armory.prompt(position), '');
   assert.equal(armory.interact(position), 'activated');
+  assert.equal(armory.prompt(position), '');
   assert.equal(frame.material.color.getHex(), 0x48ef87);
   assert.equal(frame.material.emissive.getHex(), 0);
   assert.equal(armory.interact(position), 'powered');
+  assert.equal(armory.prompt(position), '');
   assert.equal(frame.material.emissive.getHex(), 0x48ef87);
   assert.equal(frame.material.emissiveIntensity, 2);
   assert.equal(armory.interact(position), 'opening');
+  assert.equal(armory.prompt(position), '');
   assert.equal(armory.interact(position), 'busy');
   armory.update(0.6);
+  assert.equal(armory.prompt(position), '');
   assert.equal(armory.isOpen, false);
   assert.equal(armory.interact(position), 'busy');
   armory.update(0.6);
