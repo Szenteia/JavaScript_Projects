@@ -12,6 +12,8 @@ Earth imagery: the version-pinned `earth_atmos_2048.jpg` from the [Three.js r161
 
 The regolith has deterministic grain shading and subtle bump relief from a small, locally generated, mipmapped texture. Distant ridges extend the view beyond the playable area without changing the terrain collision surface or the level landing pad.
 
+The expedition uses a dark, cold lighting palette: exposure 0.8, hemisphere fill 0.16 and directional light 0.5, with dimmer outpost accent lights. Beyond the map edge the ridges fade into much darker silhouettes. Two small 3D mask-lamp tips sit at the lower outer edges of the view, leaving the center clear. Their camera-attached, soft spotlights reach only 18 units, fade with distance, and follow looking and walking. The fittings adapt to viewport aspect ratio and are prepared with the rest of the scene. The beams add no dynamic shadow maps or postprocessing; solid geometry does not occlude their light through a shadow map.
+
 Two ambient alien visitors repeat while the expedition is active: a broad, cyan-rimmed lander first arrives after 8 seconds and descends behind the distant ridges over 44 seconds (165-second cycle); a smaller scout crosses the sky after 72 seconds over 24 seconds (135-second cycle). They occupy fixed world positions beyond the playable area, respect terrain depth and pause their schedule with the game. They are atmosphere only, with no combat or mission effects. Look toward the Earth / northern horizon to spot them.
 
 ## Run
@@ -53,11 +55,11 @@ The intact habitat beside the starting pad (28, 18) has an equipment recess in i
 
 The pistol has a metal receiver, ribbed angled grip, trigger guard, copper cooling fins, cyan power cell strips, sights and a recessed laser emitter. Its geometry is batched into four materials and prepared during mission loading. The recess is accessible from outside the existing solid-habitat collider; the habitat remains sealed. Moving parts and the pistol do not cast stale baked shadows. This version implements acquisition only, with no firing, damage or ammunition mechanics.
 
-Armory regression checks (Node.js 22+; run from this folder):
+Armory and helmet-light regression checks (Node.js 22+; run from this folder):
 
 ```sh
 npm install --no-save --package-lock=false three@0.161.0
-node --test tests/base-armory.test.mjs
+node --test tests/*.test.mjs
 ```
 
 ## Next steps

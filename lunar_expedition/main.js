@@ -10,6 +10,7 @@ import { createRenderQuality } from './render-quality.js';
 import { createDropBotSystem } from './drop-bot.js';
 import { createScannerDrone } from './scanner-drone.js';
 import { createRemoteLandingSite } from './landing-site.js';
+import { createHelmetLights } from './helmet-lights.js';
 
 const canvas = document.getElementById('experience');
 const overlay = document.getElementById('overlay');
@@ -34,7 +35,7 @@ const logEntries = document.getElementById('logEntries');
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.35;
+renderer.toneMappingExposure = 0.8;
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 // The outpost and sun are static; animated pickups do not cast baked shadows.
@@ -45,12 +46,13 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 const renderQuality = createRenderQuality(renderer.getPixelRatio(), (ratio) => renderer.setPixelRatio(ratio));
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x05070b);
-scene.fog = new THREE.FogExp2(0x11151a, 0.0045);
+scene.background = new THREE.Color(0x020305);
+scene.fog = new THREE.FogExp2(0x05080c, 0.0045);
 
 
 const camera = new THREE.PerspectiveCamera(72, window.innerWidth / window.innerHeight, 0.1, 1200);
 scene.add(camera);
+const helmetLights = createHelmetLights(camera);
 
 const controls = new PointerLockControls(camera, renderer.domElement);
 const EYE_HEIGHT = 2.4;
@@ -186,10 +188,10 @@ function createStarField() {
 const lightGroup = new THREE.Group();
 
 function createLights() {
-  const hemi = new THREE.HemisphereLight(0xb4bfca, 0x24252b, 0.8);
+  const hemi = new THREE.HemisphereLight(0x8795aa, 0x10131b, 0.16);
   scene.add(hemi);
 
-  const moonGlow = new THREE.DirectionalLight(0xf1f0df, 2.1);
+  const moonGlow = new THREE.DirectionalLight(0xb3bdce, 0.5);
   moonGlow.position.set(110, 185, -95);
   moonGlow.castShadow = true;
   moonGlow.shadow.mapSize.set(1024, 1024);
@@ -202,11 +204,11 @@ function createLights() {
   moonGlow.shadow.bias = -0.0002;
   scene.add(moonGlow);
 
-  const rimLight = new THREE.PointLight(0xff784c, 9, 55, 2);
+  const rimLight = new THREE.PointLight(0xff784c, 3, 35, 2);
   rimLight.position.set(-47, 12, -42);
   lightGroup.add(rimLight);
 
-  const coolLight = new THREE.PointLight(0x7da8bd, 6, 45, 2);
+  const coolLight = new THREE.PointLight(0x7da8bd, 2, 28, 2);
   coolLight.position.set(28, 9, 18);
   lightGroup.add(coolLight);
 
@@ -323,7 +325,7 @@ function updateCollectibles(delta) {
 
 function updateLights() {
   lightGroup.children.forEach((light, index) => {
-    light.intensity = (index === 0 ? 9 : 6) * (0.88 + Math.sin(clock.elapsedTime * (index === 0 ? 4.5 : 0.8)) * 0.12);
+    light.intensity = (index === 0 ? 3 : 2) * (0.88 + Math.sin(clock.elapsedTime * (index === 0 ? 4.5 : 0.8)) * 0.12);
   });
 }
 
@@ -515,6 +517,7 @@ function setupEventListeners() {
   window.addEventListener('resize', () => {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
+    helmetLights.resize();
     renderer.setSize(window.innerWidth, window.innerHeight);
     if (missionState !== 'running') renderer.render(scene, camera);
   });

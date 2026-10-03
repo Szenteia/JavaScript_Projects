@@ -51,7 +51,7 @@ function landingPad(scene, heightAt) {
   }
   add(pad, new THREE.CylinderGeometry(0.85, 1.2, 5, 10), hull, 0, 2.8, -8);
   add(pad, new THREE.CylinderGeometry(1.2, 1.2, 0.4, 12), beaconLight, 0, 5.6, -8);
-  const light = new THREE.PointLight(0xffaa6b, 12, 30, 2);
+  const light = new THREE.PointLight(0xffaa6b, 3.5, 22, 2);
   light.position.set(0, 6, -8);
   pad.add(light);
 }
