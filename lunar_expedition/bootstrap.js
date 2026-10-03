@@ -17,10 +17,10 @@ async function boot() {
     document.body.classList.remove('loading');
     progress.hidden = true;
     title.textContent = 'Lunar Expedition';
-    message.textContent = 'Search the ruined outpost for 8 salvage materials, then return to the marked landing pad before your suit fails.';
+    message.textContent = 'Gyűjts össze 8 anyagot a romos holdbázison, majd térj vissza a jelölt leszállóhelyre, mielőtt elfogy a ruha integritása.';
     document.getElementById('controlsHelp').hidden = false;
     button.disabled = false;
-    button.textContent = 'Launch Expedition';
+    button.textContent = 'Küldetés indítása';
   } catch (error) {
     console.error('Mission preparation failed', error);
     title.textContent = 'A misszió előkészítése sikertelen';

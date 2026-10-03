@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hu">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -24,13 +24,13 @@
       <p id="overlayMessage" role="status" aria-live="polite">Rendszerek és modellek betöltése…</p>
       <progress id="loadingProgress" max="100" value="5" aria-label="A misszió betöltése"></progress>
       <ul id="controlsHelp" hidden>
-        <li><span>Click</span> to deploy to the surface.</li>
-        <li><span>W A S D</span> to move through the wreckage.</li>
-        <li><span>Mouse</span> to look.</li>
-        <li><span>E</span> to interact with nearby supplies.</li>
-        <li><span>Q / F</span> to use an O<sub>2</sub> pack / suit repair kit.</li>
-        <li><span>Space</span> to jump over Drop-Bot's sharp caltrops.</li>
-        <li><span>Drone</span> — avoid its green scan beam. Detection triggers an immediate alert.</li>
+        <li><span>Kattintás</span> a küldetés indításához.</li>
+        <li><span>W A S D</span> a mozgáshoz.</li>
+        <li><span>Egér</span> a körülnézéshez. <span>Esc</span> a szünethez.</li>
+        <li><span>E</span> a közeli tárgyak felvételéhez.</li>
+        <li><span>Q</span> az O<sub>2</sub>-palack, <span>F</span> a javítókészlet használatához.</li>
+        <li><span>Szóköz</span> az ugráshoz és a szöges akadályok átugrásához.</li>
+        <li><span>Drón</span> — kerüld a zöld pásztázófényt! Észleléskor azonnal riaszt.</li>
       </ul>
       <button id="startButton" type="button" disabled>Betöltés…</button>
     </div>
@@ -38,7 +38,7 @@
 
   <div id="hud" class="hud">
     <div class="hud__panel">
-      <h2>Vitals</h2>
+      <h2>Állapot</h2>
       <div class="hud__stat">
         <span>O<sub>2</sub></span>
         <div class="hud__bar">
@@ -47,7 +47,7 @@
         <span id="oxygenLabel">100%</span>
       </div>
       <div class="hud__stat">
-        <span>Suit Integrity</span>
+        <span>Ruha állapota</span>
         <div class="hud__bar">
           <div id="healthBar" class="hud__bar-fill hud__bar-fill--health"></div>
         </div>
@@ -55,17 +55,17 @@
       </div>
     </div>
     <div class="hud__panel">
-      <h2>Inventory</h2>
+      <h2>Készlet</h2>
       <ul class="hud__list">
-        <li>Materials: <span id="materialsCount">0</span></li>
-        <li>O<sub>2</sub> Packs: <span id="oxygenPacksCount">0</span></li>
-        <li>Repair Kits (F): <span id="survivalKitsCount">0</span></li>
+        <li>Anyagok: <span id="materialsCount">0</span></li>
+        <li>O<sub>2</sub>-palackok (Q): <span id="oxygenPacksCount">0</span></li>
+        <li>Javítókészletek (F): <span id="survivalKitsCount">0</span></li>
       </ul>
     </div>
     <div class="hud__panel hud__log">
-      <h2>Mission Log</h2>
-      <p id="missionObjective" class="hud__objective">Collect materials: 0 / 8</p>
-      <p id="droneStatus" class="hud__objective" data-state="scanning" role="status">DRONE: scanning</p>
+      <h2>Küldetésnapló</h2>
+      <p id="missionObjective" class="hud__objective">Anyaggyűjtés: 0 / 8</p>
+      <p id="droneStatus" class="hud__objective" data-state="scanning" role="status">DRÓN: pásztázás</p>
       <ul id="logEntries"></ul>
     </div>
   </div>

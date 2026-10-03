@@ -43,7 +43,7 @@ function powerCore() {
   }
   box(group, dark, [0.34, 0.64, 0.16], [0, 0, 0.58]);
   box(group, amber, [0.15, 0.42, 0.06], [0, 0, 0.69]);
-  group.userData.label = 'power core';
+  group.userData.label = 'energiamag';
   return group;
 }
 
@@ -66,7 +66,7 @@ function electronics() {
     new THREE.Vector3(0.8, -0.1, 0.85), new THREE.Vector3(0.3, -0.2, 0.75),
   ]);
   part(group, new THREE.TubeGeometry(cable, 10, 0.045, 6, false), copper);
-  group.userData.label = 'electronics assembly';
+  group.userData.label = 'elektronikai egység';
   return group;
 }
 
@@ -89,7 +89,7 @@ function scrapFrame() {
     for (const z of [-0.5, 0.5]) part(group, boltGeometry, copper, x, 0.12, z);
   }
   box(group, amber, [0.32, 0.04, 0.14], [-0.3, -0.12, -0.25]);
-  group.userData.label = 'structural scrap';
+  group.userData.label = 'szerkezeti törmelék';
   return group;
 }
 
