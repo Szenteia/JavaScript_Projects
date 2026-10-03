@@ -27,7 +27,7 @@
         <li><span>Kattintás</span> a küldetés indításához.</li>
         <li><span>W A S D</span> a mozgáshoz.</li>
         <li><span>Egér</span> a körülnézéshez. <span>Esc</span> a szünethez.</li>
-        <li><span>E</span> a közeli tárgyak felvételéhez.</li>
+        <li><span>E</span> a közeli tárgyak felvételéhez és a bázisajtó aktiválásához.</li>
         <li><span>Q</span> az O<sub>2</sub>-palack, <span>F</span> a javítókészlet használatához.</li>
         <li><span>Szóköz</span> az ugráshoz és a szöges akadályok átugrásához.</li>
         <li><span>Drón</span> — kerüld a zöld pásztázófényt! Észleléskor azonnal riaszt.</li>
@@ -60,6 +60,7 @@
         <li>Anyagok: <span id="materialsCount">0</span></li>
         <li>O<sub>2</sub>-palackok (Q): <span id="oxygenPacksCount">0</span></li>
         <li>Javítókészletek (F): <span id="survivalKitsCount">0</span></li>
+        <li>Lézerpisztoly: <span id="pistolStatus">nincs</span></li>
       </ul>
     </div>
     <div class="hud__panel hud__log">
@@ -70,6 +71,7 @@
     </div>
   </div>
 
+  <p id="interactionHint" class="interaction-hint" role="status" hidden></p>
   <canvas id="experience"></canvas>
 
   <script type="module" src="bootstrap.js"></script>
