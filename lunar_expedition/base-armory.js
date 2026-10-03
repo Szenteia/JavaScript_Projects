@@ -99,13 +99,8 @@ export function createBaseArmory(habitat) {
     get collected() { return collected; },
     get isOpen() { return opening >= OPEN_TIME; },
     prompt(position) {
-      if (collected || !inRange(position)) return '';
-      return [
-        'E — Bázisajtó: rendszer aktiválása (1/3)',
-        'E — Bázisajtó: zöld fény bekapcsolása (2/3)',
-        'E — Bázisajtó kinyitása (3/3)',
-        opening < OPEN_TIME ? 'Bázisajtó nyílik…' : 'E — Lézerpisztoly felvétele',
-      ][stage];
+      if (collected || opening < OPEN_TIME || !inRange(position)) return '';
+      return 'E — Lézerpisztoly felvétele';
     },
     interact(position) {
       if (collected || !inRange(position)) return null;
