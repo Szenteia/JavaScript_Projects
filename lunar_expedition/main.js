@@ -19,6 +19,8 @@ const overlayMessage = document.getElementById('overlayMessage');
 const controlsHelp = document.getElementById('controlsHelp');
 const missionObjective = document.getElementById('missionObjective');
 const droneStatus = document.getElementById('droneStatus');
+const interactionHint = document.getElementById('interactionHint');
+const pistolStatus = document.getElementById('pistolStatus');
 
 const oxygenBar = document.getElementById('oxygenBar');
 const oxygenLabel = document.getElementById('oxygenLabel');
@@ -64,6 +66,7 @@ let skyEvents;
 let dropBot;
 let scannerDrone;
 let remoteLandingSite;
+let baseArmory;
 let starField;
 
 const clock = new THREE.Clock();
@@ -82,6 +85,7 @@ const inventory = {
   materials: 0,
   oxygenPacks: 0,
   survivalKits: 0,
+  laserPistol: false,
 };
 
 let oxygen = 100;
@@ -103,7 +107,7 @@ function log(message, color = null) {
 }
 
 function updateHud() {
-  const values = [Math.round(oxygen), Math.round(health), inventory.materials, inventory.oxygenPacks, inventory.survivalKits].join(':');
+  const values = [Math.round(oxygen), Math.round(health), inventory.materials, inventory.oxygenPacks, inventory.survivalKits, inventory.laserPistol].join(':');
   if (values === lastHudValues) return;
   lastHudValues = values;
   oxygenBar.style.width = `${oxygen.toFixed(0)}%`;
@@ -113,6 +117,7 @@ function updateHud() {
   materialsCount.textContent = inventory.materials;
   oxygenPacksCount.textContent = inventory.oxygenPacks;
   survivalKitsCount.textContent = inventory.survivalKits;
+  pistolStatus.textContent = inventory.laserPistol ? 'felvéve' : 'nincs';
   missionObjective.textContent = inventory.materials < MATERIALS_GOAL
     ? `Anyaggyűjtés: ${inventory.materials} / ${MATERIALS_GOAL}`
     : 'Térj vissza a jelölt leszállóhelyre!';
@@ -278,6 +283,22 @@ function collectItem(mesh) {
 }
 
 function attemptInteract() {
+  const result = baseArmory.interact(camera.position);
+  if (result) {
+    const messages = {
+      activated: 'Bázisajtó: a keret zöldre váltott. Újabb E: tápellátás.',
+      powered: 'Bázisajtó: folyamatos zöld fény. Újabb E: nyitás.',
+      opening: 'Bázisajtó nyitása. Egy lézerpisztoly van a rekeszben!',
+      pistol: 'Lézerpisztoly felvéve! A fegyver a készletedben van.',
+    };
+    if (messages[result]) log(messages[result], '#88ffb7');
+    if (result === 'pistol') {
+      inventory.laserPistol = true;
+      updateHud();
+    }
+    updateInteractionHint();
+    return;
+  }
   tempVector.copy(controls.getObject().position);
   let nearest = null;
   let nearestDistance = 6;
@@ -289,6 +310,12 @@ function attemptInteract() {
     }
   }
   if (nearest) collectItem(nearest);
+}
+
+function updateInteractionHint() {
+  const text = missionState === 'running' && controls.isLocked ? baseArmory.prompt(camera.position) : '';
+  if (interactionHint.textContent !== text) interactionHint.textContent = text;
+  interactionHint.hidden = !text;
 }
 
 function updateCollectibles(delta) {
@@ -380,6 +407,7 @@ function animate() {
   renderQuality.update(frameDelta);
   // Preserve real-time speed below 20 FPS while keeping physics steps stable.
   const delta = Math.min(frameDelta, 0.2);
+  baseArmory.update(delta);
   dropBot.update(delta);
   const steps = Math.max(1, Math.ceil(delta / 0.025));
   for (let step = 0; step < steps; step += 1) handleMovement(delta / steps);
@@ -391,6 +419,7 @@ function animate() {
   updateCollectibles(delta);
   updateLights();
   degradeVitals(delta);
+  updateInteractionHint();
 
   renderer.render(scene, camera);
 }
@@ -474,6 +503,7 @@ function setupEventListeners() {
   });
 
   controls.addEventListener('unlock', () => {
+    interactionHint.hidden = true;
     if (missionState === 'running') {
       missionState = 'paused';
       overlayTitle.textContent = 'Küldetés szüneteltetve';
@@ -507,7 +537,9 @@ export async function prepareMission(report) {
   scene.add(remoteLandingSite.root);
   controls.getObject().position.set(basePosition.x, terrainHeightAt(basePosition.x, basePosition.z) + EYE_HEIGHT, basePosition.z);
   await report(35, 'Holdbázis és felszerelések összeállítása…');
-  structureColliders.push(...createWreckedBase(scene, terrainHeightAt));
+  const outpost = createWreckedBase(scene, terrainHeightAt);
+  structureColliders.push(...outpost.colliders);
+  baseArmory = outpost.armory;
   starField = createStarField();
   earthSky = createEarthSky();
   scene.add(earthSky.root);

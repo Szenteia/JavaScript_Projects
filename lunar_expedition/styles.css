@@ -221,6 +221,23 @@ canvas#experience {
 #droneStatus { color: #79e89a; }
 #droneStatus[data-state="alert"] { color: #ff987d; }
 
+.interaction-hint {
+  position: fixed;
+  bottom: 8%;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: calc(100vw - 2rem);
+  width: max-content;
+  padding: 0.75rem 1rem;
+  border: 1px solid #48ef87;
+  border-radius: 8px;
+  background: var(--panel-bg);
+  color: #a8ffc9;
+  text-align: center;
+  pointer-events: none;
+  z-index: 5;
+}
+
 .hud__log li {
   color: var(--success);
   font-family: 'Orbitron', sans-serif;

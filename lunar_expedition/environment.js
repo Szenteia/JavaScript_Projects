@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { createBaseArmory } from './base-armory.js';
 
 const hull = new THREE.MeshStandardMaterial({ color: 0xa7a9a2, metalness: 0.62, roughness: 0.55 });
 const scarred = new THREE.MeshStandardMaterial({ color: 0x4b4b48, metalness: 0.48, roughness: 0.85 });
@@ -57,6 +58,7 @@ function landingPad(scene, heightAt) {
 
 function habitat(scene, heightAt, x, z, damaged) {
   const site = place(scene, heightAt, x, z);
+  if (!damaged) site.name = 'starting-habitat';
   site.rotation.y = damaged ? -0.4 : 0.35;
   if (damaged) site.rotation.z = 0.11;
   const body = add(site, new THREE.CylinderGeometry(4.2, 4.2, 14, 16, 1), damaged ? scarred : hull, 0, 4.7, 0);
@@ -69,8 +71,10 @@ function habitat(scene, heightAt, x, z, damaged) {
     box(site, dark, 2.4, 1.45, 0.18, 3.95, 5.6, depth).rotation.y = Math.PI / 2;
   }
   add(site, new THREE.CylinderGeometry(3.75, 3.75, 0.5, 16), dark, 0, 4.7, -7.2).rotation.x = Math.PI / 2;
-  box(site, hull, 3.1, 3.9, 0.45, 0, 3.9, -7.6);
-  box(site, dark, 2.2, 3, 0.5, 0, 3.85, -7.9);
+  if (damaged) {
+    box(site, hull, 3.1, 3.9, 0.45, 0, 3.9, -7.6);
+    box(site, dark, 2.2, 3, 0.5, 0, 3.85, -7.9);
+  }
   for (const side of [-1, 1]) {
     strut(site, [side * 3.6, 3.7, -5], [side * 5.3, 0.4, -5], 0.18);
     strut(site, [side * 3.6, 3.7, 5], [side * 5.3, 0.4, 5], 0.18);
@@ -223,5 +227,7 @@ export function createWreckedBase(scene, heightAt) {
   }
   scene.add(root);
   scatterDebris(scene, heightAt, colliders);
-  return colliders;
+  // Attach moving parts after batching so they retain independent transforms.
+  const armory = createBaseArmory(root.getObjectByName('starting-habitat'));
+  return { colliders, armory };
 }

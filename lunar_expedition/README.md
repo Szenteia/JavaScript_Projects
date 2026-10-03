@@ -41,11 +41,24 @@ The fleet shares a 64-hazard pool rendered with two instanced draws; hull geomet
 
 A detailed four-rotor scanner drone follows a lawnmower route: 17 parallel lanes spaced 22 units apart, with randomized orientation, offset, direction and initial waypoint each mission. A green cone, actual unshadowed spotlight and terrain-conforming footprint show its 18-unit ground scan radius (1.5 times the previous 12); detection narrows at higher player positions and uses a raycast so the terrain and solid outpost parts block sight. The first unobstructed contact records the position and triggers ALERT immediately in the same update, without a pending stage or delay. The drone hovers, its sensor flashes red, and the HUD/log show the alert. A single `lunar:drone-alert` browser event provides `{ position, time }` for later attack systems; no attacks or drone damage are implemented in this version.
 
-- Click **Launch Expedition** to lock the mouse. Press **Esc** to pause.
+- Click **Küldetés indítása** to lock the mouse. Press **Esc** to pause.
 - **W / S**: forward / backward; **A / D**: strafe left / right. Arrow keys work too. Mouse: look; **Space**: jump.
 - **E**: collect the nearest supply within range.
 - **Q**: use one oxygen pack; **F**: use one survival kit.
 - Once you have eight materials, return to the marked landing pad and orange beacon.
+
+## Base armory
+
+The intact habitat beside the starting pad (28, 18) has an equipment recess in its original rectangular front doorway. Approach its front, then press and release **E** three times: the outer frame turns green, becomes steadily emissive green, then the door slides upward over 1.2 active seconds. A contextual Hungarian prompt shows each step. After it opens, another **E** picks up the laser pistol once and records it in the inventory HUD. Holding E does not advance multiple steps. Pausing freezes the opening animation; a new mission resets the door and weapon.
+
+The pistol has a metal receiver, ribbed angled grip, trigger guard, copper cooling fins, cyan power cell strips, sights and a recessed laser emitter. Its geometry is batched into four materials and prepared during mission loading. The recess is accessible from outside the existing solid-habitat collider; the habitat remains sealed. Moving parts and the pistol do not cast stale baked shadows. This version implements acquisition only, with no firing, damage or ammunition mechanics.
+
+Armory regression checks (Node.js 22+; run from this folder):
+
+```sh
+npm install --no-save --package-lock=false three@0.161.0
+node --test tests/base-armory.test.mjs
+```
 
 ## Next steps
 
