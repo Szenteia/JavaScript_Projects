@@ -65,8 +65,10 @@ function createHorizon(material) {
       const blend = THREE.MathUtils.smoothstep(edge, 400, 650);
       const ridge = 14 + noise(x * 0.006, z * 0.006) * 32 + noise(x * 0.018, z * 0.018) * 8;
       positions.push(x, THREE.MathUtils.lerp(heightAtPoint(x, z), ridge, blend), z);
-      const shade = 0.20 + noise(x * 0.015, z * 0.015) * 0.07;
-      colors.push(shade, shade, shade * 1.02);
+      // Fade from the map edge into almost-black, cold distant silhouettes.
+      const variation = noise(x * 0.015, z * 0.015);
+      const shade = THREE.MathUtils.lerp(0.10 + variation * 0.025, 0.018 + variation * 0.008, blend);
+      colors.push(shade * 0.85, shade * 0.92, shade);
     }
   }
   for (let ring = 0; ring < radii.length - 1; ring += 1) {
