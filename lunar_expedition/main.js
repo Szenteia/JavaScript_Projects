@@ -114,19 +114,19 @@ function updateHud() {
   oxygenPacksCount.textContent = inventory.oxygenPacks;
   survivalKitsCount.textContent = inventory.survivalKits;
   missionObjective.textContent = inventory.materials < MATERIALS_GOAL
-    ? `Collect materials: ${inventory.materials} / ${MATERIALS_GOAL}`
-    : 'Return to the marked landing pad!';
+    ? `Anyaggyűjtés: ${inventory.materials} / ${MATERIALS_GOAL}`
+    : 'Térj vissza a jelölt leszállóhelyre!';
 }
 
 function finishMission(won) {
   if (missionState !== 'running') return;
   missionState = won ? 'won' : 'lost';
-  overlayTitle.textContent = won ? 'Mission accomplished!' : 'Expedition failed';
+  overlayTitle.textContent = won ? 'Sikeres küldetés!' : 'Sikertelen küldetés';
   overlayMessage.textContent = won
-    ? `You brought ${inventory.materials} materials safely back to base.`
-    : 'Your suit integrity reached zero. Give the expedition another try.';
+    ? `${inventory.materials} anyagot hoztál vissza épségben a bázisra.`
+    : 'A ruha integritása elfogyott. Próbáld újra a küldetést!';
   controlsHelp.hidden = true;
-  startButton.textContent = 'New expedition';
+  startButton.textContent = 'Új küldetés';
   overlay.classList.add('active');
   controls.unlock();
 }
@@ -135,7 +135,7 @@ function useOxygenPack() {
   if (missionState !== 'running' || inventory.oxygenPacks === 0 || oxygen >= 100) return;
   inventory.oxygenPacks -= 1;
   oxygen = Math.min(100, oxygen + 55);
-  log('Used an O₂ pack!', '#7ae3ff');
+  log('O₂-palack felhasználva!', '#7ae3ff');
   updateHud();
 }
 
@@ -143,7 +143,7 @@ function useSurvivalKit() {
   if (missionState !== 'running' || inventory.survivalKits === 0 || health >= 100) return;
   inventory.survivalKits -= 1;
   health = Math.min(100, health + 35);
-  log('Used a repair kit: restored up to 35% suit integrity!', '#88ffb7');
+  log('Javítókészlet felhasználva: legfeljebb 35 pont integritás helyreállítva!', '#88ffb7');
   updateHud();
 }
 
@@ -260,17 +260,17 @@ function collectItem(mesh) {
       break;
     case 'oxygen':
       inventory.oxygenPacks += 1;
-      label = 'O₂ gas pack';
+      label = 'O₂-palack';
       break;
     case 'survival':
       inventory.survivalKits += 1;
-      label = 'suit repair kit (F)';
+      label = 'javítókészlet (F)';
       break;
     default:
       break;
   }
 
-  log(`Collected ${label}!`);
+  log(`Felvéve: ${label}!`);
   updateHud();
 
   scene.remove(mesh);
@@ -361,7 +361,7 @@ function handleMovement(delta) {
   const damage = dropBot.contactDamage(position, EYE_HEIGHT);
   if (damage) {
     health = Math.max(0, health - damage);
-    log(`Caltrops puncture! −${damage}% suit integrity. Use F to repair.`, '#ff987d');
+    log(`Szöges akadály! −${damage} pont integritás. Javítás: F.`, '#ff987d');
     updateHud();
     if (health <= 0) finishMission(false);
   }
@@ -476,9 +476,9 @@ function setupEventListeners() {
   controls.addEventListener('unlock', () => {
     if (missionState === 'running') {
       missionState = 'paused';
-      overlayTitle.textContent = 'Expedition paused';
-      overlayMessage.textContent = 'Return to the surface when you are ready.';
-      startButton.textContent = 'Resume expedition';
+      overlayTitle.textContent = 'Küldetés szüneteltetve';
+      overlayMessage.textContent = 'Folytasd a küldetést, amikor készen állsz.';
+      startButton.textContent = 'Küldetés folytatása';
     }
     keys.forward = keys.backward = keys.left = keys.right = false;
     overlay.classList.add('active');
@@ -525,20 +525,20 @@ export async function prepareMission(report) {
       if (index !== -1) collectibles.splice(index, 1);
     },
     onDrop: (type) => log(type === 'material'
-      ? 'Drop-Bot ejected salvage. Collect it with E.'
-      : 'Drop-Bot ejected caltrops! Watch your step.', type === 'material' ? '#88ffb7' : '#ff987d'),
+      ? 'A Drop-Bot anyagot dobott ki. Felvétel: E.'
+      : 'A Drop-Bot szöges akadályt dobott ki! Vigyázz, hová lépsz.', type === 'material' ? '#88ffb7' : '#ff987d'),
   });
   scene.add(dropBot.root);
   structureColliders.push(...dropBot.colliders);
-  log(`${dropBot.count} Drop-Bots patrol the surface. Green eyes: material; red eyes: caltrops. F repairs your suit.`);
+  log(`${dropBot.count} Drop-Bot járőrözik. Zöld szem: anyag; piros: szöges akadály. Javítás: F.`);
   scene.updateMatrixWorld(true);
   scannerDrone = createScannerDrone({
     heightAt: terrainHeightAt,
     occluders: [terrain.mesh, scene.getObjectByName('static-outpost')],
     onState: (state) => {
-      droneStatus.textContent = 'DRONE: ALERT';
+      droneStatus.textContent = 'DRÓN: RIASZTÁS';
       droneStatus.dataset.state = state;
-      log('DRONE ALERT — your position has been marked.', '#ff987d');
+      log('DRÓNRIASZTÁS — a helyzetedet megjelölték.', '#ff987d');
     },
     onAlert: (detail) => {
       // Future attack systems can subscribe; this version stops at the alert.
