@@ -37,23 +37,27 @@
   </div>
 
   <div id="hud" class="hud">
-    <div class="hud__panel">
-      <h2>Állapot</h2>
-      <div class="hud__stat">
-        <span>O<sub>2</sub></span>
-        <div class="hud__bar">
-          <div id="oxygenBar" class="hud__bar-fill"></div>
+    <section class="visor-display" aria-label="Űrruha állapota">
+      <div class="visor-display__header"><span class="visor-display__led" aria-hidden="true"></span>Életfenntartás</div>
+      <div class="visor-display__readings">
+        <div id="oxygenReadout" class="visor-reading visor-reading--oxygen">
+          <div class="visor-reading__top">
+            <svg class="visor-reading__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M9 5V2h6v3M8 5h8a2 2 0 0 1 2 2v12a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3V7a2 2 0 0 1 2-2Z"/><path d="M6 10h12M6 17h12M10 13h4"/></svg>
+            <span id="oxygenLabel" class="visor-reading__value">100%</span>
+          </div>
+          <div class="visor-reading__label">O<sub>2</sub><span class="visor-reading__key">Q</span></div>
+          <div id="oxygenMeter" class="visor-reading__meter" role="meter" aria-label="O₂" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><div id="oxygenBar" class="visor-reading__fill"></div></div>
         </div>
-        <span id="oxygenLabel">100%</span>
-      </div>
-      <div class="hud__stat">
-        <span>Ruha állapota</span>
-        <div class="hud__bar">
-          <div id="healthBar" class="hud__bar-fill hud__bar-fill--health"></div>
+        <div id="healthReadout" class="visor-reading visor-reading--health">
+          <div class="visor-reading__top">
+            <svg class="visor-reading__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m12 2 8 3v6c0 5-3.5 8.5-8 11-4.5-2.5-8-6-8-11V5l8-3Z"/><path d="m8 12 2.5 2.5L16 9"/></svg>
+            <span id="healthLabel" class="visor-reading__value">100%</span>
+          </div>
+          <div class="visor-reading__label">Ruha állapota<span class="visor-reading__key">F</span></div>
+          <div id="healthMeter" class="visor-reading__meter" role="meter" aria-label="Ruha állapota" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><div id="healthBar" class="visor-reading__fill"></div></div>
         </div>
-        <span id="healthLabel">100%</span>
       </div>
-    </div>
+    </section>
     <div class="hud__panel">
       <h2>Készlet</h2>
       <ul class="hud__list">
