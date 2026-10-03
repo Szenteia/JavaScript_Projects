@@ -9,6 +9,7 @@ import { createSkyEvents } from './sky-events.js';
 import { createRenderQuality } from './render-quality.js';
 import { createDropBotSystem } from './drop-bot.js';
 import { createScannerDrone } from './scanner-drone.js';
+import { createRemoteLandingSite } from './landing-site.js';
 
 const canvas = document.getElementById('experience');
 const overlay = document.getElementById('overlay');
@@ -62,6 +63,7 @@ let earthSky;
 let skyEvents;
 let dropBot;
 let scannerDrone;
+let remoteLandingSite;
 let starField;
 
 const clock = new THREE.Clock();
@@ -382,6 +384,7 @@ function animate() {
   const steps = Math.max(1, Math.ceil(delta / 0.025));
   for (let step = 0; step < steps; step += 1) handleMovement(delta / steps);
   if (missionState === 'running') scannerDrone.update(delta, camera.position);
+  remoteLandingSite.update(camera.position);
   earthSky.update(delta, camera.position);
   skyEvents.update(delta, missionState === 'running' && controls.isLocked);
   starField.position.copy(camera.position);
@@ -500,6 +503,8 @@ export async function prepareMission(report) {
   terrainHeightAt = terrain.heightAt;
   scene.add(terrain.mesh);
   scene.add(terrain.horizon);
+  remoteLandingSite = createRemoteLandingSite(terrainHeightAt);
+  scene.add(remoteLandingSite.root);
   controls.getObject().position.set(basePosition.x, terrainHeightAt(basePosition.x, basePosition.z) + EYE_HEIGHT, basePosition.z);
   await report(35, 'Holdbázis és felszerelések összeállítása…');
   structureColliders.push(...createWreckedBase(scene, terrainHeightAt));
@@ -559,6 +564,7 @@ export async function prepareMission(report) {
   // Include future visitors so their first appearance does not compile a new shader.
   skyEvents.root.children.forEach((visitor) => { visitor.visible = true; });
   dropBot.setPreloading(true);
+  remoteLandingSite.setPreloading(true);
   const culling = new Map();
   scene.traverse((object) => {
     if (object.isMesh || object.isPoints) {
@@ -574,6 +580,7 @@ export async function prepareMission(report) {
     culling.forEach((value, object) => { object.frustumCulled = value; });
     skyEvents.root.children.forEach((visitor) => { visitor.visible = false; });
     dropBot.setPreloading(false);
+    remoteLandingSite.setPreloading(false);
   }
   renderer.render(scene, camera);
   await report(100, 'A misszió készen áll.');

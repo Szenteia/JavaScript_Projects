@@ -33,6 +33,8 @@ Open `http://localhost:8000`. The browser needs access to jsDelivr for Three.js 
 
 ## Controls
 
+A small abandoned landing site sits near the Earth-facing edge at (-104, -360). Its 17-unit diameter is roughly twice the scanner drone's full footprint. A dark, terrain-conforming surface and faint rim become visible only within 32 units, fading to full visibility within 18. It adds two draws when nearby, with no beacon, map marker, new lights or mission reward. The named `remote-landing-site` anchor is reserved for a future curious event; this version has no trigger. Its geometry and shaders are warmed behind the loading screen.
+
 Each mission places 5–8 Drop-Bots randomly on safe, separated patrol loops. Their patrol radii are 32–48 world units (previously 8–12), and they move at 3.6 world units/second (four times the previous 0.9) and eject every 10 seconds after staggered initial delays. Each shuffled ten-drop sequence contains exactly seven caltrops and three materials. Sensor eyes flash green for material or red for caltrops for one active second, then return to cyan. E pickup, F repair (+35), caltrops damage (18 with a shared two-second cooldown) and jump avoidance continue to work.
 
 The fleet shares a 64-hazard pool rendered with two instanced draws; hull geometry stays shared while each robot has its own sensor material. Extra materials expire after 60 active seconds (at most 18 across the fleet); hazards expire after 90 seconds, with the oldest recycled if necessary. No new dynamic shadows are generated. Robot timers and scan detection pause with the mission.
