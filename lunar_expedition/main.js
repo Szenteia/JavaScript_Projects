@@ -116,6 +116,10 @@ function updateHud() {
   oxygenLabel.textContent = `${oxygen.toFixed(0)}%`;
   healthBar.style.width = `${health.toFixed(0)}%`;
   healthLabel.textContent = `${health.toFixed(0)}%`;
+  document.getElementById('oxygenMeter').setAttribute('aria-valuenow', Math.round(oxygen));
+  document.getElementById('healthMeter').setAttribute('aria-valuenow', Math.round(health));
+  document.getElementById('oxygenReadout').dataset.level = oxygen <= 25 ? 'low' : 'normal';
+  document.getElementById('healthReadout').dataset.level = health <= 25 ? 'low' : 'normal';
   materialsCount.textContent = inventory.materials;
   oxygenPacksCount.textContent = inventory.oxygenPacks;
   survivalKitsCount.textContent = inventory.survivalKits;

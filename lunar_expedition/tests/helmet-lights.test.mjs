@@ -3,6 +3,17 @@ import assert from 'node:assert/strict';
 import * as THREE from 'three';
 import { createHelmetLights } from '../helmet-lights.js';
 
+test('visor light fittings are thin strips rather than projecting barrels', () => {
+  const camera = new THREE.PerspectiveCamera(72, 16 / 9, 0.1, 1200);
+  const helmet = createHelmetLights(camera);
+  camera.updateMatrixWorld(true);
+  for (const housing of helmet.root.children.filter((part) => part.isGroup)) {
+    const size = new THREE.Box3().setFromObject(housing).getSize(new THREE.Vector3());
+    assert.ok(size.z < 0.006);
+    assert.ok(size.x > size.y * 2.5);
+  }
+});
+
 test('both short-range beams follow camera translation and rotation', () => {
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(72, 16 / 9, 0.1, 1200);
