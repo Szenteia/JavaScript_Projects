@@ -49,82 +49,140 @@ function createModel() {
   group.traverse((mesh) => { if (mesh.isMesh) mesh.geometry.dispose(); });
   const lamp = new THREE.MeshBasicMaterial({ color: 0x46ff77 });
   const lens = new THREE.Mesh(new THREE.SphereGeometry(0.3, 12, 8), lamp);
+  lens.name = 'scanner-sensor';
   lens.position.set(0, -1.15, -0.4); model.add(lens);
   const rotors = new THREE.InstancedMesh(new THREE.BoxGeometry(2.2, 0.07, 0.18), black, 4);
   rotors.instanceMatrix.setUsage(THREE.DynamicDrawUsage); model.add(rotors);
   return { model, lamp, rotors };
 }
 
-export function createScannerDrone({ heightAt, occluders = [], random = Math.random, onState = () => {}, onAlert = () => {} }) {
+const SCAN_RADIUS = 18;
+const ALTITUDE = 24;
+const ALERT_SCALE = Math.sqrt(1.5); // Area, rather than radius, grows by 50%.
+const DESCENT_TIME = 4;
+
+export function createScannerDrone({ heightAt, occluders = [], random = Math.random, onState = () => {}, onAlert = () => {}, onDamage = () => {} }) {
   const root = new THREE.Group(); root.name = 'scanner-system';
-  const { model, lamp, rotors } = createModel(); root.add(model);
-  const radius = 18, altitude = 24;
-  const beamMaterial = new THREE.MeshBasicMaterial({ color: 0x39ff70, transparent: true, opacity: 0.055, depthWrite: false, side: THREE.DoubleSide });
-  const beam = new THREE.Mesh(new THREE.CylinderGeometry(0, radius, 1, 32, 1, true), beamMaterial); root.add(beam);
-  const footprintGeometry = new THREE.CircleGeometry(radius, 48); footprintGeometry.rotateX(-Math.PI / 2);
-  const footprint = new THREE.Mesh(footprintGeometry, new THREE.MeshBasicMaterial({ color: 0x46ff77, transparent: true, opacity: 0.18, depthWrite: false }));
-  root.add(footprint);
-  const light = new THREE.SpotLight(0x39ff70, 35, 45, Math.atan(radius / altitude), 0.35, 1);
-  light.castShadow = false; root.add(light); root.add(light.target);
-  const point = footprintGeometry.attributes.position;
-  const ray = new THREE.Raycaster(), direction = new THREE.Vector3(), dummy = new THREE.Object3D();
-  const lastContact = new THREE.Vector3();
+  const template = createModel();
   const route = createScanRoute(random);
-  let target = Math.floor(random() * route.length), elapsed = 0;
-  let state = 'scanning';
-  model.position.copy(route[target]);
-  target = (target + 1) % route.length;
-  function setState(next) { state = next; root.userData.state = next; onState(next); }
+  const alertRoute = route.map((point) => point.clone().multiplyScalar(ALERT_SCALE));
+  const start = Math.floor(random() * route.length);
+  const ray = new THREE.Raycaster(), direction = new THREE.Vector3(), dummy = new THREE.Object3D();
+  let elapsed = 0, alertTime = 0, damageCooldown = 0, state = 'scanning';
+  let preloading = false;
+
+  const drones = Array.from({ length: 4 }, (_, index) => {
+    const group = new THREE.Group(); group.name = `scanner-unit-${index + 1}`; root.add(group);
+    const model = index === 0 ? template.model : template.model.clone();
+    // Hull geometry/materials are shared; each sensor and rotor matrix is independent.
+    const lamp = template.lamp.clone();
+    model.getObjectByName('scanner-sensor').material = lamp;
+    const rotors = model.children.find((part) => part.isInstancedMesh);
+    group.add(model);
+    const beam = new THREE.Mesh(new THREE.CylinderGeometry(0, SCAN_RADIUS, 1, 32, 1, true),
+      new THREE.MeshBasicMaterial({ color: 0x39ff70, transparent: true, opacity: 0.055, depthWrite: false, side: THREE.DoubleSide }));
+    group.add(beam);
+    const geometry = new THREE.CircleGeometry(SCAN_RADIUS, 48); geometry.rotateX(-Math.PI / 2);
+    const footprint = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ color: 0x46ff77, transparent: true, opacity: 0.18, depthWrite: false }));
+    group.add(footprint);
+    const light = new THREE.SpotLight(0x39ff70, 0, 110, Math.atan(SCAN_RADIUS / ALTITUDE), 0.35, 1);
+    light.castShadow = false;
+    // Keep all four lights in the scene to prepare the alert shaders at startup.
+    root.add(light, light.target);
+    const waypoint = (start + index * Math.floor(route.length / 4)) % route.length;
+    model.position.copy(route[waypoint]);
+    return { group, model, lamp, rotors, beam, footprint, light,
+      target: (waypoint + 1) % route.length, basePoints: geometry.attributes.position.array.slice() };
+  });
+
+  function beginAlert(position) {
+    state = 'alert'; alertTime = elapsed; root.userData.state = state;
+    for (const [index, drone] of drones.entries()) {
+      if (index > 0) drone.model.position.copy(alertRoute[(drone.target + alertRoute.length - 1) % alertRoute.length]);
+      drone.lamp.color.setHex(0xff3434);
+      drone.beam.material.color.setHex(0xff3434);
+      drone.footprint.material.color.setHex(0xff3434);
+      drone.light.color.setHex(0xff3434);
+    }
+    onState(state);
+    onAlert({ position: position.clone(), time: elapsed });
+  }
+
+  function updateDrone(drone, index, delta) {
+    const active = state === 'alert' || index === 0;
+    drone.group.visible = active || preloading;
+    drone.light.intensity = active ? 35 : 0;
+    if (!active && !preloading) return;
+    const path = state === 'alert' ? alertRoute : route;
+    let remaining = delta * (state === 'alert' ? 23 : 20);
+    while (remaining > 0) {
+      direction.copy(path[drone.target]).sub(drone.model.position); direction.y = 0;
+      const distance = direction.length();
+      if (distance <= remaining) {
+        drone.model.position.x = path[drone.target].x; drone.model.position.z = path[drone.target].z;
+        remaining -= distance; drone.target = (drone.target + 1) % path.length;
+      } else { direction.multiplyScalar(remaining / distance); drone.model.position.add(direction); remaining = 0; }
+    }
+    if (delta > 0) drone.model.rotation.y = Math.atan2(-direction.x, -direction.z);
+    const ground = heightAt(drone.model.position.x, drone.model.position.z);
+    const descent = index > 0 && state === 'alert' ? 48 * (1 - Math.min(1, (elapsed - alertTime) / DESCENT_TIME)) : 0;
+    drone.model.position.y = ground + ALTITUDE + descent + Math.sin(elapsed * 1.4 + index) * 0.35;
+    let rotor = 0;
+    for (const x of [-2.7, 2.7]) for (const z of [-2.7, 2.7]) {
+      dummy.position.set(x, 0.15, z); dummy.rotation.set(0, elapsed * 28 * (rotor % 2 ? -1 : 1), 0); dummy.updateMatrix();
+      drone.rotors.setMatrixAt(rotor++, dummy.matrix);
+    }
+    drone.rotors.instanceMatrix.needsUpdate = true;
+    const scale = state === 'alert' ? ALERT_SCALE : 1;
+    const height = drone.model.position.y - ground;
+    drone.beam.position.set(drone.model.position.x, (ground + drone.model.position.y) / 2, drone.model.position.z);
+    drone.beam.scale.set(scale, height, scale);
+    drone.footprint.position.set(drone.model.position.x, ground + 0.1, drone.model.position.z);
+    const point = drone.footprint.geometry.attributes.position;
+    for (let vertex = 0; vertex < point.count; vertex += 1) {
+      const x = drone.basePoints[vertex * 3] * scale, z = drone.basePoints[vertex * 3 + 2] * scale;
+      point.setXYZ(vertex, x, heightAt(drone.model.position.x + x, drone.model.position.z + z) - ground, z);
+    }
+    point.needsUpdate = true; drone.footprint.geometry.computeBoundingSphere();
+    drone.light.position.copy(drone.model.position); drone.light.target.position.copy(drone.footprint.position);
+    drone.light.angle = Math.atan(SCAN_RADIUS * scale / height);
+    if (state === 'alert') drone.lamp.color.setRGB(1, 0.05 + (Math.sin(elapsed * 8) + 1) * 0.08, 0.05);
+  }
+
+  function seesPlayer(drone, position) {
+    const ground = heightAt(drone.model.position.x, drone.model.position.z);
+    const height = drone.model.position.y - ground;
+    const playerHeight = position.y - ground;
+    const radius = SCAN_RADIUS * (state === 'alert' ? ALERT_SCALE : 1) * Math.max(0, 1 - playerHeight / height);
+    if (playerHeight < 0 || playerHeight >= height || Math.hypot(position.x - drone.model.position.x, position.z - drone.model.position.z) >= radius) return false;
+    direction.copy(position).sub(drone.model.position);
+    const distance = direction.length();
+    ray.set(drone.model.position, direction.normalize()); ray.far = Math.max(0, distance - 0.25);
+    return ray.intersectObjects(occluders, true).length === 0;
+  }
+
   function update(delta, playerPosition) {
     elapsed += delta;
-    if (state !== 'alert') {
-      let remaining = delta * 20;
-      while (remaining > 0) {
-        direction.copy(route[target]).sub(model.position); direction.y = 0;
-        const distance = direction.length();
-        if (distance <= remaining) {
-          model.position.x = route[target].x; model.position.z = route[target].z;
-          remaining -= distance; target = (target + 1) % route.length;
-        } else { direction.multiplyScalar(remaining / distance); model.position.add(direction); remaining = 0; }
-      }
-      model.rotation.y = Math.atan2(-direction.x, -direction.z);
+    damageCooldown = Math.max(0, damageCooldown - delta);
+    drones.forEach((drone, index) => updateDrone(drone, index, delta));
+    if (state === 'scanning' && playerPosition && seesPlayer(drones[0], playerPosition)) {
+      beginAlert(playerPosition);
+      drones.forEach((drone, index) => updateDrone(drone, index, 0));
     }
-    const ground = heightAt(model.position.x, model.position.z);
-    model.position.y = ground + altitude + Math.sin(elapsed * 1.4) * 0.35;
-    let i = 0;
-    for (const x of [-2.7, 2.7]) for (const z of [-2.7, 2.7]) {
-      dummy.position.set(x, 0.15, z); dummy.rotation.set(0, elapsed * 28 * (i % 2 ? -1 : 1), 0); dummy.updateMatrix();
-      rotors.setMatrixAt(i++, dummy.matrix);
+    if (state === 'alert' && playerPosition) {
+      const exposed = drones.some((drone) => seesPlayer(drone, playerPosition));
+      if (exposed && damageCooldown <= 0) {
+        damageCooldown = 1;
+        onDamage(10);
+      } else if (!exposed) damageCooldown = 0;
     }
-    rotors.instanceMatrix.needsUpdate = true;
-    beam.position.set(model.position.x, (ground + model.position.y) / 2, model.position.z);
-    beam.scale.y = model.position.y - ground;
-    footprint.position.set(model.position.x, ground + 0.1, model.position.z);
-    for (let v = 0; v < point.count; v += 1) {
-      point.setY(v, heightAt(model.position.x + point.getX(v), model.position.z + point.getZ(v)) - ground);
-    }
-    point.needsUpdate = true; footprintGeometry.computeBoundingSphere();
-    light.position.copy(model.position); light.target.position.copy(footprint.position);
-    if (state === 'scanning' && playerPosition) {
-      const feetAboveGround = playerPosition.y - heightAt(playerPosition.x, playerPosition.z);
-      // Cone narrows with height: a jumping player must still be inside the real beam.
-      const detectionRadius = radius * Math.max(0, 1 - feetAboveGround / (model.position.y - ground));
-      if (feetAboveGround >= 0 && feetAboveGround < altitude && Math.hypot(playerPosition.x - model.position.x, playerPosition.z - model.position.z) < detectionRadius) {
-        direction.copy(playerPosition).sub(model.position); const distance = direction.length();
-        ray.set(model.position, direction.normalize()); ray.far = Math.max(0, distance - 0.25);
-        if (!ray.intersectObjects(occluders, true).length) {
-          lastContact.copy(playerPosition);
-          setState('alert'); lamp.color.set(0xff3434);
-          onAlert({ position: lastContact.clone(), time: elapsed });
-        }
-      }
-    }
-    beam.visible = footprint.visible = state !== 'alert';
-    // Preserve the light count so ALERT does not trigger fresh shader variants.
-    light.intensity = state === 'alert' ? 0 : 35;
-    if (state === 'alert') lamp.color.setRGB(1, 0.05 + (Math.sin(elapsed * 8) + 1) * 0.08, 0.05);
   }
   root.userData.state = state;
   update(0);
-  return { root, update, get state() { return state; } };
+  return { root, update, get state() { return state; },
+    setPreloading(value) {
+      preloading = value;
+      drones.forEach((drone, index) => updateDrone(drone, index, 0));
+    },
+  };
 }

@@ -41,7 +41,11 @@ Each mission places 5–8 Drop-Bots randomly on safe, separated patrol loops. Th
 
 The fleet shares a 64-hazard pool rendered with two instanced draws; hull geometry stays shared while each robot has its own sensor material. Extra materials expire after 60 active seconds (at most 18 across the fleet); hazards expire after 90 seconds, with the oldest recycled if necessary. No new dynamic shadows are generated. Robot timers and scan detection pause with the mission.
 
-A detailed four-rotor scanner drone follows a lawnmower route: 17 parallel lanes spaced 22 units apart, with randomized orientation, offset, direction and initial waypoint each mission. A green cone, actual unshadowed spotlight and terrain-conforming footprint show its 18-unit ground scan radius (1.5 times the previous 12); detection narrows at higher player positions and uses a raycast so the terrain and solid outpost parts block sight. The first unobstructed contact records the position and triggers ALERT immediately in the same update, without a pending stage or delay. The drone hovers, its sensor flashes red, and the HUD/log show the alert. A single `lunar:drone-alert` browser event provides `{ position, time }` for later attack systems; no attacks or drone damage are implemented in this version.
+A detailed four-rotor scanner drone initially follows a lawnmower route: 17 parallel lanes spaced 22 units apart, with randomized orientation, offset, direction and initial waypoint each mission. Its green light scans an 18-unit ground radius at 20 units/second. The first unobstructed contact immediately triggers ALERT, summons three reinforcements descending from 72 to 24 units over four active seconds, and turns all four beams, ground footprints, spotlights and sensors red. The original drone keeps moving rather than stopping.
+
+The alert fleet patrols at 23 units/second (+15%). Both patrol coverage and each ground scan area expand by 50%, using a radius/route scale of sqrt(1.5), not a 50% radius increase. Phase-separated waypoints spread the four patrols across the field. The red light deals 10 suit-integrity damage immediately on contact and once per active second while exposed. All overlapping beams share one damage interval; leaving cover and entering a beam again hits immediately. The same raycast checks terrain and solid outpost cover for detection and damage, and the cone narrows at the player's actual height. Suit failure still ends the mission; F repair remains usable. No weapon firing is added.
+
+All four drone models and beam geometries are created and warmed behind the loading screen. Hull geometries/materials are shared, sensor materials and rotor instance matrices are independent, and only the original unit is visible before alert. Four unshadowed spotlights stay registered from startup to avoid a new light-count shader variant during escalation. This adds three animated drones and terrain-conforming footprint updates after alert, without new shadow maps. Alert, descent, patrol and damage timers stop when the game is paused. The single `lunar:drone-alert` browser event still provides `{ position, time }` once per mission.
 
 - Click **Küldetés indítása** to lock the mouse. Press **Esc** to pause.
 - **W / S**: forward / backward; **A / D**: strafe left / right. Arrow keys work too. Mouse: look; **Space**: jump.
@@ -55,7 +59,7 @@ The intact habitat beside the starting pad (28, 18) has an equipment recess in i
 
 The pistol has a metal receiver, ribbed angled grip, trigger guard, copper cooling fins, cyan power cell strips, sights and a recessed laser emitter. Its geometry is batched into four materials and prepared during mission loading. The recess is accessible from outside the existing solid-habitat collider; the habitat remains sealed. Moving parts and the pistol do not cast stale baked shadows. This version implements acquisition only, with no firing, damage or ammunition mechanics.
 
-Armory and helmet-light regression checks (Node.js 22+; run from this folder):
+Gameplay regression checks (Node.js 22+; run from this folder):
 
 ```sh
 npm install --no-save --package-lock=false three@0.161.0
