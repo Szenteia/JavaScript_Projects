@@ -569,13 +569,19 @@ export async function prepareMission(report) {
     heightAt: terrainHeightAt,
     occluders: [terrain.mesh, scene.getObjectByName('static-outpost')],
     onState: (state) => {
-      droneStatus.textContent = 'DRÓN: RIASZTÁS';
+      droneStatus.textContent = 'DRÓN: RIASZTÁS — 4 támadó';
       droneStatus.dataset.state = state;
-      log('DRÓNRIASZTÁS — a helyzetedet megjelölték.', '#ff987d');
+      log('DRÓNRIASZTÁS — három erősítés érkezik! Kerüld a piros fényt.', '#ff987d');
     },
     onAlert: (detail) => {
-      // Future attack systems can subscribe; this version stops at the alert.
       window.dispatchEvent(new CustomEvent('lunar:drone-alert', { detail }));
+    },
+    onDamage: (damage) => {
+      if (missionState !== 'running') return;
+      health = Math.max(0, health - damage);
+      log(`Drónsugár! −${damage} pont integritás. Javítás: F.`, '#ff797b');
+      updateHud();
+      if (health <= 0) finishMission(false);
     },
   });
   scene.add(scannerDrone.root);
@@ -597,6 +603,7 @@ export async function prepareMission(report) {
   // Include future visitors so their first appearance does not compile a new shader.
   skyEvents.root.children.forEach((visitor) => { visitor.visible = true; });
   dropBot.setPreloading(true);
+  scannerDrone.setPreloading(true);
   remoteLandingSite.setPreloading(true);
   const culling = new Map();
   scene.traverse((object) => {
@@ -613,6 +620,7 @@ export async function prepareMission(report) {
     culling.forEach((value, object) => { object.frustumCulled = value; });
     skyEvents.root.children.forEach((visitor) => { visitor.visible = false; });
     dropBot.setPreloading(false);
+    scannerDrone.setPreloading(false);
     remoteLandingSite.setPreloading(false);
   }
   renderer.render(scene, camera);
